@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
-from .database import engine
-from .models import Base
+from .database import Base, engine
+from .models import Cat
 
 app = FastAPI()
 
