@@ -14,7 +14,7 @@ async def get_all_cats(db: Session = Depends(get_db)) -> List[CatApiResponse]:
 
 @router.post("/cats/", response_model=CatApiResponse)
 async def create_cat(cat_data: CreateCatRequest, db: Session = Depends(get_db))->CatApiResponse:
-    new_cat = Cat(**cat_data.dict())
+    new_cat = Cat(**cat_data.model_dump())  # Unpack dictionary to keyword arguments
     db.add(new_cat)
     db.commit()
     db.refresh(new_cat)
@@ -27,4 +27,20 @@ async def get_cat(cat_id: int, db: Session = Depends(get_db)) -> CatApiResponse:
     if not cat:
         raise HTTPException(status_code=404, detail="Cat not found, provide a valid id")
 
+    return cat
+
+@router.put("/cats/{cat_id}", response_model=CatApiResponse)
+async def update_cat(cat_id: int, cat_data: CreateCatRequest, db: Session = Depends(get_db)) -> CatApiResponse:
+    cat = db.query(Cat).filter(Cat.id == cat_id).first()
+
+    if not cat:
+        raise HTTPException(status_code=404, detail="Cat not found, provide a valid id")
+
+    # Update cat fields
+    for key, value in cat_data.model_dump().items():
+        setattr(cat, key, value)
+
+    # Save changes
+    db.commit()
+    db.refresh(cat)
     return cat
