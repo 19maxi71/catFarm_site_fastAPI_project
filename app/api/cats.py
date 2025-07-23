@@ -19,3 +19,12 @@ async def create_cat(cat_data: CreateCatRequest, db: Session = Depends(get_db))-
     db.commit()
     db.refresh(new_cat)
     return new_cat
+
+@router.get("/cats/{cat_id}", response_model=CatApiResponse)
+async def get_cat(cat_id: int, db: Session = Depends(get_db)) -> CatApiResponse:
+    cat = db.query(Cat).filter(Cat.id == cat_id).first()
+
+    if not cat:
+        raise HTTPException(status_code=404, detail="Cat not found, provide a valid id")
+
+    return cat
