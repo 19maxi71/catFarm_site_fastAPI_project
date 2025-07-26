@@ -14,5 +14,5 @@ class Article(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    def __repr__(self):
+    def __repr__(self):  # Transforms the object into a string (for debugging)
         return f'Article(id={self.id}, title={self.title}, published={self.published})'

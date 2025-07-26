@@ -16,5 +16,5 @@ class Cat(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())  # When cat was added
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())  # When cat info was changed
 
-    def __repr__(self):
+    def __repr__(self): # Transforms the object into a string (for debugging)
         return f'Cat(id={self.id}, name={self.name}, role={self.role}, breed={self.breed})'
