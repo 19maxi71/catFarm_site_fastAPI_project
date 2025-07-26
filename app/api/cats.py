@@ -44,3 +44,15 @@ async def update_cat(cat_id: int, cat_data: CreateCatRequest, db: Session = Depe
     db.commit()
     db.refresh(cat)
     return cat
+
+@router.delete("/cats/{cat_id}") # Delete a cat, no need of 'response_model' since returs simple message, don't need to validate through Pydantic schemas
+async def delete_cat(cat_id: int, db: Session = Depends(get_db)) -> dict:
+    cat = db.query(Cat).filter(Cat.id == cat_id).first()
+
+    if not cat:
+        raise HTTPException(status_code=404, detail="Cat not found, provide a valid id")
+
+    db.delete(cat)
+    db.commit()
+    return {"message": "Cat deleted"}
+
