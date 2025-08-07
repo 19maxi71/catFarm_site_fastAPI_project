@@ -59,7 +59,7 @@
                 </button>
             </div>
 
-            <!-- Mobile menu (shows/hides based on mobileMenuOpen) -->
+            <!-- Mobile menu (shows under hamburger, right-aligned) -->
             <div x-show="mobileMenuOpen"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -67,14 +67,14 @@
                  x-transition:leave="transition ease-in duration-150"
                  x-transition:leave-start="opacity-100 transform translate-y-0"
                  x-transition:leave-end="opacity-0 transform -translate-y-2"
-                 class="md:hidden mt-4 pb-4">
-                <div class="flex flex-col space-y-3">
+                 class="md:hidden absolute right-4 top-16 bg-warm-beige border border-soft-gray rounded-lg shadow-lg p-4 z-50">
+                <div class="flex flex-col space-y-3 min-w-32">
                     <a href="/" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2">Home</a>
+                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">Home</a>
                     <a href="/cats" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2">Cats</a>
+                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">Cats</a>
                     <a href="/news" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2">News</a>
+                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">News</a>
                 </div>
             </div>
         </div>
