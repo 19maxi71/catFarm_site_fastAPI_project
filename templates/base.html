@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RocKaRan Cat Farm</title>
+
     <!-- Tailwind CSS from CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js from CDN -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Custom colors -->
     <script>
         tailwind.config = {
@@ -24,10 +24,27 @@
             }
         }
     </script>
+
+    <!-- Alpine.js Store (add this BEFORE Alpine.js loads) -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('images', [
+            "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
+            ]);
+        });
+    </script>
+
+    <!-- Alpine.js from CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js"></script>
 </head>
 <body class="bg-beige">
     <!-- Navigation bar -->
-    <nav class="bg-warm-beige border-b border-soft-gray p-4" x-data="{ mobileMenuOpen: false }">
+    <!-- Replace your nav with this CSS-only version -->
+    <nav class="bg-warm-beige border-b border-soft-gray p-4">
         <div class="container mx-auto px-4 lg:px-16">
             <div class="flex justify-between items-center">
                 <!-- Logo and title -->
@@ -36,49 +53,42 @@
                     <h1 class="text-xl font-bold text-black">RocKaRan Cat Farm</h1>
                 </div>
 
-                <!-- Desktop Navigation (hidden on mobile) -->
+                <!-- Desktop Navigation -->
                 <div class="hidden md:flex space-x-6">
                     <a href="/" class="text-black hover:text-dusty-rose transition-colors">Home</a>
                     <a href="/cats" class="text-black hover:text-dusty-rose transition-colors">Cats</a>
                     <a href="/news" class="text-black hover:text-dusty-rose transition-colors">News</a>
                 </div>
 
-                <!-- Hamburger button (visible on mobile) -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-black focus:outline-none">
-                    <div class="w-6 h-6 flex flex-col justify-center items-center">
-                        <!-- Top line -->
-                        <div class="w-5 h-0.5 bg-black transform transition-all duration-300"
-                             :class="mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''"></div>
-                        <!-- Middle line -->
-                        <div class="w-5 h-0.5 bg-black mt-1 transition-all duration-300"
-                             :class="mobileMenuOpen ? 'opacity-0' : ''"></div>
-                        <!-- Bottom line -->
-                        <div class="w-5 h-0.5 bg-black mt-1 transform transition-all duration-300"
-                             :class="mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''"></div>
-                    </div>
-                </button>
-            </div>
+                <!-- Simple mobile menu (dropdown style) -->
+                <div class="md:hidden relative">
+                    <input type="checkbox" id="mobile-menu-toggle" class="hidden">
+                    <label for="mobile-menu-toggle" class="cursor-pointer">
+                        <div class="w-6 h-6 flex flex-col justify-center items-center">
+                            <div class="w-5 h-0.5 bg-black"></div>
+                            <div class="w-5 h-0.5 bg-black mt-1"></div>
+                            <div class="w-5 h-0.5 bg-black mt-1"></div>
+                        </div>
+                    </label>
 
-            <!-- Mobile menu (shows under hamburger, right-aligned) -->
-            <div x-show="mobileMenuOpen"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                 class="md:hidden absolute right-4 top-16 bg-warm-beige border border-soft-gray rounded-lg shadow-lg p-4 z-50">
-                <div class="flex flex-col space-y-3 min-w-32">
-                    <a href="/" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">Home</a>
-                    <a href="/cats" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">Cats</a>
-                    <a href="/news" @click="mobileMenuOpen = false"
-                       class="text-black hover:text-dusty-rose transition-colors py-2 text-right">News</a>
+                    <!-- Mobile dropdown (hidden by default) -->
+                    <div class="absolute right-0 top-8 hidden bg-warm-beige border border-soft-gray rounded-lg shadow-lg p-4 z-50" id="mobile-menu">
+                        <div class="flex flex-col space-y-3 min-w-32">
+                            <a href="/" class="text-black hover:text-dusty-rose transition-colors">🏠 Home</a>
+                            <a href="/cats" class="text-black hover:text-dusty-rose transition-colors">🐱 Cats</a>
+                            <a href="/news" class="text-black hover:text-dusty-rose transition-colors">📰 News</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
+
+    <style>
+        #mobile-menu-toggle:checked + label + #mobile-menu {
+            display: block !important;
+        }
+    </style>
 
     <!-- Main content area -->
     <main class="container mx-auto p-6">
