@@ -25,16 +25,66 @@
         }
     </script>
 
-    <!-- Alpine.js Store (add this BEFORE Alpine.js loads) -->
+    <!-- Alpine.js Store (update the updateCarousel function) -->
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.store('images', [
-            "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
-            ]);
+            Alpine.store('carousel', {
+                images: [
+                    "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
+                    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
+                    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
+                    "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
+                    "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
+                    "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
+                ],
+                active: 0,
+                infiniteImages: [],
+                init() {
+                    // Create infinite loop: [last, ...images, first]
+                    this.infiniteImages = [
+                        this.images[this.images.length - 1], // Last image at start
+                        ...this.images,                      // All original images
+                        this.images[0]                       // First image at end
+                    ];
+                    this.updateCarousel();
+                },
+                next() {
+                    this.active++;
+                    this.updateCarousel();
+
+                    // Reset to start after showing the duplicate
+                    if (this.active >= this.images.length) {
+                        setTimeout(() => {
+                            this.active = 0;
+                            this.updateCarousel(false); // No transition
+                        }, 500);
+                    }
+                },
+                prev() {
+                    this.active--;
+                    this.updateCarousel();
+
+                    // Reset to end after showing the duplicate
+                    if (this.active < 0) {
+                        setTimeout(() => {
+                            this.active = this.images.length - 1;
+                            this.updateCarousel(false); // No transition
+                        }, 500);
+                    }
+                },
+                updateCarousel(withTransition = true) {
+                    const carousel = this.$refs.carousel;
+                    if (carousel) {
+                        // Calculate offset in pixels (each slide is roughly 60% of container width)
+                        const containerWidth = carousel.parentElement.offsetWidth;
+                        const slideWidth = containerWidth * 0.6; // 60% width
+                        const offset = -((this.active + 1) * slideWidth);
+
+                        carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
+                        carousel.style.transform = `translateX(${offset}px)`;
+                    }
+                }
+            });
         });
     </script>
 
