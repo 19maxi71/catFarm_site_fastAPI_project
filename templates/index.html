@@ -10,67 +10,86 @@
     </a>
 </div>
 
-<!-- Infinite Peek Carousel -->
-<div class="relative w-full max-w-6xl mx-auto mb-8 h-96" x-data="$store.carousel" x-init="init()">
-    <div class="relative h-full overflow-hidden rounded-lg">
+<!-- Simple Responsive Carousel with Auto-play and Infinite Scroll -->
+<div class="relative w-full mx-auto mb-8 overflow-hidden"
+     :class="{ 'h-64': isMobile, 'h-96': !isMobile }"
+     x-data="$store.carousel"
+     x-init="init()"
+     @mouseenter="stopAutoPlay()"
+     @mouseleave="startAutoPlay()">
 
-        <!-- Carousel track with infinite images -->
-        <div class="carousel flex h-full" x-ref="carousel" style="width: calc(700% + 4rem);">
-            <template x-for="(image, index) in infiniteImages" :key="index">
-                <div class="w-3/5 px-2 flex-shrink-0" style="width: calc(60% / 7);">
-                    <img :src="image"
-                         :alt="'Beautiful Siberian cat'"
-                         class="w-full h-full object-cover rounded-lg shadow-xl"
-                         :class="{
-                             'scale-105 z-10': index === active + 1,
-                             'opacity-70': index !== active + 1
-                         }"
-                         loading="lazy">
-                </div>
-            </template>
-        </div>
+    <!-- Carousel track -->
+    <div class="flex h-full transition-transform duration-500 ease-out" x-ref="carousel">
 
-        <!-- Navigation arrows -->
-        <button @click="prev()"
-                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 z-20">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-        </button>
+        <!-- Mobile version: Full width images (regular loop) -->
+        <template x-if="isMobile">
+            <div class="flex h-full">
+                <template x-for="(image, index) in images" :key="'mobile-' + index">
+                    <div class="w-full h-full flex-shrink-0">
+                        <img :src="image"
+                             :alt="'Beautiful Siberian cat ' + (index + 1)"
+                             class="w-full h-full object-cover rounded-lg">
+                    </div>
+                </template>
+            </div>
+        </template>
 
-        <button @click="next()"
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 z-20">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-        </button>
+        <!-- Desktop version: Infinite peek effect -->
+        <template x-if="!isMobile">
+            <div class="flex h-full items-center" style="width: max-content;">
+                <template x-for="(image, index) in extendedImages" :key="'desktop-' + index">
+                    <div class="flex-shrink-0 mx-8" style="width: 400px;">
+                        <img :src="image"
+                             :alt="'Beautiful Siberian cat'"
+                             class="w-full h-80 object-cover rounded-xl shadow-xl transition-all duration-300"
+                             :class="{
+                                 'scale-105 shadow-2xl': index === active + 1,
+                                 'scale-95 opacity-60': index !== active + 1
+                             }">
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
 
-        <!-- Slide indicators (only for real images) -->
-        <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            <template x-for="(image, index) in images" :key="index">
-                <button @click="active = index; updateCarousel()"
-                        class="w-3 h-3 rounded-full transition-all duration-200"
-                        :class="active === index ? 'bg-white shadow-lg scale-125' : 'bg-white/50 hover:bg-white/75'">
-                </button>
-            </template>
-        </div>
+    <!-- Navigation arrows -->
+    <button @click="prev()"
+            :disabled="isTransitioning"
+            class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 z-20 disabled:opacity-50">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+    </button>
+
+    <button @click="next()"
+            :disabled="isTransitioning"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 z-20 disabled:opacity-50">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </button>
+
+    <!-- Slide indicators -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+        <template x-for="(image, index) in images" :key="'indicator-' + index">
+            <button @click="goToSlide(index)"
+                    :disabled="isTransitioning"
+                    class="w-3 h-3 rounded-full transition-all duration-200 disabled:opacity-50"
+                    :class="active === index ? 'bg-white shadow-lg' : 'bg-white/50 hover:bg-white/75'">
+            </button>
+        </template>
+    </div>
+
+    <!-- Current slide info -->
+    <div class="absolute top-4 left-4 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm z-20">
+        <span x-text="(active + 1) + ' / ' + images.length"></span>
+    </div>
+
+    <!-- Auto-play status -->
+    <div class="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded-full text-xs z-20">
+        <span x-text="autoPlayInterval ? '⏸️' : '▶️'"></span>
     </div>
 </div>
-
-<!-- Simplified CSS -->
-<style>
-    .carousel {
-        transition: transform 0.5s ease-out;
-    }
-
-    .carousel img {
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    .carousel img:hover {
-        transform: scale(1.02) !important;
-    }
-</style>
 
 <!-- About section -->
 <div class="bg-white rounded-lg p-6 mb-8">

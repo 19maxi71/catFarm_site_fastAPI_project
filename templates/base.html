@@ -25,7 +25,7 @@
         }
     </script>
 
-    <!-- Alpine.js Store (update the updateCarousel function) -->
+    <!-- Alpine.js Store (replace your existing store) -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('carousel', {
@@ -33,52 +33,140 @@
                     "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
                     "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
                     "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
-                    "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
                     "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
                     "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
                 ],
                 active: 0,
-                infiniteImages: [],
+                isMobile: false,
+                autoPlayInterval: null,
+                extendedImages: [],
+                isTransitioning: false,
                 init() {
+                    this.checkScreenSize();
+                    this.createExtendedImages();
+                    window.addEventListener('resize', () => {
+                        this.checkScreenSize();
+                        this.updateCarousel();
+                    });
+                    this.updateCarousel();
+                    this.startAutoPlay();
+                },
+                createExtendedImages() {
                     // Create infinite loop: [last, ...images, first]
-                    this.infiniteImages = [
+                    this.extendedImages = [
                         this.images[this.images.length - 1], // Last image at start
                         ...this.images,                      // All original images
                         this.images[0]                       // First image at end
                     ];
-                    this.updateCarousel();
+                },
+                checkScreenSize() {
+                    this.isMobile = window.innerWidth < 768;
                 },
                 next() {
+                    if (this.isTransitioning) return;
+                    this.isTransitioning = true;
+
+                    // Reset auto-play timer
+                    this.stopAutoPlay();
+                    this.startAutoPlay();
+
                     this.active++;
                     this.updateCarousel();
 
-                    // Reset to start after showing the duplicate
+                    // Handle infinite scroll
                     if (this.active >= this.images.length) {
                         setTimeout(() => {
                             this.active = 0;
                             this.updateCarousel(false); // No transition
+                            this.isTransitioning = false;
                         }, 500);
+                    } else {
+                        setTimeout(() => this.isTransitioning = false, 500);
                     }
                 },
                 prev() {
+                    if (this.isTransitioning) return;
+                    this.isTransitioning = true;
+
+                    // Reset auto-play timer
+                    this.stopAutoPlay();
+                    this.startAutoPlay();
+
                     this.active--;
                     this.updateCarousel();
 
-                    // Reset to end after showing the duplicate
+                    // Handle infinite scroll
                     if (this.active < 0) {
                         setTimeout(() => {
                             this.active = this.images.length - 1;
                             this.updateCarousel(false); // No transition
+                            this.isTransitioning = false;
                         }, 500);
+                    } else {
+                        setTimeout(() => this.isTransitioning = false, 500);
+                    }
+                },
+                goToSlide(index) {
+                    if (this.isTransitioning) return;
+
+                    // Reset auto-play timer
+                    this.stopAutoPlay();
+                    this.startAutoPlay();
+
+                    this.active = index;
+                    this.updateCarousel();
+                },
+                startAutoPlay() {
+                    this.stopAutoPlay(); // Clear any existing interval
+                    this.autoPlayInterval = setInterval(() => {
+                        this.autoNext();
+                    }, 6000); // Increased to 6 seconds (was 4)
+                },
+                autoNext() {
+                    // Auto-play version of next (no timer reset)
+                    if (this.isTransitioning) return;
+                    this.isTransitioning = true;
+
+                    this.active++;
+                    this.updateCarousel();
+
+                    // Handle infinite scroll
+                    if (this.active >= this.images.length) {
+                        setTimeout(() => {
+                            this.active = 0;
+                            this.updateCarousel(false); // No transition
+                            this.isTransitioning = false;
+                        }, 500);
+                    } else {
+                        setTimeout(() => this.isTransitioning = false, 500);
+                    }
+                },
+                stopAutoPlay() {
+                    if (this.autoPlayInterval) {
+                        clearInterval(this.autoPlayInterval);
+                        this.autoPlayInterval = null;
                     }
                 },
                 updateCarousel(withTransition = true) {
                     const carousel = this.$refs.carousel;
-                    if (carousel) {
-                        // Calculate offset in pixels (each slide is roughly 60% of container width)
+                    if (!carousel) return;
+
+                    if (this.isMobile) {
+                        // Mobile: Full width images, slide completely
+                        const offset = this.active * -100;
+                        carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
+                        carousel.style.transform = `translateX(${offset}%)`;
+                    } else {
+                        // Desktop: Center active image with peek effect (infinite scroll)
                         const containerWidth = carousel.parentElement.offsetWidth;
-                        const slideWidth = containerWidth * 0.6; // 60% width
-                        const offset = -((this.active + 1) * slideWidth);
+                        const imageWidth = 400;
+                        const gap = 60;
+
+                        // Calculate center position and offset for infinite scroll
+                        const centerPosition = (containerWidth - imageWidth) / 2;
+                        const slideDistance = imageWidth + gap;
+                        // Add 1 to active because we have the last image at index 0
+                        const offset = centerPosition - ((this.active + 1) * slideDistance);
 
                         carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
                         carousel.style.transform = `translateX(${offset}px)`;
