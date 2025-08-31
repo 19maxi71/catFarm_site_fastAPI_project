@@ -41,7 +41,7 @@
                 autoPlayInterval: null,
                 extendedImages: [],
                 isTransitioning: false,
-                currentPosition: 1, // Start at position 1 (first real image)
+                currentPosition: 1,
                 init() {
                     this.checkScreenSize();
                     this.createExtendedImages();
@@ -53,14 +53,15 @@
                     this.startAutoPlay();
                 },
                 createExtendedImages() {
-                    // Create triple loop for smoother infinite scroll: [last, ...images, first, second]
+                    // Create extended loop for perfect infinite scroll
                     this.extendedImages = [
-                        this.images[this.images.length - 1], // Last image at start
+                        this.images[this.images.length - 2], // Second to last
+                        this.images[this.images.length - 1], // Last image
                         ...this.images,                      // All original images
-                        this.images[0],                      // First image at end
-                        this.images[1]                       // Second image for smoother transition
+                        this.images[0],                      // First image
+                        this.images[1]                       // Second image
                     ];
-                    this.currentPosition = 1; // Start at first real image
+                    this.currentPosition = 2; // Start at first real image (index 2 in extended array)
                 },
                 checkScreenSize() {
                     this.isMobile = window.innerWidth < 768;
@@ -69,7 +70,6 @@
                     if (this.isTransitioning) return;
                     this.isTransitioning = true;
 
-                    // Reset auto-play timer
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
@@ -77,22 +77,21 @@
                     this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
 
-                    // Smooth reset when reaching the end
-                    if (this.currentPosition > this.images.length) {
+                    // Check if we need to reset (after showing first duplicate)
+                    if (this.currentPosition >= this.images.length + 2) {
                         setTimeout(() => {
-                            this.currentPosition = 1;
-                            this.updateCarousel(false); // No transition
-                            setTimeout(() => this.isTransitioning = false, 50);
-                        }, 520); // Wait for transition to complete
+                            this.currentPosition = 2; // Reset to first real image
+                            this.updateCarousel(false);
+                            setTimeout(() => this.isTransitioning = false, 20);
+                        }, 500);
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 520);
+                        setTimeout(() => this.isTransitioning = false, 500);
                     }
                 },
                 prev() {
                     if (this.isTransitioning) return;
                     this.isTransitioning = true;
 
-                    // Reset auto-play timer
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
@@ -100,26 +99,25 @@
                     this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                     this.updateCarousel();
 
-                    // Smooth reset when reaching the beginning
-                    if (this.currentPosition < 1) {
+                    // Check if we need to reset (after showing last duplicate)
+                    if (this.currentPosition < 2) {
                         setTimeout(() => {
-                            this.currentPosition = this.images.length;
-                            this.updateCarousel(false); // No transition
-                            setTimeout(() => this.isTransitioning = false, 50);
-                        }, 520); // Wait for transition to complete
+                            this.currentPosition = this.images.length + 1; // Reset to last real image
+                            this.updateCarousel(false);
+                            setTimeout(() => this.isTransitioning = false, 20);
+                        }, 500);
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 520);
+                        setTimeout(() => this.isTransitioning = false, 500);
                     }
                 },
                 goToSlide(index) {
                     if (this.isTransitioning) return;
 
-                    // Reset auto-play timer
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
                     this.active = index;
-                    this.currentPosition = index + 1;
+                    this.currentPosition = index + 2; // +2 because of the two prefix images
                     this.updateCarousel();
                 },
                 startAutoPlay() {
@@ -136,14 +134,14 @@
                     this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
 
-                    if (this.currentPosition > this.images.length) {
+                    if (this.currentPosition >= this.images.length + 2) {
                         setTimeout(() => {
-                            this.currentPosition = 1;
+                            this.currentPosition = 2;
                             this.updateCarousel(false);
-                            setTimeout(() => this.isTransitioning = false, 50);
-                        }, 520);
+                            setTimeout(() => this.isTransitioning = false, 20);
+                        }, 500);
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 520);
+                        setTimeout(() => this.isTransitioning = false, 500);
                     }
                 },
                 stopAutoPlay() {
@@ -157,12 +155,10 @@
                     if (!carousel) return;
 
                     if (this.isMobile) {
-                        // Mobile: Full width images, slide completely
                         const offset = this.active * -100;
                         carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
                         carousel.style.transform = `translateX(${offset}%)`;
                     } else {
-                        // Desktop: Use currentPosition for smoother infinite scroll
                         const containerWidth = carousel.parentElement.offsetWidth;
                         const imageWidth = 400;
                         const gap = 60;
@@ -174,6 +170,10 @@
                         carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
                         carousel.style.transform = `translateX(${offset}px)`;
                     }
+                },
+                // Helper function to determine if image should be highlighted
+                isActiveImage(index) {
+                    return index === this.currentPosition;
                 }
             });
         });

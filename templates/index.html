@@ -43,8 +43,8 @@
                              :alt="'Beautiful Siberian cat'"
                              class="w-full h-80 object-cover rounded-xl shadow-xl transition-all duration-300"
                              :class="{
-                                 'scale-105 shadow-2xl': index === active + 1,
-                                 'scale-95 opacity-60': index !== active + 1
+                                 'scale-105 shadow-2xl': isActiveImage(index),
+                                 'scale-95 opacity-60': !isActiveImage(index)
                              }">
                     </div>
                 </template>
