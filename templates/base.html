@@ -25,7 +25,7 @@
         }
     </script>
 
-    <!-- Alpine.js Store - ONLY replace the updateCarousel function -->
+    <!-- Alpine.js Store -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('carousel', {
@@ -39,10 +39,15 @@
                 active: 0,
                 isMobile: false,
                 autoPlayInterval: null,
-                virtualIndex: 100, // Start at virtual position 100 (middle of infinite strip)
+                virtualIndex: 100,
+                isTransitioning: false,
+                extendedImages: [],
 
                 init() {
                     this.checkScreenSize();
+                    this.createExtendedImages();
+                    // Fix: Start at position that centers first image
+                    this.virtualIndex = 25; // This centers the first image properly
                     this.updateCarousel();
                     window.addEventListener('resize', () => {
                         this.checkScreenSize();
@@ -51,34 +56,55 @@
                     this.startAutoPlay();
                 },
 
+                createExtendedImages() {
+                    const repeats = 50;
+                    const infiniteArray = [];
+                    for (let i = 0; i < repeats; i++) {
+                        infiniteArray.push(...this.images);
+                    }
+                    this.extendedImages = infiniteArray;
+                },
+
                 checkScreenSize() {
                     this.isMobile = window.innerWidth < 768;
                 },
 
                 next() {
+                    if (this.isTransitioning) return;
+                    this.isTransitioning = true;
+
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    // Always move forward in virtual space
                     this.virtualIndex++;
                     this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
+
+                    setTimeout(() => this.isTransitioning = false, 500);
                 },
 
                 prev() {
+                    if (this.isTransitioning) return;
+                    this.isTransitioning = true;
+
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    // Always move backward in virtual space
                     this.virtualIndex--;
                     this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                     this.updateCarousel();
+
+                    setTimeout(() => this.isTransitioning = false, 500);
                 },
 
                 goToSlide(index) {
+                    if (this.isTransitioning) return;
+
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
+                    const steps = index - this.active;
+                    this.virtualIndex += steps;
                     this.active = index;
                     this.updateCarousel();
                 },
@@ -88,25 +114,17 @@
                     if (!carousel) return;
 
                     if (this.isMobile) {
-                        // Mobile: use virtualIndex for infinite scroll (keep as is)
-                        const containerWidth = carousel.parentElement.offsetWidth;
-                        const offset = this.virtualIndex * -containerWidth;
+                        const offset = this.active * -100;
                         carousel.style.transition = 'transform 0.5s ease-out';
-                        carousel.style.transform = `translateX(${offset}px)`;
+                        carousel.style.transform = `translateX(${offset}%)`;
                     } else {
-                        // Desktop: ALWAYS center active image perfectly
                         const containerWidth = carousel.parentElement.offsetWidth;
-                        const imageWidth = 400;
-                        const gap = 60;
+                        const imageWidth = 800;  // Bigger images
+                        const gap = 30;          // Less gap
                         const slideWidth = imageWidth + gap;
 
-                        // Perfect center calculation - active image ALWAYS in exact center
-                        const exactCenter = containerWidth / 2;
-                        const imageCenterOffset = imageWidth / 2;
-                        const perfectCenterPosition = exactCenter - imageCenterOffset;
-
-                        // Calculate offset to center the active image (virtualIndex position)
-                        const offset = perfectCenterPosition - (this.virtualIndex * slideWidth);
+                        const centerPosition = (containerWidth - imageWidth) / 2;
+                        const offset = centerPosition - (this.virtualIndex * slideWidth);
 
                         carousel.style.transition = 'transform 0.5s ease-out';
                         carousel.style.transform = `translateX(${offset}px)`;
@@ -127,18 +145,7 @@
                     }
                 },
 
-                // Create a large infinite array for true endless scroll
-                getInfiniteImages() {
-                    const repeats = 50; // Create 50 copies (250 images total)
-                    const infiniteArray = [];
-                    for (let i = 0; i < repeats; i++) {
-                        infiniteArray.push(...this.images);
-                    }
-                    return infiniteArray;
-                },
-
                 isActiveImage(index) {
-                    // Check if this image represents the currently active image
                     return index % this.images.length === this.active;
                 }
             });
