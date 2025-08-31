@@ -41,6 +41,7 @@
                 autoPlayInterval: null,
                 extendedImages: [],
                 isTransitioning: false,
+                currentPosition: 1, // Start at position 1 (first real image)
                 init() {
                     this.checkScreenSize();
                     this.createExtendedImages();
@@ -52,12 +53,14 @@
                     this.startAutoPlay();
                 },
                 createExtendedImages() {
-                    // Create infinite loop: [last, ...images, first]
+                    // Create triple loop for smoother infinite scroll: [last, ...images, first, second]
                     this.extendedImages = [
                         this.images[this.images.length - 1], // Last image at start
                         ...this.images,                      // All original images
-                        this.images[0]                       // First image at end
+                        this.images[0],                      // First image at end
+                        this.images[1]                       // Second image for smoother transition
                     ];
+                    this.currentPosition = 1; // Start at first real image
                 },
                 checkScreenSize() {
                     this.isMobile = window.innerWidth < 768;
@@ -70,18 +73,19 @@
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    this.active++;
+                    this.currentPosition++;
+                    this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
 
-                    // Handle infinite scroll
-                    if (this.active >= this.images.length) {
+                    // Smooth reset when reaching the end
+                    if (this.currentPosition > this.images.length) {
                         setTimeout(() => {
-                            this.active = 0;
+                            this.currentPosition = 1;
                             this.updateCarousel(false); // No transition
-                            this.isTransitioning = false;
-                        }, 500);
+                            setTimeout(() => this.isTransitioning = false, 50);
+                        }, 520); // Wait for transition to complete
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
+                        setTimeout(() => this.isTransitioning = false, 520);
                     }
                 },
                 prev() {
@@ -92,18 +96,19 @@
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    this.active--;
+                    this.currentPosition--;
+                    this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                     this.updateCarousel();
 
-                    // Handle infinite scroll
-                    if (this.active < 0) {
+                    // Smooth reset when reaching the beginning
+                    if (this.currentPosition < 1) {
                         setTimeout(() => {
-                            this.active = this.images.length - 1;
+                            this.currentPosition = this.images.length;
                             this.updateCarousel(false); // No transition
-                            this.isTransitioning = false;
-                        }, 500);
+                            setTimeout(() => this.isTransitioning = false, 50);
+                        }, 520); // Wait for transition to complete
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
+                        setTimeout(() => this.isTransitioning = false, 520);
                     }
                 },
                 goToSlide(index) {
@@ -114,31 +119,31 @@
                     this.startAutoPlay();
 
                     this.active = index;
+                    this.currentPosition = index + 1;
                     this.updateCarousel();
                 },
                 startAutoPlay() {
-                    this.stopAutoPlay(); // Clear any existing interval
+                    this.stopAutoPlay();
                     this.autoPlayInterval = setInterval(() => {
                         this.autoNext();
-                    }, 6000); // Increased to 6 seconds (was 4)
+                    }, 6000);
                 },
                 autoNext() {
-                    // Auto-play version of next (no timer reset)
                     if (this.isTransitioning) return;
                     this.isTransitioning = true;
 
-                    this.active++;
+                    this.currentPosition++;
+                    this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
 
-                    // Handle infinite scroll
-                    if (this.active >= this.images.length) {
+                    if (this.currentPosition > this.images.length) {
                         setTimeout(() => {
-                            this.active = 0;
-                            this.updateCarousel(false); // No transition
-                            this.isTransitioning = false;
-                        }, 500);
+                            this.currentPosition = 1;
+                            this.updateCarousel(false);
+                            setTimeout(() => this.isTransitioning = false, 50);
+                        }, 520);
                     } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
+                        setTimeout(() => this.isTransitioning = false, 520);
                     }
                 },
                 stopAutoPlay() {
@@ -157,16 +162,14 @@
                         carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
                         carousel.style.transform = `translateX(${offset}%)`;
                     } else {
-                        // Desktop: Center active image with peek effect (infinite scroll)
+                        // Desktop: Use currentPosition for smoother infinite scroll
                         const containerWidth = carousel.parentElement.offsetWidth;
                         const imageWidth = 400;
                         const gap = 60;
 
-                        // Calculate center position and offset for infinite scroll
                         const centerPosition = (containerWidth - imageWidth) / 2;
                         const slideDistance = imageWidth + gap;
-                        // Add 1 to active because we have the last image at index 0
-                        const offset = centerPosition - ((this.active + 1) * slideDistance);
+                        const offset = centerPosition - (this.currentPosition * slideDistance);
 
                         carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
                         carousel.style.transform = `translateX(${offset}px)`;
