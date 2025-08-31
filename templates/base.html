@@ -25,7 +25,7 @@
         }
     </script>
 
-    <!-- Alpine.js Store (replace your existing store) -->
+    <!-- Alpine.js Store - ONLY replace the updateCarousel function -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('carousel', {
@@ -39,141 +39,107 @@
                 active: 0,
                 isMobile: false,
                 autoPlayInterval: null,
-                extendedImages: [],
-                isTransitioning: false,
-                currentPosition: 1,
+                virtualIndex: 100, // Start at virtual position 100 (middle of infinite strip)
+
                 init() {
                     this.checkScreenSize();
-                    this.createExtendedImages();
+                    this.updateCarousel();
                     window.addEventListener('resize', () => {
                         this.checkScreenSize();
                         this.updateCarousel();
                     });
-                    this.updateCarousel();
                     this.startAutoPlay();
                 },
-                createExtendedImages() {
-                    // Create extended loop for perfect infinite scroll
-                    this.extendedImages = [
-                        this.images[this.images.length - 2], // Second to last
-                        this.images[this.images.length - 1], // Last image
-                        ...this.images,                      // All original images
-                        this.images[0],                      // First image
-                        this.images[1]                       // Second image
-                    ];
-                    this.currentPosition = 2; // Start at first real image (index 2 in extended array)
-                },
+
                 checkScreenSize() {
                     this.isMobile = window.innerWidth < 768;
                 },
-                next() {
-                    if (this.isTransitioning) return;
-                    this.isTransitioning = true;
 
+                next() {
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    this.currentPosition++;
+                    // Always move forward in virtual space
+                    this.virtualIndex++;
                     this.active = (this.active + 1) % this.images.length;
                     this.updateCarousel();
-
-                    // Check if we need to reset (after showing first duplicate)
-                    if (this.currentPosition >= this.images.length + 2) {
-                        setTimeout(() => {
-                            this.currentPosition = 2; // Reset to first real image
-                            this.updateCarousel(false);
-                            setTimeout(() => this.isTransitioning = false, 20);
-                        }, 500);
-                    } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
-                    }
                 },
-                prev() {
-                    if (this.isTransitioning) return;
-                    this.isTransitioning = true;
 
+                prev() {
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
-                    this.currentPosition--;
+                    // Always move backward in virtual space
+                    this.virtualIndex--;
                     this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                     this.updateCarousel();
-
-                    // Check if we need to reset (after showing last duplicate)
-                    if (this.currentPosition < 2) {
-                        setTimeout(() => {
-                            this.currentPosition = this.images.length + 1; // Reset to last real image
-                            this.updateCarousel(false);
-                            setTimeout(() => this.isTransitioning = false, 20);
-                        }, 500);
-                    } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
-                    }
                 },
-                goToSlide(index) {
-                    if (this.isTransitioning) return;
 
+                goToSlide(index) {
                     this.stopAutoPlay();
                     this.startAutoPlay();
 
                     this.active = index;
-                    this.currentPosition = index + 2; // +2 because of the two prefix images
                     this.updateCarousel();
                 },
+
+                updateCarousel() {
+                    const carousel = this.$refs.carousel;
+                    if (!carousel) return;
+
+                    if (this.isMobile) {
+                        // Mobile: use virtualIndex for infinite scroll (keep as is)
+                        const containerWidth = carousel.parentElement.offsetWidth;
+                        const offset = this.virtualIndex * -containerWidth;
+                        carousel.style.transition = 'transform 0.5s ease-out';
+                        carousel.style.transform = `translateX(${offset}px)`;
+                    } else {
+                        // Desktop: ALWAYS center active image perfectly
+                        const containerWidth = carousel.parentElement.offsetWidth;
+                        const imageWidth = 400;
+                        const gap = 60;
+                        const slideWidth = imageWidth + gap;
+
+                        // Perfect center calculation - active image ALWAYS in exact center
+                        const exactCenter = containerWidth / 2;
+                        const imageCenterOffset = imageWidth / 2;
+                        const perfectCenterPosition = exactCenter - imageCenterOffset;
+
+                        // Calculate offset to center the active image (virtualIndex position)
+                        const offset = perfectCenterPosition - (this.virtualIndex * slideWidth);
+
+                        carousel.style.transition = 'transform 0.5s ease-out';
+                        carousel.style.transform = `translateX(${offset}px)`;
+                    }
+                },
+
                 startAutoPlay() {
                     this.stopAutoPlay();
                     this.autoPlayInterval = setInterval(() => {
-                        this.autoNext();
+                        this.next();
                     }, 6000);
                 },
-                autoNext() {
-                    if (this.isTransitioning) return;
-                    this.isTransitioning = true;
 
-                    this.currentPosition++;
-                    this.active = (this.active + 1) % this.images.length;
-                    this.updateCarousel();
-
-                    if (this.currentPosition >= this.images.length + 2) {
-                        setTimeout(() => {
-                            this.currentPosition = 2;
-                            this.updateCarousel(false);
-                            setTimeout(() => this.isTransitioning = false, 20);
-                        }, 500);
-                    } else {
-                        setTimeout(() => this.isTransitioning = false, 500);
-                    }
-                },
                 stopAutoPlay() {
                     if (this.autoPlayInterval) {
                         clearInterval(this.autoPlayInterval);
                         this.autoPlayInterval = null;
                     }
                 },
-                updateCarousel(withTransition = true) {
-                    const carousel = this.$refs.carousel;
-                    if (!carousel) return;
 
-                    if (this.isMobile) {
-                        const offset = this.active * -100;
-                        carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
-                        carousel.style.transform = `translateX(${offset}%)`;
-                    } else {
-                        const containerWidth = carousel.parentElement.offsetWidth;
-                        const imageWidth = 400;
-                        const gap = 60;
-
-                        const centerPosition = (containerWidth - imageWidth) / 2;
-                        const slideDistance = imageWidth + gap;
-                        const offset = centerPosition - (this.currentPosition * slideDistance);
-
-                        carousel.style.transition = withTransition ? 'transform 0.5s ease-out' : 'none';
-                        carousel.style.transform = `translateX(${offset}px)`;
+                // Create a large infinite array for true endless scroll
+                getInfiniteImages() {
+                    const repeats = 50; // Create 50 copies (250 images total)
+                    const infiniteArray = [];
+                    for (let i = 0; i < repeats; i++) {
+                        infiniteArray.push(...this.images);
                     }
+                    return infiniteArray;
                 },
-                // Helper function to determine if image should be highlighted
+
                 isActiveImage(index) {
-                    return index === this.currentPosition;
+                    // Check if this image represents the currently active image
+                    return index % this.images.length === this.active;
                 }
             });
         });
