@@ -27,129 +27,141 @@
 
     <!-- Alpine.js Store -->
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('carousel', {
-                images: [
-                    "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
-                    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
-                    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
-                    "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
-                    "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
-                ],
-                active: 0,
-                isMobile: false,
-                autoPlayInterval: null,
-                virtualIndex: 100,
-                isTransitioning: false,
-                extendedImages: [],
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('carousel', {
+            images: [
+                "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1472491235688-bdc81a63246e?auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
+            ],
+            active: 0,
+            isMobile: false,
+            autoPlayInterval: null,
+            virtualIndex: 0,
+            isTransitioning: false,
+            extendedImages: [],
 
-                init() {
+            init() {
+                this.checkScreenSize();
+                this.createExtendedImages();
+                this.virtualIndex = this.images.length * 50; // Start in the middle of extendedImages
+                this.updateCarousel();
+                window.addEventListener('resize', () => {
                     this.checkScreenSize();
-                    this.createExtendedImages();
-                    // Fix: Start at position that centers first image
-                    this.virtualIndex = 25; // This centers the first image properly
                     this.updateCarousel();
-                    window.addEventListener('resize', () => {
-                        this.checkScreenSize();
-                        this.updateCarousel();
-                    });
-                    this.startAutoPlay();
-                },
+                });
+                this.startAutoPlay();
+            },
 
-                createExtendedImages() {
-                    const repeats = 50;
-                    const infiniteArray = [];
-                    for (let i = 0; i < repeats; i++) {
-                        infiniteArray.push(...this.images);
-                    }
-                    this.extendedImages = infiniteArray;
-                },
+            createExtendedImages() {
+                const repeats = 100; // Enough for seamless looping
+                this.extendedImages = Array(repeats).fill(this.images).flat();
+            },
 
-                checkScreenSize() {
-                    this.isMobile = window.innerWidth < 768;
-                },
+            checkScreenSize() {
+                this.isMobile = window.innerWidth < 768;
+            },
 
-                next() {
-                    if (this.isTransitioning) return;
-                    this.isTransitioning = true;
+            next() {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
 
-                    this.stopAutoPlay();
-                    this.startAutoPlay();
+                this.active = (this.active + 1) % this.images.length;
+                this.virtualIndex++;
+                this.updateCarousel();
 
-                    this.virtualIndex++;
-                    this.active = (this.active + 1) % this.images.length;
-                    this.updateCarousel();
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                    this.checkBounds();
+                }, 500);
+            },
 
-                    setTimeout(() => this.isTransitioning = false, 500);
-                },
+            prev() {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
 
-                prev() {
-                    if (this.isTransitioning) return;
-                    this.isTransitioning = true;
+                this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
+                this.virtualIndex--;
+                this.updateCarousel();
 
-                    this.stopAutoPlay();
-                    this.startAutoPlay();
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                    this.checkBounds();
+                }, 500);
+            },
 
-                    this.virtualIndex--;
-                    this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
-                    this.updateCarousel();
+            goToSlide(index) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
 
-                    setTimeout(() => this.isTransitioning = false, 500);
-                },
+                const steps = index - this.active;
+                this.active = index;
+                this.virtualIndex += steps;
+                this.updateCarousel();
 
-                goToSlide(index) {
-                    if (this.isTransitioning) return;
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                    this.checkBounds();
+                }, 500);
+            },
 
-                    this.stopAutoPlay();
-                    this.startAutoPlay();
+            checkBounds() {
+                const totalImages = this.extendedImages.length;
+                const imageCount = this.images.length;
+                const middle = Math.floor(totalImages / 2);
 
-                    const steps = index - this.active;
-                    this.virtualIndex += steps;
-                    this.active = index;
-                    this.updateCarousel();
-                },
-
-                updateCarousel() {
-                    const carousel = this.$refs.carousel;
-                    if (!carousel) return;
-
-                    if (this.isMobile) {
-                        const offset = this.active * -100;
-                        carousel.style.transition = 'transform 0.5s ease-out';
-                        carousel.style.transform = `translateX(${offset}%)`;
-                    } else {
-                        const containerWidth = carousel.parentElement.offsetWidth;
-                        const imageWidth = 800;  // Bigger images
-                        const gap = 30;          // Less gap
-                        const slideWidth = imageWidth + gap;
-
-                        const centerPosition = (containerWidth - imageWidth) / 2;
-                        const offset = centerPosition - (this.virtualIndex * slideWidth);
-
-                        carousel.style.transition = 'transform 0.5s ease-out';
-                        carousel.style.transform = `translateX(${offset}px)`;
-                    }
-                },
-
-                startAutoPlay() {
-                    this.stopAutoPlay();
-                    this.autoPlayInterval = setInterval(() => {
-                        this.next();
-                    }, 6000);
-                },
-
-                stopAutoPlay() {
-                    if (this.autoPlayInterval) {
-                        clearInterval(this.autoPlayInterval);
-                        this.autoPlayInterval = null;
-                    }
-                },
-
-                isActiveImage(index) {
-                    return index % this.images.length === this.active;
+                // Reset virtualIndex to stay within bounds for seamless looping
+                if (this.virtualIndex >= middle + imageCount) {
+                    this.virtualIndex -= imageCount;
+                    this.updateCarousel(false); // No transition for reset
+                } else if (this.virtualIndex < middle - imageCount) {
+                    this.virtualIndex += imageCount;
+                    this.updateCarousel(false); // No transition for reset
                 }
-            });
+            },
+
+            updateCarousel(animate = true) {
+                const carousel = this.$refs.carousel;
+                if (!carousel) return;
+
+                if (this.isMobile) {
+                    const offset = this.active * -100;
+                    carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';
+                    carousel.style.transform = `translateX(${offset}%)`;
+                } else {
+                    const containerWidth = carousel.parentElement.offsetWidth;
+                    const imageWidth = 600; // Adjusted for better visibility
+                    const gap = 24; // Tailwind's mx-3 (6px each side)
+                    const slideWidth = imageWidth + gap;
+                    const centerPosition = (containerWidth - imageWidth) / 2;
+                    const offset = centerPosition - (this.virtualIndex * slideWidth);
+
+                    carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';
+                    carousel.style.transform = `translateX(${offset}px)`;
+                }
+            },
+
+            startAutoPlay() {
+                this.stopAutoPlay();
+                this.autoPlayInterval = setInterval(() => {
+                    this.next();
+                }, 6000);
+            },
+
+            stopAutoPlay() {
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                    this.autoPlayInterval = null;
+                }
+            },
+
+            isActiveImage(index) {
+                return index % this.images.length === this.active;
+            }
         });
+    });
     </script>
 
     <!-- Alpine.js from CDN -->
