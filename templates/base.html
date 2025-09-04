@@ -46,7 +46,7 @@
             init() {
                 this.checkScreenSize();
                 this.createExtendedImages();
-                this.virtualIndex = this.images.length * 50; // Start in the middle of extendedImages
+                this.virtualIndex = this.images.length * 50; // Start in the middle for bidirectional infinite scroll
                 this.updateCarousel();
                 window.addEventListener('resize', () => {
                     this.checkScreenSize();
@@ -56,7 +56,7 @@
             },
 
             createExtendedImages() {
-                const repeats = 100; // Enough for seamless looping
+                const repeats = 100; // Enough duplicates for seamless looping without performance issues
                 this.extendedImages = Array(repeats).fill(this.images).flat();
             },
 
@@ -68,8 +68,8 @@
                 if (this.isTransitioning) return;
                 this.isTransitioning = true;
 
-                this.active = (this.active + 1) % this.images.length;
                 this.virtualIndex++;
+                this.active = (this.active + 1) % this.images.length;
                 this.updateCarousel();
 
                 setTimeout(() => {
@@ -82,8 +82,8 @@
                 if (this.isTransitioning) return;
                 this.isTransitioning = true;
 
-                this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                 this.virtualIndex--;
+                this.active = this.active === 0 ? this.images.length - 1 : this.active - 1;
                 this.updateCarousel();
 
                 setTimeout(() => {
@@ -97,8 +97,8 @@
                 this.isTransitioning = true;
 
                 const steps = index - this.active;
-                this.active = index;
                 this.virtualIndex += steps;
+                this.active = index;
                 this.updateCarousel();
 
                 setTimeout(() => {
@@ -112,13 +112,13 @@
                 const imageCount = this.images.length;
                 const middle = Math.floor(totalImages / 2);
 
-                // Reset virtualIndex to stay within bounds for seamless looping
+                // Reset virtualIndex to prevent drift and maintain performance
                 if (this.virtualIndex >= middle + imageCount) {
                     this.virtualIndex -= imageCount;
-                    this.updateCarousel(false); // No transition for reset
+                    this.updateCarousel(false); // Reset without animation to avoid jumps
                 } else if (this.virtualIndex < middle - imageCount) {
                     this.virtualIndex += imageCount;
-                    this.updateCarousel(false); // No transition for reset
+                    this.updateCarousel(false); // Reset without animation
                 }
             },
 
@@ -126,19 +126,19 @@
                 const carousel = this.$refs.carousel;
                 if (!carousel) return;
 
+                carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';
+
                 if (this.isMobile) {
-                    const offset = this.active * -100;
-                    carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';
+                    // Use virtualIndex for infinite scroll on mobile
+                    const offset = - (this.virtualIndex % this.extendedImages.length) * 100;
                     carousel.style.transform = `translateX(${offset}%)`;
                 } else {
                     const containerWidth = carousel.parentElement.offsetWidth;
-                    const imageWidth = 600; // Adjusted for better visibility
-                    const gap = 24; // Tailwind's mx-3 (6px each side)
+                    const imageWidth = 600; // Adjusted for visibility
+                    const gap = 24; // Matches mx-3 in Tailwind (12px each side)
                     const slideWidth = imageWidth + gap;
                     const centerPosition = (containerWidth - imageWidth) / 2;
                     const offset = centerPosition - (this.virtualIndex * slideWidth);
-
-                    carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';
                     carousel.style.transform = `translateX(${offset}px)`;
                 }
             },
