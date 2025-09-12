@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Our Cats - RocKaRan Cat Farm{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8" x-data="{ 
+    showModal: false, 
+    selectedCat: 0,
+    cats: {{ cats|tojson|safe }}
+}">
+    <!-- Page Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Our Beautiful Cats</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Meet our wonderful Siberian cats looking for loving homes. Click on any cat to learn more and start the adoption process.
+        </p>
+    </div>
+
+    <!-- Cats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        {% for cat in cats %}
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+             @click="selectedCat = {{ loop.index0 }}; showModal = true">
+
+            <!-- Cat Photo -->
+            <div class="aspect-square overflow-hidden">
+                {% if cat.photo_url %}
+                    <img src="{{ cat.photo_url }}"
+                         alt="{{ cat.name }}"
+                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                {% else %}
+                    <!-- Placeholder if no photo -->
+                    <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-6xl mb-2">🐱</div>
+                            <p class="text-gray-600">{{ cat.name }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Cat Basic Info -->
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ cat.name }}</h3>
+                <p class="text-lg text-gray-600 mb-2">{{ cat.role|title }} • {{ cat.breed or "Mixed Breed" }}</p>
+
+                <!-- Vaccination Status -->
+                <div class="flex items-center gap-2 mb-4">
+                    {% if cat.rabies_vaccinated %}
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                            ✅ Vaccinated
+                        </span>
+                    {% else %}
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                            ⚠️ Not Vaccinated
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Click to Learn More -->
+                <div class="text-center">
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                        Learn More & Adopt
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Cats Message -->
+    {% if not cats %}
+    <div class="text-center py-16">
+        <div class="text-6xl mb-4">😿</div>
+        <h2 class="text-2xl font-bold text-gray-600 mb-2">No cats available right now</h2>
+        <p class="text-gray-500">Please check back soon for new arrivals!</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Cat Details Modal -->
+<div x-show="showModal" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+     @click.self="showModal = false">
+    
+    <div class="bg-white rounded-2xl max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl"
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        
+        <!-- Modal Header with Close Button -->
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800">Meet Our Cat</h2>
+            <button @click="showModal = false" 
+                    class="text-gray-400 hover:text-gray-600 text-3xl font-bold leading-none">
+                ×
+            </button>
+        </div>
+
+        <!-- Modal Content -->
+        <template x-if="cats && cats[selectedCat]">
+            <div class="grid md:grid-cols-2 gap-8 p-6">
+                <!-- Cat Photo -->
+                <div class="space-y-4">
+                    <div class="aspect-square overflow-hidden rounded-xl shadow-lg">
+                        <template x-if="cats[selectedCat].photo_url">
+                            <img :src="cats[selectedCat].photo_url" 
+                                 :alt="cats[selectedCat].name"
+                                 class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!cats[selectedCat].photo_url">
+                            <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-8xl mb-4">🐱</div>
+                                    <p class="text-gray-600 text-xl" x-text="cats[selectedCat].name"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Cat Information -->
+                <div class="space-y-6">
+                    <!-- Name and Role -->
+                    <div>
+                        <h3 class="text-4xl font-bold text-gray-800 mb-2" x-text="cats[selectedCat].name"></h3>
+                        <p class="text-xl text-gray-600 mb-4">
+                            <span x-text="cats[selectedCat].role.charAt(0).toUpperCase() + cats[selectedCat].role.slice(1)"></span>
+                            • 
+                            <span x-text="cats[selectedCat].breed || 'Mixed Breed'"></span>
+                        </p>
+                    </div>
+
+                    <!-- Bio -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">About Me</h4>
+                        <p class="text-gray-600 leading-relaxed" x-text="cats[selectedCat].bio || 'This beautiful cat is looking for a loving home!'"></p>
+                    </div>
+
+                    <!-- Health & Vaccination -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Health Information</h4>
+                        <div class="flex items-center gap-3 mb-3">
+                            <template x-if="cats[selectedCat].rabies_vaccinated">
+                                <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                                    ✅ Vaccinated against Rabies
+                                </span>
+                            </template>
+                            <template x-if="!cats[selectedCat].rabies_vaccinated">
+                                <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                                    ⚠️ Vaccination Pending
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Awards -->
+                    <template x-if="cats[selectedCat].award">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Special Recognition</h4>
+                            <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">
+                                🏆 <span x-text="cats[selectedCat].award"></span>
+                            </span>
+                        </div>
+                    </template>
+
+                    <!-- Adoption Button -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl text-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
+                            💚 Request Adoption for <span x-text="cats[selectedCat].name"></span>
+                        </button>
+                        <p class="text-sm text-gray-500 text-center mt-3">
+                            We'll contact you within 24 hours to discuss the adoption process
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
 from sqladmin import Admin, ModelView
-from .database import Base, engine
+from .database import Base, engine, get_db
 from .models import Cat, Article
 from .admin import CatAdmin
 from .api.cats import router as cats_router
@@ -34,8 +35,13 @@ async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/cats")
-async def cats_page(request: Request):
-    return templates.TemplateResponse("cats.html", {"request": request})
+async def cats_page(request: Request, db: Session = Depends(get_db)):
+    # Fetch all cats from the database
+    cats = db.query(Cat).all()
+    return templates.TemplateResponse("cats.html", {
+        "request": request,
+        "cats": cats
+    })
 
 @app.get("/news")
 async def news_page(request: Request):
