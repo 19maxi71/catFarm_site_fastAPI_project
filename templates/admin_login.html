@@ -85,7 +85,7 @@
         </div>
         {% endif %}
 
-        <form method="post">
+        <form method="post" action="/admin/login" id="loginForm">
             <div class="mb-3">
                 <label for="username" class="form-label">
                     <i class="fas fa-user me-2"></i>Username
@@ -100,7 +100,7 @@
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
 
-            <button type="submit" class="btn btn-login">
+            <button type="submit" class="btn btn-login" id="loginBtn">
                 <i class="fas fa-sign-in-alt me-2"></i>Login
             </button>
         </form>
@@ -113,5 +113,43 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+            btn.disabled = true;
+
+            // Let the form submit normally, but show feedback
+            setTimeout(() => {
+                if (!btn.disabled) return; // Form already processed
+
+                // If still loading after 3 seconds, show a message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-info alert-dismissible fade show mt-3';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-info-circle me-2"></i>
+                    Processing login... If this takes too long, please refresh and try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.login-container').appendChild(alertDiv);
+            }, 3000);
+        });
+
+        // Check for error parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error')) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Login failed. Please check your credentials and try again.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.login-container').insertBefore(alertDiv, document.querySelector('form'));
+        }
+    </script>
 </body>
 </html>

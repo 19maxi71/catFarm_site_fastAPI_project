@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Management - RocKaRan Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8f0ff;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .cat-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+        .cat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .photo-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cat me-2"></i>
+                RocKaRan Cat Farm - Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin">
+                    <i class="fas fa-database me-1"></i>SQLAdmin
+                </a>
+                <a class="nav-link" href="/admin/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Add New Cat
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="catForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Cat Name *</label>
+                                        <input type="text" class="form-control" id="name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="breed" class="form-label">Breed</label>
+                                        <input type="text" class="form-control" id="breed" placeholder="e.g., Siberian, Persian">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role *</label>
+                                <select class="form-control" id="role" required>
+                                    <option value="">Select role...</option>
+                                    <option value="king">King</option>
+                                    <option value="queen">Queen</option>
+                                    <option value="kitten">Kitten</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio/Description</label>
+                                <textarea class="form-control" id="bio" rows="3" placeholder="Tell us about this cat..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Photo</label>
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h5>Drag & Drop Photo Here</h5>
+                                    <p class="text-muted">or <button type="button" class="btn btn-link p-0" onclick="document.getElementById('fileInput').click()">browse files</button></p>
+                                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                </div>
+                                <div id="previewContainer" class="mt-3" style="display: none;">
+                                    <img id="previewImage" class="preview-image">
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removePhoto()">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="rabies_vaccinated">
+                                <label class="form-check-label" for="rabies_vaccinated">
+                                    Rabies Vaccinated
+                                </label>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="award" class="form-label">Awards/Achievements</label>
+                                <input type="text" class="form-control" id="award" placeholder="Any awards or special achievements">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-2"></i>
+                                Save Cat
+                            </button>
+                            <button type="button" class="btn btn-secondary ms-2" id="cancelBtn" style="display: none;" onclick="cancelEdit()">
+                                <i class="fas fa-times me-2"></i>
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Quick Stats</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="stats">
+                            <p class="text-muted">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Recent Cats</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentCats">
+                            <p class="text-muted">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Cats List -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    All Cats
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="catsList">
+                    <p class="text-muted">Loading cats...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedPhotoPath = null;
+        let editingCatId = null;
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadRecentCats();
+            loadAllCats();
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFileSelect, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        }
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const catName = document.getElementById('name').value;
+            if (catName) {
+                formData.append('cat_name', catName);
+            }
+
+            try {
+                const response = await fetch('/api/upload/photo', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    uploadedPhotoPath = result.data.full_image;
+                    showPreview(result.data.thumbnail, file.name);
+                    showAlert('Photo uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+            }
+        }
+
+        function showPreview(thumbnailPath, filename) {
+            previewImage.src = '/static/' + thumbnailPath;
+            previewContainer.style.display = 'block';
+            uploadArea.style.display = 'none';
+        }
+
+        function removePhoto() {
+            uploadedPhotoPath = null;
+            previewContainer.style.display = 'none';
+            uploadArea.style.display = 'block';
+            fileInput.value = '';
+        }
+
+        // Form submission
+        document.getElementById('catForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            submitBtn.disabled = true;
+
+            const catData = {
+                name: document.getElementById('name').value,
+                breed: document.getElementById('breed').value,
+                role: document.getElementById('role').value,
+                bio: document.getElementById('bio').value,
+                photo_url: uploadedPhotoPath || '',
+                rabies_vaccinated: document.getElementById('rabies_vaccinated').checked,
+                award: document.getElementById('award').value
+            };
+
+            try {
+                let response;
+                if (editingCatId) {
+                    // Update existing cat
+                    response = await fetch('/api/cats/' + editingCatId, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(catData)
+                    });
+                } else {
+                    // Create new cat
+                    response = await fetch('/api/cats/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(catData)
+                    });
+                }
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(editingCatId ? 'Cat updated successfully!' : 'Cat saved successfully!', 'success');
+                    document.getElementById('catForm').reset();
+                    removePhoto();
+                    cancelEdit(); // Reset form to create mode
+                    loadStats();
+                    loadAllCats();
+                    loadRecentCats();
+                } else {
+                    const error = await response.json();
+                    showAlert('Error ' + (editingCatId ? 'updating' : 'saving') + ' cat: ' + (error.detail || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Load functions
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/cats/');
+                const cats = await response.json();
+
+                const kings = cats.filter(cat => cat.role === 'king').length;
+                const queens = cats.filter(cat => cat.role === 'queen').length;
+                const kittens = cats.filter(cat => cat.role === 'kitten').length;
+
+                document.getElementById('stats').innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <span>Total Cats:</span>
+                        <strong>${cats.length}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Kings:</span>
+                        <strong>${kings}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Queens:</span>
+                        <strong>${queens}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Kittens:</span>
+                        <strong>${kittens}</strong>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('stats').innerHTML = '<p class="text-danger">Error loading stats: ' + error.message + '</p>';
+            }
+        }
+
+        async function loadRecentCats() {
+            try {
+                const response = await fetch('/api/cats/');
+                const cats = await response.json();
+
+                const recentCats = cats.slice(-3).reverse();
+                const html = recentCats.map(cat => `
+                    <div class="d-flex align-items-center mb-2">
+                        ${cat.photo_url ? `<img src="${cat.photo_url.replace('/cats/', '/thumbnails/').replace('_full.jpg', '_thumb.jpg')}" class="photo-preview me-2" alt="${cat.name}">` : '<div class="bg-light photo-preview me-2 d-flex align-items-center justify-content-center"><i class="fas fa-cat text-muted"></i></div>'}
+                        <div>
+                            <strong>${cat.name}</strong><br>
+                            <small class="text-muted">${cat.breed || 'Unknown breed'} • ${cat.role}</small>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('recentCats').innerHTML = html || '<p class="text-muted">No cats yet</p>';
+            } catch (error) {
+                console.error('Error loading recent cats:', error);
+            }
+        }
+
+        async function loadAllCats() {
+            try {
+                const response = await fetch('/api/cats/');
+                const cats = await response.json();
+
+                const html = cats.map(cat => `
+                    <div class="cat-card">
+                        <div class="row">
+                            <div class="col-md-2">
+                                ${cat.photo_url ? `<img src="${cat.photo_url.replace('/cats/', '/thumbnails/').replace('_full.jpg', '_thumb.jpg')}" class="img-fluid rounded" alt="${cat.name}">` : '<div class="bg-light d-flex align-items-center justify-content-center" style="height: 80px;"><i class="fas fa-cat fa-2x text-muted"></i></div>'}
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="mb-1">${cat.name}</h6>
+                                <p class="mb-1 text-muted">${cat.breed || 'Unknown breed'} • ${cat.role}</p>
+                                ${cat.bio ? `<p class="mb-1">${cat.bio.substring(0, 100)}${cat.bio.length > 100 ? '...' : ''}</p>` : ''}
+                                <small class="text-muted">
+                                    ${cat.rabies_vaccinated ? '<i class="fas fa-check-circle text-success me-2"></i>Vaccinated' : '<i class="fas fa-times-circle text-warning me-2"></i>Not vaccinated'}
+                                    ${cat.award ? ` • <i class="fas fa-trophy text-warning me-1"></i>${cat.award}` : ''}
+                                </small>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editCat(${cat.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteCat(${cat.id}, '${cat.name}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('catsList').innerHTML = html || '<p class="text-muted">No cats found</p>';
+            } catch (error) {
+                console.error('Error loading cats:', error);
+                document.getElementById('catsList').innerHTML = '<p class="text-danger">Error loading cats: ' + error.message + '</p>';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        async function editCat(catId) {
+            try {
+                const response = await fetch('/api/cats/' + catId);
+                if (response.ok) {
+                    const cat = await response.json();
+
+                    // Populate form with cat data
+                    document.getElementById('name').value = cat.name || '';
+                    document.getElementById('breed').value = cat.breed || '';
+                    document.getElementById('role').value = cat.role || '';
+                    document.getElementById('bio').value = cat.bio || '';
+                    document.getElementById('rabies_vaccinated').checked = cat.rabies_vaccinated || false;
+                    document.getElementById('award').value = cat.award || '';
+
+                    // Handle photo
+                    if (cat.photo_url) {
+                        uploadedPhotoPath = cat.photo_url;
+                        // Show thumbnail in preview
+                        const thumbnailUrl = cat.photo_url.replace('/cats/', '/thumbnails/').replace('_full.jpg', '_thumb.jpg');
+                        document.getElementById('previewImage').src = '/static/' + thumbnailUrl;
+                        document.getElementById('previewContainer').style.display = 'block';
+                        document.getElementById('uploadArea').style.display = 'none';
+                    }
+
+                    // Set edit mode
+                    editingCatId = catId;
+                    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Cat';
+                    document.getElementById('cancelBtn').style.display = 'inline-block';
+
+                    // Scroll to form
+                    document.getElementById('catForm').scrollIntoView({ behavior: 'smooth' });
+
+                    showAlert('Editing cat: ' + cat.name, 'info');
+                } else {
+                    showAlert('Error loading cat data', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        }
+
+        function cancelEdit() {
+            editingCatId = null;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Save Cat';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('catForm').reset();
+            removePhoto();
+        }
+
+        async function deleteCat(catId, catName) {
+            if (confirm(`Are you sure you want to delete ${catName}?`)) {
+                try {
+                    const response = await fetch('/api/cats/' + catId, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showAlert('Cat deleted successfully!', 'success');
+                        loadStats();
+                        loadAllCats();
+                        loadRecentCats();
+                    } else {
+                        showAlert('Error deleting cat', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error: ' + error.message, 'danger');
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

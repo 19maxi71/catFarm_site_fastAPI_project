@@ -1,22 +1,34 @@
 from starlette.responses import RedirectResponse
 from starlette.requests import Request
-from sqladmin.authentication import AuthenticationBackend
-from sqladmin import Admin
 from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqladmin import Admin, ModelView
+from starlette.middleware.sessions import SessionMiddleware
 from .database import Base, engine, get_db
 from .models import Cat, Article
-from .admin import CatAdmin
 from .api.cats import router as cats_router
 from .api.articles import router as articles_router
+from .upload_api import router as upload_router
+from .auth import authenticate_user
 
 
 app = FastAPI(title="RocKaRan Cat Farm",
               description="Siberian Cat Breeding Farm")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Add session middleware (required for SQLAdmin authentication)
+app.add_middleware(SessionMiddleware,
+                   secret_key="your-secret-key-change-this-in-production")
 
 # Serve static files (CSS, JS, images)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -27,51 +39,34 @@ templates = Jinja2Templates(directory="templates")
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Initialize admin with authentication
-
-
-class AdminAuth(AuthenticationBackend):
-    async def login(self, request: Request) -> bool:
-        """Handle login logic."""
-        form = await request.form()
-        username = form.get("username")
-        password = form.get("password")
-
-        # Use our authentication function
-        from .auth import authenticate_user
-        user = authenticate_user(username, password)
-        if user:
-            # Store user in session
-            request.session.update({"user": user["username"]})
-            return True
-        return False
-
-    async def logout(self, request: Request) -> bool:
-        """Handle logout logic."""
-        request.session.clear()
-        return True
-
-    async def authenticate(self, request: Request) -> bool:
-        """Check if user is authenticated."""
-        user = request.session.get("user")
-        return user is not None
-
-
-# Create authentication backend
-authentication_backend = AdminAuth(
-    secret_key="your-secret-key-change-this-in-production")
-
-admin = Admin(app, engine, authentication_backend=authentication_backend)
-admin.add_view(CatAdmin)
+# Custom admin interface (replacing SQLAdmin for better UX)
+# No SQLAdmin setup needed - using custom interface at /admin
 
 # Include authentication routes
-# Removed - using SQLAdmin's built-in authentication
+# Removed - using custom authentication for admin interface
 
 # Include API routes
 app.include_router(cats_router, prefix="/api", tags=["cats"])
 app.include_router(articles_router, prefix="/api", tags=["articles"])
+app.include_router(upload_router, prefix="/api", tags=["uploads"])
 
-# Admin authentication middleware - removed, using SQLAdmin's built-in auth
+# Admin authentication middleware
+
+
+@app.middleware("http")
+async def admin_auth_middleware(request: Request, call_next):
+    """Protect admin routes with authentication."""
+    if request.url.path.startswith("/admin") and not request.url.path.startswith("/admin/login"):
+        # Check for access token in cookies
+        access_token = request.cookies.get("access_token")
+        if not access_token:
+            return RedirectResponse(url="/admin/login", status_code=302)
+
+        # Here you could verify the token if needed
+        # For now, just check if token exists
+
+    response = await call_next(request)
+    return response
 
 # Frontend routes
 
@@ -89,13 +84,18 @@ async def cats_page(request: Request, db: Session = Depends(get_db)):
     # Convert Cat objects to dictionaries for JSON serialization
     cats_data = []
     for cat in cats:
+        # Fix photo URL for proper static file serving
+        photo_url = cat.photo_url
+        if photo_url and not photo_url.startswith(('http://', 'https://')):
+            photo_url = f"/static/{photo_url}"
+
         cat_dict = {
             "id": cat.id,
             "name": cat.name,
             "role": cat.role,
             "breed": cat.breed,
             "bio": cat.bio,
-            "photo_url": cat.photo_url,
+            "photo_url": photo_url,
             "rabies_vaccinated": cat.rabies_vaccinated,
             "award": cat.award,
             "created_at": cat.created_at.isoformat() if cat.created_at else None,
@@ -114,14 +114,47 @@ async def news_page(request: Request):
     return templates.TemplateResponse("news.html", {"request": request})
 
 
-@app.get("/article/{article_id}")
-async def article_detail(request: Request, article_id: int, db: Session = Depends(get_db)):
-    article = db.query(Article).filter(Article.id == article_id).first()
+@app.get("/admin/login")
+async def admin_login_page(request: Request):
+    """Serve admin login page."""
+    return templates.TemplateResponse("admin_login.html", {"request": request})
 
-    if not article or not article.published:
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
 
-    return templates.TemplateResponse("article_detail.html", {
-        "request": request,
-        "article": article
-    })
+@app.post("/admin/login")
+async def admin_login(request: Request):
+    """Handle admin login form submission."""
+    form_data = await request.form()
+    username = form_data.get("username")
+    password = form_data.get("password")
+
+    # Simple authentication for now (replace with proper auth later)
+    if username == "admin" and password == "admin123":
+        # Create access token (simple cookie-based auth for now)
+        response = RedirectResponse(url="/admin", status_code=302)
+        response.set_cookie(
+            key="access_token",
+            value="authenticated",  # Simple token for now
+            httponly=True,
+            max_age=3600  # 1 hour
+        )
+        return response
+    else:
+        # Login failed - redirect back to login with error
+        return templates.TemplateResponse(
+            "admin_login.html",
+            {"request": request, "error": "Invalid username or password"}
+        )
+
+
+@app.get("/admin/logout")
+async def admin_logout(request: Request):
+    """Handle admin logout."""
+    response = RedirectResponse(url="/admin/login", status_code=302)
+    response.delete_cookie("access_token")
+    return response
+
+
+@app.get("/admin")
+async def custom_admin(request: Request):
+    """Serve custom admin interface for cat management."""
+    return templates.TemplateResponse("cat_admin.html", {"request": request})
