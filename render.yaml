@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: catfarm-api
+    runtime: docker
+    plan: free
+    buildCommand: docker build -t catfarm .
+    startCommand: docker run -p $PORT:8000 catfarm
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: catfarm-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHONPATH
+        value: /app
+
+  - type: pserv
+    name: catfarm-db
+    runtime: postgresql
+    plan: free
+    databaseName: catfarm
+    user: catfarm_user

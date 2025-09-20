@@ -19,9 +19,9 @@
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
             <!-- Featured Image -->
             {% if article.featured_image %}
-            <div class="relative max-h-96 overflow-hidden flex items-center justify-center bg-gray-100">
-                <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="max-w-full max-h-full object-contain">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+            <div class="relative w-full overflow-hidden flex justify-center bg-gray-100">
+                <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="max-w-full max-h-screen object-scale-down">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
             </div>
             {% endif %}
 
@@ -57,8 +57,8 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Gallery</h3>
                     <div class="relative">
                         <!-- Main Image Display -->
-                        <div class="mb-4">
-                            <img id="mainImage" src="{{ images[0].image_path }}" alt="{{ images[0].caption or article.title }}" class="w-full h-96 object-cover rounded-lg shadow-lg">
+                        <div class="mb-4 flex justify-center bg-gray-100 rounded-lg">
+                            <img id="mainImage" src="{{ images[0].image_path }}" alt="{{ images[0].caption or article.title }}" class="max-w-full max-h-screen object-scale-down rounded-lg shadow-lg">
                             {% if images[0].caption %}
                             <p class="text-sm text-gray-600 mt-2 italic">{{ images[0].caption }}</p>
                             {% endif %}
@@ -68,7 +68,7 @@
                         <div class="flex gap-2 overflow-x-auto pb-2" id="thumbnailStrip">
                             {% for image in images %}
                             <div class="flex-shrink-0 cursor-pointer transition-all duration-200 hover:scale-105" onclick="changeMainImage('{{ image.image_path }}', '{{ image.caption or article.title }}', {{ loop.index0 }})">
-                                <img src="{{ image.image_path }}" alt="{{ image.caption or article.title }}" class="w-20 h-20 object-cover rounded border-2 {% if loop.first %}border-amber-500{% else %}border-gray-300{% endif %} hover:border-amber-400">
+                                <img src="{{ image.image_path }}" alt="{{ image.caption or article.title }}" class="w-20 h-20 object-scale-down rounded border-2 {% if loop.first %}border-amber-500{% else %}border-gray-300{% endif %} hover:border-amber-400 bg-gray-100">
                             </div>
                             {% endfor %}
                         </div>
