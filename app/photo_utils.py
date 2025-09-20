@@ -3,7 +3,7 @@ import uuid
 import aiofiles
 from datetime import datetime
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageOps
 from fastapi import UploadFile, HTTPException
 from typing import Tuple
 
@@ -82,6 +82,9 @@ async def process_image(temp_path: Path, base_name: str, file_ext: str, target_d
     try:
         # Open image
         with Image.open(temp_path) as img:
+            # Auto-rotate based on EXIF orientation data
+            img = ImageOps.exif_transpose(img)
+
             # Convert to RGB if necessary (for PNG with transparency)
             if img.mode in ('RGBA', 'LA', 'P'):
                 # Create white background

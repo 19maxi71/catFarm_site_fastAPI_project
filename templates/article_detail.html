@@ -19,9 +19,9 @@
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
             <!-- Featured Image -->
             {% if article.featured_image %}
-            <div class="relative h-64 md:h-80 overflow-hidden">
-                <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+            <div class="relative max-h-96 overflow-hidden flex items-center justify-center bg-gray-100">
+                <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="max-w-full max-h-full object-contain">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             </div>
             {% endif %}
 
