@@ -51,6 +51,45 @@
                     </div>
                 </div>
 
+                <!-- Article Images Gallery -->
+                {% if images %}
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Gallery</h3>
+                    <div class="relative">
+                        <!-- Main Image Display -->
+                        <div class="mb-4">
+                            <img id="mainImage" src="{{ images[0].image_path }}" alt="{{ images[0].caption or article.title }}" class="w-full h-96 object-cover rounded-lg shadow-lg">
+                            {% if images[0].caption %}
+                            <p class="text-sm text-gray-600 mt-2 italic">{{ images[0].caption }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Thumbnail Strip -->
+                        <div class="flex gap-2 overflow-x-auto pb-2" id="thumbnailStrip">
+                            {% for image in images %}
+                            <div class="flex-shrink-0 cursor-pointer transition-all duration-200 hover:scale-105" onclick="changeMainImage('{{ image.image_path }}', '{{ image.caption or article.title }}', {{ loop.index0 }})">
+                                <img src="{{ image.image_path }}" alt="{{ image.caption or article.title }}" class="w-20 h-20 object-cover rounded border-2 {% if loop.first %}border-amber-500{% else %}border-gray-300{% endif %} hover:border-amber-400">
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Navigation Arrows (if more than 4 images) -->
+                        {% if images|length > 4 %}
+                        <button id="prevBtn" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200 hidden" onclick="scrollThumbnails(-1)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="nextBtn" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200" onclick="scrollThumbnails(1)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Article Footer -->
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <div class="flex flex-wrap justify-between items-center gap-4">
@@ -152,7 +191,76 @@ function shareArticle() {
 // Load related articles when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadRelatedArticles();
+    initializeGallery();
 });
+
+let currentImageIndex = 0;
+const images = [
+    {% for image in images %}
+    {src: '{{ image.image_path }}', caption: '{{ image.caption or article.title }}', alt: '{{ image.caption or article.title }}'}{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+function initializeGallery() {
+    if (images.length === 0) return;
+
+    // Set up keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+            changeImageByOffset(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeImageByOffset(1);
+        }
+    });
+
+    updateNavigationButtons();
+}
+
+function changeMainImage(src, caption, index) {
+    document.getElementById('mainImage').src = src;
+    document.getElementById('mainImage').alt = caption;
+
+    // Update active thumbnail
+    const thumbnails = document.querySelectorAll('#thumbnailStrip img');
+    thumbnails.forEach((thumb, i) => {
+        if (i === index) {
+            thumb.classList.remove('border-gray-300');
+            thumb.classList.add('border-amber-500');
+        } else {
+            thumb.classList.remove('border-amber-500');
+            thumb.classList.add('border-gray-300');
+        }
+    });
+
+    currentImageIndex = index;
+    updateNavigationButtons();
+}
+
+function changeImageByOffset(offset) {
+    const newIndex = currentImageIndex + offset;
+    if (newIndex >= 0 && newIndex < images.length) {
+        changeMainImage(images[newIndex].src, images[newIndex].caption, newIndex);
+    }
+}
+
+function scrollThumbnails(direction) {
+    const strip = document.getElementById('thumbnailStrip');
+    const scrollAmount = 200; // Adjust scroll amount as needed
+    strip.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+    });
+}
+
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    if (prevBtn && nextBtn) {
+        prevBtn.style.display = currentImageIndex > 0 ? 'block' : 'none';
+        nextBtn.style.display = currentImageIndex < images.length - 1 ? 'block' : 'none';
+    }
+}
 </script>
 
 {% endblock %}

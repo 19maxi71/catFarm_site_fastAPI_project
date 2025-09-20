@@ -9,17 +9,21 @@ router = APIRouter()
 
 
 @router.post("/upload/photo")
-async def upload_cat_photo(
+async def upload_photo(
     file: UploadFile = File(...),
-    cat_name: Optional[str] = Form(None)
+    cat_name: Optional[str] = Form(None),
+    article_image: Optional[str] = Form(None)
 ):
     """
-    Upload and process a cat photo.
+    Upload and process a photo (cat or article).
     Returns the file paths for storage in database.
     """
     try:
+        # Determine the naming prefix based on type
+        name_prefix = f"article_{cat_name}" if article_image == "true" else cat_name
+
         # Process and save the photo
-        full_path, thumb_path = await save_uploaded_photo(file, cat_name)
+        full_path, thumb_path = await save_uploaded_photo(file, name_prefix, article_image == "true")
 
         # Get image info
         image_info = get_image_info(full_path)

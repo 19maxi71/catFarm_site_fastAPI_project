@@ -10,11 +10,13 @@ from typing import Tuple
 # Configuration
 UPLOAD_DIR = Path("static/uploads")
 CATS_DIR = UPLOAD_DIR / "cats"
+ARTICLES_DIR = UPLOAD_DIR / "articles"
 THUMBNAILS_DIR = UPLOAD_DIR / "thumbnails"
 TEMP_DIR = UPLOAD_DIR / "temp"
 
 # Ensure directories exist
 CATS_DIR.mkdir(parents=True, exist_ok=True)
+ARTICLES_DIR.mkdir(parents=True, exist_ok=True)
 THUMBNAILS_DIR.mkdir(parents=True, exist_ok=True)
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -25,7 +27,7 @@ THUMBNAIL_SIZE = (300, 300)
 FULL_SIZE = (1200, 1200)
 
 
-async def save_uploaded_photo(file: UploadFile, cat_name: str = None) -> Tuple[str, str]:
+async def save_uploaded_photo(file: UploadFile, cat_name: str = None, article_image: bool = False) -> Tuple[str, str]:
     """
     Save uploaded photo with compression and create thumbnail.
     Returns: (full_image_path, thumbnail_path)
@@ -45,7 +47,13 @@ async def save_uploaded_photo(file: UploadFile, cat_name: str = None) -> Tuple[s
     # Generate unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     unique_id = str(uuid.uuid4())[:8]
-    base_name = f"{cat_name}_{timestamp}_{unique_id}" if cat_name else f"cat_{timestamp}_{unique_id}"
+
+    if article_image:
+        base_name = f"article_{timestamp}_{unique_id}"
+        target_dir = ARTICLES_DIR
+    else:
+        base_name = f"{cat_name}_{timestamp}_{unique_id}" if cat_name else f"cat_{timestamp}_{unique_id}"
+        target_dir = CATS_DIR
 
     # Save original file temporarily
     temp_path = TEMP_DIR / f"{base_name}_original{file_ext}"
@@ -54,7 +62,7 @@ async def save_uploaded_photo(file: UploadFile, cat_name: str = None) -> Tuple[s
 
     try:
         # Process and optimize image
-        full_path, thumb_path = await process_image(temp_path, base_name, file_ext)
+        full_path, thumb_path = await process_image(temp_path, base_name, file_ext, target_dir)
 
         # Clean up temp file
         temp_path.unlink(missing_ok=True)
@@ -69,7 +77,7 @@ async def save_uploaded_photo(file: UploadFile, cat_name: str = None) -> Tuple[s
             status_code=500, detail=f"Error processing image: {str(e)}")
 
 
-async def process_image(temp_path: Path, base_name: str, file_ext: str) -> Tuple[Path, Path]:
+async def process_image(temp_path: Path, base_name: str, file_ext: str, target_dir: Path = CATS_DIR) -> Tuple[Path, Path]:
     """Process image: compress, resize, and create thumbnail."""
     try:
         # Open image
@@ -87,7 +95,7 @@ async def process_image(temp_path: Path, base_name: str, file_ext: str) -> Tuple
                 img = img.convert('RGB')
 
             # Create full-size optimized image
-            full_path = CATS_DIR / f"{base_name}_full.jpg"
+            full_path = target_dir / f"{base_name}_full.jpg"
             img_resized = resize_image(img, FULL_SIZE)
             img_resized.save(full_path, 'JPEG', quality=85, optimize=True)
 

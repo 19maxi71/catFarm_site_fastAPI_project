@@ -1,6 +1,26 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+
+
+class ArticleImageSerializer(BaseModel):
+    image_path: str
+    caption: Optional[str] = None
+    display_order: int = 0
+
+
+class CreateArticleImageRequest(ArticleImageSerializer):
+    pass
+
+
+class ArticleImageResponse(ArticleImageSerializer):
+    id: int
+    article_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 
 class ArticleSerializer(BaseModel):
     title: str
@@ -12,6 +32,7 @@ class ArticleSerializer(BaseModel):
 
 class CreateArticleRequest(ArticleSerializer):
     pass
+
 
 class ArticleApiResponse(ArticleSerializer):
     id: int

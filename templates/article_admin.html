@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Management - RocKaRan Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8f0ff;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .article-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+        .article-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-newspaper me-2"></i>
+                RocKaRan Article Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin">
+                    <i class="fas fa-cat me-1"></i> Cat Admin
+                </a>
+                <a class="nav-link" href="/admin/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Create New Article
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="articleForm">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Article Title *</label>
+                                <input type="text" class="form-control" id="title" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="author" class="form-label">Author</label>
+                                <input type="text" class="form-control" id="author" value="Admin">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content *</label>
+                                <textarea class="form-control" id="content" rows="10" required placeholder="Write your article content here..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Featured Image</label>
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h5>Drag & Drop Image Here</h5>
+                                    <p class="text-muted">or <button type="button" class="btn btn-link p-0" onclick="document.getElementById('fileInput').click()">browse files</button></p>
+                                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                </div>
+                                <div id="previewContainer" class="mt-3" style="display: none;">
+                                    <img id="previewImage" class="preview-image">
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removePhoto()">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Article Gallery Images -->
+                            <div class="mb-3">
+                                <label class="form-label">Article Gallery Images</label>
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="upload-area mb-3" id="galleryUploadArea">
+                                        <i class="fas fa-images fa-2x text-muted mb-2"></i>
+                                        <h6>Add Gallery Images</h6>
+                                        <p class="text-muted small">Drag & drop multiple images here or <button type="button" class="btn btn-link p-0" onclick="document.getElementById('galleryFileInput').click()">browse files</button></p>
+                                        <input type="file" id="galleryFileInput" accept="image/*" multiple style="display: none;">
+                                    </div>
+
+                                    <!-- Gallery Images Preview -->
+                                    <div id="galleryImages" class="row g-2">
+                                        <!-- Gallery images will be displayed here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="published" checked>
+                                <label class="form-check-label" for="published">
+                                    Publish Article (visible to public)
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-2"></i>
+                                Publish Article
+                            </button>
+                            <button type="button" class="btn btn-secondary ms-2" id="cancelBtn" style="display: none;" onclick="cancelEdit()">
+                                <i class="fas fa-times me-2"></i>
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Article Stats</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="stats">
+                            <p class="text-muted">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Articles List -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    All Articles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="articlesList">
+                    <p class="text-muted">Loading articles...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedPhotoPath = null; // Kept for compatibility but not used
+        let editingArticleId = null;
+        let galleryImages = []; // Array to store gallery images
+        let featuredImages = []; // Array to store featured images
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadAllArticles();
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFileSelect, false);
+
+        // Gallery upload functionality
+        const galleryUploadArea = document.getElementById('galleryUploadArea');
+        const galleryFileInput = document.getElementById('galleryFileInput');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        galleryUploadArea.addEventListener('drop', handleGalleryDrop, false);
+        galleryFileInput.addEventListener('change', handleGalleryFileSelect, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleGalleryDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleGalleryFiles(files);
+        }
+
+        function handleGalleryFileSelect(e) {
+            const files = e.target.files;
+            handleGalleryFiles(files);
+        }
+
+        async function handleGalleryFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                await uploadGalleryImage(files[i]);
+            }
+        }
+
+        async function uploadGalleryImage(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('article_image', 'true');
+
+            // If editing, upload to existing article
+            if (editingArticleId) {
+                formData.append('article_id', editingArticleId);
+            }
+
+            try {
+                const response = await fetch('/api/upload/photo', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const imageData = {
+                        id: Date.now(), // Temporary ID for new images
+                        image_path: result.data.full_image,
+                        caption: '',
+                        display_order: galleryImages.length,
+                        isNew: true
+                    };
+                    galleryImages.push(imageData);
+                    displayGalleryImages();
+                    showAlert('Gallery image uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+            }
+        }
+
+        function displayGalleryImages() {
+            const container = document.getElementById('galleryImages');
+            container.innerHTML = '';
+
+            galleryImages.forEach((image, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-6';
+
+                col.innerHTML = `
+                    <div class="position-relative">
+                        <img src="/static/${image.image_path.replace('uploads/', 'thumbnails/').replace('_full.jpg', '_thumb.jpg')}"
+                             class="img-fluid rounded mb-2" alt="Gallery image">
+                        <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1"
+                                onclick="removeGalleryImage(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <input type="text" class="form-control form-control-sm" placeholder="Caption (optional)"
+                               value="${image.caption || ''}" onchange="updateGalleryCaption(${index}, this.value)">
+                    </div>
+                `;
+
+                container.appendChild(col);
+            });
+        }
+
+        function removeGalleryImage(index) {
+            const image = galleryImages[index];
+            if (image.isNew) {
+                // Just remove from array for new images
+                galleryImages.splice(index, 1);
+                displayGalleryImages();
+            } else {
+                // For existing images, we need to delete from server
+                if (confirm('Are you sure you want to delete this image?')) {
+                    deleteGalleryImage(image.id);
+                }
+            }
+        }
+
+        async function deleteGalleryImage(imageId) {
+            try {
+                const response = await fetch(`/api/articles/${editingArticleId}/images/${imageId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    galleryImages = galleryImages.filter(img => img.id !== imageId);
+                    displayGalleryImages();
+                    showAlert('Gallery image deleted successfully!', 'success');
+                } else {
+                    showAlert('Error deleting image', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        }
+
+        function updateGalleryCaption(index, caption) {
+            galleryImages[index].caption = caption;
+        }
+
+        async function saveGalleryImages(articleId) {
+            try {
+                // First, clear all existing gallery images for this article
+                const clearResponse = await fetch(`/api/articles/${articleId}/images/clear/`, {
+                    method: 'POST'
+                });
+
+                if (!clearResponse.ok) {
+                    console.error('Failed to clear existing gallery images');
+                }
+
+                // Then associate all current gallery images
+                for (let i = 0; i < galleryImages.length; i++) {
+                    const image = galleryImages[i];
+                    try {
+                        const response = await fetch(`/api/articles/${articleId}/images/associate/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                image_path: image.image_path,
+                                caption: image.caption || '',
+                                display_order: i
+                            })
+                        });
+
+                        if (!response.ok) {
+                            console.error('Failed to associate gallery image:', image);
+                        }
+                    } catch (error) {
+                        console.error('Error associating gallery image:', error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving gallery images:', error);
+            }
+        }
+
+        function clearGallery() {
+            galleryImages = [];
+            displayGalleryImages();
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        }
+
+        async function uploadFile(file) {
+            console.log('uploadFile called with file:', file.name);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('article_image', 'true'); // Flag for article images
+
+            try {
+                console.log('Sending upload request...');
+                const response = await fetch('/api/upload/photo', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log('Upload result:', result);
+
+                if (result.success) {
+                    // Add to featured images array (only keep one)
+                    featuredImages = [{
+                        id: Date.now(),
+                        image_path: result.data.full_image,
+                        isNew: true
+                    }];
+                    console.log('Added to featuredImages:', featuredImages);
+                    showPreview(result.data.thumbnail, file.name);
+                    showAlert('Featured image uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showAlert('Upload error: ' + error.message, 'danger');
+            }
+        }
+
+        function showPreview(thumbnailPath, filename) {
+            previewImage.src = '/static/' + thumbnailPath;
+            previewContainer.style.display = 'block';
+            uploadArea.style.display = 'none';
+        }
+
+        function removePhoto() {
+            featuredImages = [];
+            previewContainer.style.display = 'none';
+            uploadArea.style.display = 'block';
+            fileInput.value = '';
+        }
+
+        // Form submission
+        document.getElementById('articleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            submitBtn.disabled = true;
+
+            const articleData = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                content: document.getElementById('content').value,
+                featured_image: featuredImages[0]?.image_path || '',
+                published: document.getElementById('published').checked
+            };
+
+            try {
+                let response;
+                if (editingArticleId) {
+                    // Update existing article
+                    response = await fetch('/api/articles/' + editingArticleId, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(articleData)
+                    });
+                } else {
+                    // Create new article
+                    response = await fetch('/api/articles/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(articleData)
+                    });
+                }
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(editingArticleId ? 'Article updated successfully!' : 'Article published successfully!', 'success');
+
+                    // Save gallery images for both new and existing articles
+                    if (galleryImages.length > 0) {
+                        await saveGalleryImages(result.id);
+                    }
+
+                    document.getElementById('articleForm').reset();
+                    removePhoto();
+                    clearGallery();
+                    cancelEdit();
+                    loadStats();
+                    loadAllArticles();
+                } else {
+                    const error = await response.json();
+                    showAlert('Error ' + (editingArticleId ? 'updating' : 'publishing') + ' article: ' + (error.detail || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Load functions
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/articles/');
+                const articles = await response.json();
+
+                const published = articles.filter(article => article.published).length;
+                const drafts = articles.filter(article => !article.published).length;
+
+                document.getElementById('stats').innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <span>Total Articles:</span>
+                        <strong>${articles.length}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Published:</span>
+                        <strong>${published}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Drafts:</span>
+                        <strong>${drafts}</strong>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('stats').innerHTML = '<p class="text-danger">Error loading stats: ' + error.message + '</p>';
+            }
+        }
+
+        async function loadAllArticles() {
+            try {
+                const response = await fetch('/api/articles/');
+                const articles = await response.json();
+
+                const html = articles.map(article => `
+                    <div class="article-card">
+                        <div class="row">
+                            <div class="col-md-2">
+                                ${article.featured_image ? `<img src="${article.featured_image}" class="img-fluid rounded" alt="${article.title}">` : '<div class="bg-light d-flex align-items-center justify-content-center" style="height: 80px;"><i class="fas fa-newspaper fa-2x text-muted"></i></div>'}
+                            </div>
+                            <div class="col-md-8">
+                                <h6 class="mb-1">${article.title}</h6>
+                                <p class="mb-1 text-muted">By ${article.author} • ${new Date(article.created_at).toLocaleDateString()}</p>
+                                <p class="mb-1">${article.content.substring(0, 100)}${article.content.length > 100 ? '...' : ''}</p>
+                                <small class="text-muted">
+                                    ${article.published ? '<i class="fas fa-eye text-success me-2"></i>Published' : '<i class="fas fa-eye-slash text-warning me-2"></i>Draft'}
+                                </small>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editArticle(${article.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteArticle(${article.id}, '${article.title}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('articlesList').innerHTML = html || '<p class="text-muted">No articles found</p>';
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                document.getElementById('articlesList').innerHTML = '<p class="text-danger">Error loading articles: ' + error.message + '</p>';
+            }
+        }
+
+        async function editArticle(articleId) {
+            try {
+                const response = await fetch('/api/articles/' + articleId);
+                if (response.ok) {
+                    const article = await response.json();
+
+                    // Populate form with article data
+                    document.getElementById('title').value = article.title || '';
+                    document.getElementById('author').value = article.author || '';
+                    document.getElementById('content').value = article.content || '';
+                    document.getElementById('published').checked = article.published || false;
+
+                    // Handle featured image
+                    if (article.featured_image) {
+                        featuredImages = [{
+                            id: Date.now(),
+                            image_path: article.featured_image.replace('/static/', ''),
+                            isNew: false
+                        }];
+                        previewImage.src = article.featured_image;
+                        previewContainer.style.display = 'block';
+                        uploadArea.style.display = 'none';
+                    }
+
+                    // Load gallery images
+                    await loadGalleryImages(articleId);
+
+                    // Set edit mode
+                    editingArticleId = articleId;
+                    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Article';
+                    document.getElementById('cancelBtn').style.display = 'inline-block';
+
+                    // Scroll to form
+                    document.getElementById('articleForm').scrollIntoView({ behavior: 'smooth' });
+
+                    showAlert('Editing article: ' + article.title, 'info');
+                } else {
+                    showAlert('Error loading article data', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        }
+
+        async function loadGalleryImages(articleId) {
+            try {
+                const response = await fetch(`/api/articles/${articleId}/images/`);
+                if (response.ok) {
+                    const images = await response.json();
+                    galleryImages = images.map(img => ({
+                        id: img.id,
+                        image_path: img.image_path.replace('/static/', ''),
+                        caption: img.caption || '',
+                        display_order: img.display_order,
+                        isNew: false
+                    }));
+                    displayGalleryImages();
+                }
+            } catch (error) {
+                console.error('Error loading gallery images:', error);
+            }
+        }
+
+        function cancelEdit() {
+            editingArticleId = null;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save me-2"></i>Publish Article';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('articleForm').reset();
+            removePhoto();
+            clearGallery();
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -10,6 +10,7 @@ from .database import Base, engine, get_db
 from .models import Cat, Article
 from .api.cats import router as cats_router
 from .api.articles import router as articles_router
+from .api.article_images import router as article_images_router
 from .upload_api import router as upload_router
 from .auth import authenticate_user
 
@@ -48,6 +49,8 @@ Base.metadata.create_all(bind=engine)
 # Include API routes
 app.include_router(cats_router, prefix="/api", tags=["cats"])
 app.include_router(articles_router, prefix="/api", tags=["articles"])
+app.include_router(article_images_router, prefix="/api",
+                   tags=["article-images"])
 app.include_router(upload_router, prefix="/api", tags=["uploads"])
 
 # Admin authentication middleware
@@ -114,6 +117,37 @@ async def news_page(request: Request):
     return templates.TemplateResponse("news.html", {"request": request})
 
 
+@app.get("/article/{article_id}")
+async def article_detail_page(article_id: int, request: Request, db: Session = Depends(get_db)):
+    """Serve individual article detail page."""
+    article = db.query(Article).filter(
+        Article.id == article_id, Article.published == True).first()
+
+    if not article:
+        # Return 404 page or redirect to news
+        return templates.TemplateResponse("news.html", {"request": request, "error": "Article not found"})
+
+    # Format featured image URL
+    if article.featured_image and not article.featured_image.startswith(('http://', 'https://', '/static/')):
+        article.featured_image = f"/static/{article.featured_image}"
+
+    # Get article images
+    from .models.article import ArticleImage
+    images = db.query(ArticleImage).filter(
+        ArticleImage.article_id == article_id).order_by(ArticleImage.display_order).all()
+
+    # Format image URLs for template display
+    for image in images:
+        if image.image_path and not image.image_path.startswith(('http://', 'https://', '/static/')):
+            image.image_path = f"/static/{image.image_path}"
+
+    return templates.TemplateResponse("article_detail.html", {
+        "request": request,
+        "article": article,
+        "images": images
+    })
+
+
 @app.get("/admin/login")
 async def admin_login_page(request: Request):
     """Serve admin login page."""
@@ -158,3 +192,9 @@ async def admin_logout(request: Request):
 async def custom_admin(request: Request):
     """Serve custom admin interface for cat management."""
     return templates.TemplateResponse("cat_admin.html", {"request": request})
+
+
+@app.get("/admin/articles")
+async def article_admin(request: Request):
+    """Serve custom admin interface for article management."""
+    return templates.TemplateResponse("article_admin.html", {"request": request})
