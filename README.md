@@ -67,11 +67,33 @@ uvicorn app.main:app --reload
 
 Visit `http://localhost:8000` to see your site!
 
-## Admin Access
-- Go to `/admin/login`
-- Username: `admin`
-- Password: `admin123`
-- Change these credentials in production!
+## 🔐 Security Setup (IMPORTANT!)
+
+### Generate a Secure SECRET_KEY
+**NEVER use the default secret key in production!**
+
+```bash
+# Generate a secure 32-byte secret key
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Copy the generated key and use it in your environment variables.
+
+### For Render Deployment:
+1. In your Render dashboard, go to your web service
+2. **Environment** → **Add Environment Variable**
+3. **Key**: `SECRET_KEY`
+4. **Value**: Paste your generated secret key
+5. **Save and redeploy**
+
+### Local Development:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your generated SECRET_KEY
+nano .env
+```
 
 ## Project Structure
 ```

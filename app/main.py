@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
+import os
 from .database import Base, engine, get_db
 from .models import Cat, Article
 from .api.cats import router as cats_router
@@ -27,9 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add session middleware (required for SQLAdmin authentication)
+# Add session middleware (required for authentication)
 app.add_middleware(SessionMiddleware,
-                   secret_key="your-secret-key-change-this-in-production")
+                   secret_key=os.getenv("SECRET_KEY", "dev-secret-key-change-in-production"))
 
 # Serve static files (CSS, JS, images)
 app.mount("/static", StaticFiles(directory="static"), name="static")
