@@ -4,7 +4,7 @@ services:
     runtime: docker
     plan: free
     buildCommand: docker build -t catfarm .
-    startCommand: docker run -p $PORT:8000 catfarm
+    startCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -15,9 +15,7 @@ services:
       - key: PYTHONPATH
         value: /app
 
-  - type: pserv
-    name: catfarm-db
-    runtime: postgresql
-    plan: free
+databases:
+  - name: catfarm-db
     databaseName: catfarm
     user: catfarm_user
