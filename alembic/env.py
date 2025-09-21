@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import create_engine
 
 from alembic import context
 
@@ -44,7 +45,11 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    # Use DATABASE_URL from environment, fallback to SQLite for development
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        url = "sqlite:///./catfarm.db"
+    
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,10 +68,21 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+    # Use DATABASE_URL from environment, fallback to SQLite for development
+    database_url = os.getenv("DATABASE_URL")
+    print(f"🔍 Alembic DATABASE_URL from environment: {database_url}")
+    
+    if not database_url:
+        database_url = "sqlite:///./catfarm.db"
+        print("⚠️  No DATABASE_URL found for Alembic, using SQLite fallback")
+    else:
+        print(f"✅ Alembic using database: {database_url[:50]}...")
+    
+    print(f"🎯 Alembic final DATABASE_URL: {database_url}")
+    
+    connectable = create_engine(
+        database_url,
+        connect_args={"check_same_thread": False} if database_url.startswith("sqlite") else {},
     )
 
     with connectable.connect() as connection:
