@@ -29,7 +29,8 @@ class ArticleSerializer(BaseModel):
     author: str = "Admin"
     published: bool = False
     featured_image: Optional[str] = None  # DEPRECATED - kept for compatibility
-    featured_image_base64: Optional[str] = None  # Base64 encoded featured image
+    # Base64 encoded featured image
+    featured_image_base64: Optional[str] = None
 
 
 class CreateArticleRequest(ArticleSerializer):

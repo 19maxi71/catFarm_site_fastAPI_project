@@ -185,26 +185,27 @@ async def convert_image_to_base64(file: UploadFile, max_width: int = 800, max_he
         with Image.open(BytesIO(file_content)) as img:
             # Apply EXIF orientation correction
             img = ImageOps.exif_transpose(img)
-            
+
             # Convert to RGB if necessary (for JPEG compatibility)
             if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
-            
+
             # Resize if too large (to keep database storage reasonable)
             if img.width > max_width or img.height > max_height:
-                img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
-            
+                img.thumbnail((max_width, max_height),
+                              Image.Resampling.LANCZOS)
+
             # Save as JPEG with compression
             buffer = BytesIO()
             img.save(buffer, format='JPEG', quality=85, optimize=True)
             buffer.seek(0)
-            
+
             # Convert to base64
             img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            
+
             # Return with data URL prefix
             return f"data:image/jpeg;base64,{img_base64}"
-            
+
     except Exception as e:
         raise HTTPException(
             status_code=400, detail=f"Error processing image: {str(e)}")
@@ -217,4 +218,3 @@ def base64_to_data_url(base64_string: str) -> str:
     if base64_string and not base64_string.startswith('data:'):
         return f"data:image/jpeg;base64,{base64_string}"
     return base64_string or ""
-                temp_file.unlink(missing_ok=True)

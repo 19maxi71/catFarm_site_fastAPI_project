@@ -11,8 +11,10 @@ class Article(Base):
     title = Column(String(100), nullable=False)
     content = Column(Text, nullable=False)
     author = Column(String(50), default="Admin")
-    featured_image = Column(String(500), nullable=True)  # DEPRECATED - use featured_image_base64
-    featured_image_base64 = Column(Text, nullable=True)  # Base64 encoded featured image
+    # DEPRECATED - use featured_image_base64
+    featured_image = Column(String(500), nullable=True)
+    # Base64 encoded featured image
+    featured_image_base64 = Column(Text, nullable=True)
     published = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -30,7 +32,8 @@ class ArticleImage(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     article_id = Column(Integer, ForeignKey("articles.id"), nullable=False)
-    image_path = Column(String(500), nullable=False)  # DEPRECATED - use image_base64
+    # DEPRECATED - use image_base64
+    image_path = Column(String(500), nullable=False)
     image_base64 = Column(Text, nullable=True)  # Base64 encoded image data
     caption = Column(String(200), nullable=True)
     display_order = Column(Integer, default=0)

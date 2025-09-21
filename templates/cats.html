@@ -153,7 +153,7 @@ let currentCat = null;
 function openModal(cat) {
     currentCat = cat;
     document.getElementById('modalTitle').textContent = cat.name;
-    
+
     // Use base64 image if available, fallback to photo_url
     const photoSrc = cat.photo_base64 || cat.photo_url;
     if (photoSrc) {
@@ -162,7 +162,7 @@ function openModal(cat) {
     } else {
         document.getElementById('modalImage').style.display = 'none';
     }
-    
+
     document.getElementById('modalRole').textContent = cat.role;
     document.getElementById('modalBreed').textContent = cat.breed;
     document.getElementById('modalBio').textContent = cat.bio;
