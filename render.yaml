@@ -19,3 +19,4 @@ databases:
   - name: catfarm-db
     databaseName: catfarm
     user: catfarm_user
+    plan: free
