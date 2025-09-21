@@ -4,7 +4,8 @@ from typing import Optional, List
 
 
 class ArticleImageSerializer(BaseModel):
-    image_path: str
+    image_path: str  # DEPRECATED - kept for compatibility
+    image_base64: Optional[str] = None  # Base64 encoded image data
     caption: Optional[str] = None
     display_order: int = 0
 
@@ -27,7 +28,8 @@ class ArticleSerializer(BaseModel):
     content: str
     author: str = "Admin"
     published: bool = False
-    featured_image: Optional[str] = None
+    featured_image: Optional[str] = None  # DEPRECATED - kept for compatibility
+    featured_image_base64: Optional[str] = None  # Base64 encoded featured image
 
 
 class CreateArticleRequest(ArticleSerializer):

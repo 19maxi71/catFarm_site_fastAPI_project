@@ -108,11 +108,33 @@ nano .env
 └── requirements.txt   # Python dependencies
 ```
 
+## ⚠️ Important: File Storage on Render
+
+**Render's free tier uses ephemeral storage** - uploaded files will be lost when your app restarts or redeploys.
+
+### Solutions for Persistent File Storage:
+
+#### Option 1: External Storage (Recommended)
+- **Cloudinary** (free tier: 25GB)
+- **AWS S3** (free tier: 5GB)
+- **Imgur API** (free tier: good for demos)
+
+#### Option 2: Use Example Images
+For demonstration purposes, use pre-uploaded images in your `/static/images/` directory.
+
+#### Option 3: Database Storage (Small Images Only)
+Store small images as base64 in the database (not recommended for production).
+
+### Quick Fix for Testing:
+1. Use sample images from `/static/images/` directory
+2. Modify file paths to point to persistent static files instead of uploads
+
 ## Technologies Used
 - **Backend**: FastAPI, SQLAlchemy, PostgreSQL
 - **Frontend**: HTML, Tailwind CSS, JavaScript
 - **Image Processing**: Pillow with EXIF orientation correction
 - **Deployment**: Docker, Render
+- **File Storage**: Ephemeral (uploads lost on restart) - use external storage for production
 
 ## API Endpoints
 - `GET /` - Homepage

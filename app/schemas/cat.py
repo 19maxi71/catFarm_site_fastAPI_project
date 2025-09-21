@@ -7,7 +7,8 @@ class CatSerializer(BaseModel):
     role: str
     breed: Optional[str] = None
     bio: Optional[str] = None
-    photo_url: Optional[str] = None
+    photo_url: Optional[str] = None  # DEPRECATED - kept for compatibility
+    photo_base64: Optional[str] = None  # Base64 encoded image data
     rabies_vaccinated: bool = False
     award: Optional[str] = None
 

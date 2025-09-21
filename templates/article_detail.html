@@ -18,9 +18,10 @@
         <!-- Article Header -->
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
             <!-- Featured Image -->
-            {% if article.featured_image %}
+            {% set featured_src = article.featured_image_base64 if article.featured_image_base64 else article.featured_image %}
+            {% if featured_src %}
             <div class="relative w-full overflow-hidden flex justify-center bg-gray-100">
-                <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="max-w-full max-h-screen object-scale-down">
+                <img src="{{ featured_src }}" alt="{{ article.title }}" class="max-w-full max-h-screen object-scale-down">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
             </div>
             {% endif %}

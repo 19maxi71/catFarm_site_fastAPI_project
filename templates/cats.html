@@ -16,7 +16,14 @@
             {% for cat in cats %}
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cat-card cursor-pointer">
                 <div class="relative overflow-hidden group">
-                    <img src="{{ cat.photo_url }}" alt="{{ cat.name }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                    {% set photo_src = cat.photo_base64 if cat.photo_base64 else cat.photo_url %}
+                    {% if photo_src %}
+                        <img src="{{ photo_src }}" alt="{{ cat.name }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                    {% else %}
+                        <div class="w-full h-72 bg-gradient-to-br from-dusty-rose to-muted-pink flex items-center justify-content-center">
+                            <span class="text-6xl text-white">🐱</span>
+                        </div>
+                    {% endif %}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div class="p-6">
@@ -146,7 +153,16 @@ let currentCat = null;
 function openModal(cat) {
     currentCat = cat;
     document.getElementById('modalTitle').textContent = cat.name;
-    document.getElementById('modalImage').src = cat.photo_url;
+    
+    // Use base64 image if available, fallback to photo_url
+    const photoSrc = cat.photo_base64 || cat.photo_url;
+    if (photoSrc) {
+        document.getElementById('modalImage').src = photoSrc;
+        document.getElementById('modalImage').style.display = 'block';
+    } else {
+        document.getElementById('modalImage').style.display = 'none';
+    }
+    
     document.getElementById('modalRole').textContent = cat.role;
     document.getElementById('modalBreed').textContent = cat.breed;
     document.getElementById('modalBio').textContent = cat.bio;

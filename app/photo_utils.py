@@ -1,11 +1,13 @@
 import os
 import uuid
 import aiofiles
+import base64
 from datetime import datetime
 from pathlib import Path
 from PIL import Image, ImageOps
 from fastapi import UploadFile, HTTPException
 from typing import Tuple
+from io import BytesIO
 
 # Configuration
 UPLOAD_DIR = Path("static/uploads")
@@ -158,4 +160,61 @@ def cleanup_old_temp_files():
         if temp_file.is_file():
             file_age = current_time - temp_file.stat().st_mtime
             if file_age > 3600:  # 1 hour
+                temp_file.unlink()
+
+
+async def convert_image_to_base64(file: UploadFile, max_width: int = 800, max_height: int = 600) -> str:
+    """
+    Convert uploaded image to base64 with compression for database storage.
+    Returns base64 encoded string with data URL prefix.
+    """
+    # Validate file type
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400, detail=f"File type {file_ext} not allowed")
+
+    # Validate file size
+    file_content = await file.read()
+    if len(file_content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400, detail="File too large (max 10MB)")
+
+    try:
+        # Open and process the image
+        with Image.open(BytesIO(file_content)) as img:
+            # Apply EXIF orientation correction
+            img = ImageOps.exif_transpose(img)
+            
+            # Convert to RGB if necessary (for JPEG compatibility)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Resize if too large (to keep database storage reasonable)
+            if img.width > max_width or img.height > max_height:
+                img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+            
+            # Save as JPEG with compression
+            buffer = BytesIO()
+            img.save(buffer, format='JPEG', quality=85, optimize=True)
+            buffer.seek(0)
+            
+            # Convert to base64
+            img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            # Return with data URL prefix
+            return f"data:image/jpeg;base64,{img_base64}"
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error processing image: {str(e)}")
+
+
+def base64_to_data_url(base64_string: str) -> str:
+    """
+    Ensure base64 string has proper data URL format.
+    """
+    if base64_string and not base64_string.startswith('data:'):
+        return f"data:image/jpeg;base64,{base64_string}"
+    return base64_string or ""
                 temp_file.unlink(missing_ok=True)

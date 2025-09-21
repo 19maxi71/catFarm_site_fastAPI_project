@@ -104,8 +104,8 @@ function createArticleCard(article) {
 
     card.innerHTML = `
         <div class="relative overflow-hidden">
-            ${article.featured_image ?
-                `<img src="${article.featured_image}" alt="${article.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">` :
+            ${(article.featured_image_base64 || article.featured_image) ?
+                `<img src="${article.featured_image_base64 || article.featured_image}" alt="${article.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">` :
                 `<div class="w-full h-48 bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center">
                     <span class="text-4xl">📰</span>
                 </div>`

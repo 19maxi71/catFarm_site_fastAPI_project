@@ -22,10 +22,13 @@ async def get_all_articles(db: Session = Depends(get_db)) -> List[ArticleApiResp
     articles = db.query(Article).filter(Article.published ==
                                         True).order_by(Article.created_at.desc()).all()
 
-    # Format photo URLs for proper display
+    # Format photo URLs for proper display (backward compatibility)
     for article in articles:
         if article.featured_image and not article.featured_image.startswith(('http://', 'https://', '/static/')):
             article.featured_image = f"/static/{article.featured_image}"
+        # Ensure base64 images are properly formatted
+        if article.featured_image_base64 and not article.featured_image_base64.startswith('data:'):
+            article.featured_image_base64 = f"data:image/jpeg;base64,{article.featured_image_base64}"
 
     return articles
 

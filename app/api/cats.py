@@ -11,10 +11,13 @@ router = APIRouter()
 @router.get("/cats/", response_model=List[CatApiResponse])  # Get all cats
 async def get_all_cats(db: Session = Depends(get_db)) -> List[CatApiResponse]:
     cats = db.query(Cat).all()
-    # Format photo URLs for proper display
+    # Format photo URLs for proper display (backward compatibility)
     for cat in cats:
         if cat.photo_url and not cat.photo_url.startswith(('http://', 'https://')):
             cat.photo_url = f"/static/{cat.photo_url}"
+        # Ensure base64 images are properly formatted
+        if cat.photo_base64 and not cat.photo_base64.startswith('data:'):
+            cat.photo_base64 = f"data:image/jpeg;base64,{cat.photo_base64}"
     return cats
 
 

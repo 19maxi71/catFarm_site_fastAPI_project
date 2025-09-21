@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 import json
 
-from .photo_utils import save_uploaded_photo, get_image_info
+from .photo_utils import save_uploaded_photo, get_image_info, convert_image_to_base64
 
 router = APIRouter()
 
@@ -16,26 +16,29 @@ async def upload_photo(
 ):
     """
     Upload and process a photo (cat or article).
-    Returns the file paths for storage in database.
+    Returns base64 encoded image for database storage.
     """
     try:
-        # Determine the naming prefix based on type
+        # Convert image to base64 for database storage
+        base64_data = await convert_image_to_base64(file)
+
+        # Also save to filesystem for backward compatibility (if needed)
         name_prefix = f"article_{cat_name}" if article_image == "true" else cat_name
-
-        # Process and save the photo
-        full_path, thumb_path = await save_uploaded_photo(file, name_prefix, article_image == "true")
-
-        # Get image info
-        image_info = get_image_info(full_path)
+        try:
+            full_path, thumb_path = await save_uploaded_photo(file, name_prefix, article_image == "true")
+        except:
+            # If file save fails, still return base64 (this is for Render compatibility)
+            full_path = ""
+            thumb_path = ""
 
         return JSONResponse(content={
             "success": True,
             "message": "Photo uploaded successfully",
             "data": {
-                "full_image": full_path,
-                "thumbnail": thumb_path,
-                "original_filename": file.filename,
-                "image_info": image_info
+                "base64_image": base64_data,  # Primary storage method
+                "full_image": full_path,      # Fallback for compatibility
+                "thumbnail": thumb_path,      # Fallback for compatibility
+                "original_filename": file.filename
             }
         })
 
