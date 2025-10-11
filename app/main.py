@@ -115,6 +115,12 @@ async def cats_page(request: Request, db: Session = Depends(get_db)):
     })
 
 
+@app.get("/our-cats")
+async def our_cats_page(request: Request):
+    """Serve the Our Cats showcase page featuring breeding cats."""
+    return templates.TemplateResponse("our_cats.html", {"request": request})
+
+
 @app.get("/news")
 async def news_page(request: Request):
     return templates.TemplateResponse("news.html", {"request": request})
