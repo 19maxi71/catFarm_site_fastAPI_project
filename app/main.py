@@ -96,12 +96,14 @@ async def cats_page(request: Request, db: Session = Depends(get_db)):
         cat_dict = {
             "id": cat.id,
             "name": cat.name,
-            "role": cat.role,
-            "breed": cat.breed,
-            "bio": cat.bio,
+            "gender": cat.gender,
+            "litter_code": cat.litter_code,
+            "date_of_birth": cat.date_of_birth.isoformat() if cat.date_of_birth else None,
+            "date_of_birth_formatted": cat.date_of_birth.strftime('%B %d, %Y') if cat.date_of_birth else 'Unknown',
+            "description": cat.description,
+            "is_available": cat.is_available,
             "photo_url": photo_url,
-            "rabies_vaccinated": cat.rabies_vaccinated,
-            "award": cat.award,
+            "photo_base64": cat.photo_base64,
             "created_at": cat.created_at.isoformat() if cat.created_at else None,
             "updated_at": cat.updated_at.isoformat() if cat.updated_at else None
         }

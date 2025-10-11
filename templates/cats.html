@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Our Cats - RocKaRan Cat Farm{% endblock %}
+{% block title %}Available Kittens - RocKaRan Cat Farm{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-8">
     <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="text-center mb-12">
-            <h1 class="text-5xl font-bold text-gray-800 mb-4">🐱 Meet Our Cats</h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our wonderful feline friends waiting for their forever homes.</p>
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">🐱 Available Kittens</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our adorable Siberian kittens looking for their forever homes.</p>
         </div>
 
-        <!-- Cats Grid -->
+        <!-- Kittens Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {% for cat in cats %}
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cat-card cursor-pointer">
                 <div class="relative overflow-hidden group">
                     {% set photo_src = cat.photo_base64 if cat.photo_base64 else cat.photo_url %}
                     {% if photo_src %}
-                        <img src="{{ photo_src }}" alt="{{ cat.name }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <img src="{{ photo_src }}" alt="Litter {{ cat.litter_code }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
                     {% else %}
                         <div class="w-full h-72 bg-gradient-to-br from-dusty-rose to-muted-pink flex items-center justify-content-center">
                             <span class="text-6xl text-white">🐱</span>
@@ -27,19 +27,16 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ cat.name }}</h3>
-                    <p class="text-amber-600 font-semibold mb-1">{{ cat.role }}</p>
-                    <p class="text-gray-600 mb-4">{{ cat.breed }}</p>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Litter {{ cat.litter_code }}</h3>
+                    <p class="text-amber-600 font-semibold mb-1">{{ cat.gender }}</p>
+                    <p class="text-gray-600 mb-2">Born: {{ cat.date_of_birth_formatted }}</p>
 
                     <!-- Status badges -->
                     <div class="flex gap-2 mb-4">
-                        {% if cat.rabies_vaccinated %}
-                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">✓ Vaccinated</span>
+                        {% if cat.is_available %}
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">✓ Available</span>
                         {% else %}
-                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">⚠️ Not Vaccinated</span>
-                        {% endif %}
-                        {% if cat.award %}
-                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">🏆 Award Winner</span>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">❌ Adopted</span>
                         {% endif %}
                     </div>
 
@@ -78,24 +75,24 @@
 
                 <div class="space-y-4">
                     <div>
-                        <strong>Role:</strong> <span id="modalRole"></span>
+                        <strong>Litter Code:</strong> <span id="modalLitterCode"></span>
                     </div>
                     <div>
-                        <strong>Breed:</strong> <span id="modalBreed"></span>
+                        <strong>Gender:</strong> <span id="modalGender"></span>
                     </div>
                     <div>
-                        <strong>Bio:</strong> <p id="modalBio" class="mt-2 text-gray-700"></p>
+                        <strong>Date of Birth:</strong> <span id="modalDateOfBirth"></span>
                     </div>
                     <div>
-                        <strong>Health Status:</strong>
+                        <strong>Description:</strong> <p id="modalDescription" class="mt-2 text-gray-700"></p>
+                    </div>
+                    <div>
+                        <strong>Availability:</strong>
                         <div class="mt-2">
-                            <span id="vaccinationBadge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                <span class="mr-1">✓</span> Fully Vaccinated
+                            <span id="availabilityBadge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
+                                <span id="availabilityText"></span>
                             </span>
                         </div>
-                    </div>
-                    <div id="awardSection" style="display: none;">
-                        <strong>Award:</strong> <span id="modalAward"></span>
                     </div>
                 </div>
 
@@ -152,7 +149,7 @@ let currentCat = null;
 
 function openModal(cat) {
     currentCat = cat;
-    document.getElementById('modalTitle').textContent = cat.name;
+    document.getElementById('modalTitle').textContent = `Litter ${cat.litter_code}`;
 
     // Use base64 image if available, fallback to photo_url
     const photoSrc = cat.photo_base64 || cat.photo_url;
@@ -163,26 +160,28 @@ function openModal(cat) {
         document.getElementById('modalImage').style.display = 'none';
     }
 
-    document.getElementById('modalRole').textContent = cat.role;
-    document.getElementById('modalBreed').textContent = cat.breed;
-    document.getElementById('modalBio').textContent = cat.bio;
+    document.getElementById('modalLitterCode').textContent = cat.litter_code;
+    document.getElementById('modalGender').textContent = cat.gender;
 
-    // Handle vaccination status with proper badge
-    const vaccinationBadge = document.getElementById('vaccinationBadge');
-    if (cat.rabies_vaccinated) {
-        vaccinationBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
-        vaccinationBadge.innerHTML = '<span class="mr-1">✓</span> Fully Vaccinated';
-    } else {
-        vaccinationBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
-        vaccinationBadge.innerHTML = '<span class="mr-1">⚠️</span> Not Vaccinated';
-    }
+    // Format date of birth
+    const dob = cat.date_of_birth ? new Date(cat.date_of_birth).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    }) : 'Unknown';
+    document.getElementById('modalDateOfBirth').textContent = dob;
 
-    const awardSection = document.getElementById('awardSection');
-    if (cat.award) {
-        document.getElementById('modalAward').textContent = cat.award;
-        awardSection.style.display = 'block';
+    document.getElementById('modalDescription').textContent = cat.description || 'No description available.';
+
+    // Handle availability status with proper badge
+    const availabilityBadge = document.getElementById('availabilityBadge');
+    const availabilityText = document.getElementById('availabilityText');
+    if (cat.is_available) {
+        availabilityBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+        availabilityText.innerHTML = '<span class="mr-1">✓</span> Available for Adoption';
     } else {
-        awardSection.style.display = 'none';
+        availabilityBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
+        availabilityText.innerHTML = '<span class="mr-1">❌</span> Already Adopted';
     }
 
     document.getElementById('catModal').classList.remove('hidden');
@@ -248,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission
     document.getElementById('adoptionForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Thank you for your interest in adopting ' + currentCat.name + '! We will contact you soon.');
+        alert('Thank you for your interest in adopting from litter ' + currentCat.litter_code + '! We will contact you soon.');
         this.reset();
         closeAdoptionModal();
     });

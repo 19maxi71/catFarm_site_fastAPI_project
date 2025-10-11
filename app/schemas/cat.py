@@ -1,17 +1,17 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 
 
 class CatSerializer(BaseModel):
     name: str
-    role: str
-    breed: Optional[str] = None
-    bio: Optional[str] = None
+    gender: str  # 'Male' or 'Female'
+    litter_code: str
+    date_of_birth: date
+    description: Optional[str] = None
     photo_url: Optional[str] = None  # DEPRECATED - kept for compatibility
     photo_base64: Optional[str] = None  # Base64 encoded image data
-    rabies_vaccinated: bool = False
-    award: Optional[str] = None
+    is_available: bool = True
 
 
 class CreateCatRequest(CatSerializer):
