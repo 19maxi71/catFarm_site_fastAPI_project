@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Adoption - RocKaRan Cat Farm{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">📋 Terms of Adoption</h1>
+            <p class="text-lg text-gray-600">Please read these terms carefully before submitting your adoption request.</p>
+        </div>
+
+        <!-- Terms Content -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+            <div class="prose prose-lg max-w-none">
+                <h2>1. Adoption Process</h2>
+                <p>Adoption requests are reviewed on a case-by-case basis. We prioritize homes that can provide a loving, stable environment for our Siberian cats. The adoption process includes:</p>
+                <ul>
+                    <li>Initial application review</li>
+                    <li>Home visit (virtual or in-person)</li>
+                    <li>Reference checks</li>
+                    <li>Adoption contract signing</li>
+                    <li>Adoption fee payment</li>
+                </ul>
+
+                <h2>2. Adoption Fees</h2>
+                <p>Our adoption fees vary based on the cat's age, health status, and special needs. Fees typically range from $200-$500 and include:</p>
+                <ul>
+                    <li>Spaying/neutering</li>
+                    <li>Initial vaccinations</li>
+                    <li>Microchipping</li>
+                    <li>Health certificate</li>
+                </ul>
+
+                <h2>3. Health Guarantee</h2>
+                <p>All cats come with a 30-day health guarantee. If your adopted cat develops a serious health issue within 30 days of adoption, we will work with you to resolve the issue, which may include veterinary care reimbursement or, in rare cases, return of the cat.</p>
+
+                <h2>4. Return Policy</h2>
+                <p>If for any reason the adoption doesn't work out, you may return the cat within 30 days. We require that you contact us immediately if issues arise. Returned cats will be evaluated for health and behavior before being made available for adoption again.</p>
+
+                <h2>5. Commitment Requirements</h2>
+                <p>Adopters must commit to:</p>
+                <ul>
+                    <li>Providing proper veterinary care</li>
+                    <li>Maintaining a safe indoor environment</li>
+                    <li>Not declawing the cat</li>
+                    <li>Contacting us if rehoming becomes necessary</li>
+                    <li>Allowing periodic follow-up check-ins</li>
+                </ul>
+
+                <h2>6. Data Privacy</h2>
+                <p>Your personal information will be used solely for adoption processing and follow-up. We comply with CCPA regulations regarding data collection, use, and deletion. You may request deletion of your data at any time.</p>
+
+                <h2>7. Agreement</h2>
+                <p>By submitting an adoption application, you agree to these terms and conditions. You understand that adoption approval is at the discretion of RocKaRan Cat Farm and that we reserve the right to deny adoption requests that don't meet our standards for cat welfare.</p>
+
+                <h2>8. Contact Information</h2>
+                <p>For questions about these terms or the adoption process, please contact us at:</p>
+                <p><strong>RocKaRan Cat Farm</strong><br>
+                Email: info@rockaran.com<br>
+                Phone: (555) 123-4567</p>
+
+                <p class="text-sm text-gray-600 mt-8">
+                    <em>Last updated: November 2025</em>
+                </p>
+            </div>
+
+            <!-- Back to Form Button -->
+            <div class="text-center mt-8">
+                <a href="/adoption-form" class="inline-flex items-center px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Adoption Form
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.prose h2 {
+    @apply text-2xl font-bold text-gray-800 mt-8 mb-4;
+}
+
+.prose h2:first-child {
+    @apply mt-0;
+}
+
+.prose p {
+    @apply text-gray-700 mb-4 leading-relaxed;
+}
+
+.prose ul {
+    @apply list-disc list-inside text-gray-700 mb-4 space-y-1;
+}
+
+.prose li {
+    @apply leading-relaxed;
+}
+</style>
+
+{% endblock %}

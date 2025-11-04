@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.article import Article, ArticleImage
@@ -17,10 +17,13 @@ async def get_article_images(article_id: int, db: Session = Depends(get_db)) -> 
     images = db.query(ArticleImage).filter(
         ArticleImage.article_id == article_id).order_by(ArticleImage.display_order).all()
 
-    # Format image URLs for proper display
+    # Format image URLs for proper display (backward compatibility)
     for image in images:
-        if image.image_path and not image.image_path.startswith(('http://', 'https://')):
+        if image.image_path and not image.image_path.startswith(('http://', 'https://', '/static/')):
             image.image_path = f"/static/{image.image_path}"
+        # Ensure base64 images are properly formatted
+        if image.image_base64 and not image.image_base64.startswith('data:'):
+            image.image_base64 = f"data:image/jpeg;base64,{image.image_base64}"
 
     return images
 
@@ -28,26 +31,57 @@ async def get_article_images(article_id: int, db: Session = Depends(get_db)) -> 
 @router.post("/articles/{article_id}/images/", response_model=ArticleImageResponse)
 async def upload_article_image(
     article_id: int,
-    file: UploadFile = File(...),
+    request: Request,
+    file: UploadFile = File(None),
+    image_base64: str = Form(None),
     caption: str = Form(None),
     display_order: int = Form(0),
     db: Session = Depends(get_db)
 ):
     """Upload an image for a specific article."""
     # Check if article exists
-    from ..models.article import Article
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
 
+    # Handle JSON requests (for base64 data)
+    if request.headers.get('content-type') == 'application/json':
+        try:
+            json_data = await request.json()
+            image_base64 = json_data.get('image_base64')
+            caption = json_data.get('caption', '')
+            display_order = json_data.get('display_order', 0)
+            image_path = json_data.get('image_path', '')
+        except:
+            raise HTTPException(status_code=400, detail="Invalid JSON data")
+    else:
+        # Handle form data (for file uploads)
+        image_path = ""
+
     try:
-        # Save the uploaded photo
-        full_path, thumb_path = await save_uploaded_photo(file, f"article_{article_id}", article_image=True)
+        base64_data = image_base64
+
+        # If no base64 provided, convert uploaded file
+        if not base64_data and file:
+            from ..photo_utils import convert_image_to_base64
+            base64_data = await convert_image_to_base64(file)
+
+            # Also save to filesystem for backward compatibility (if needed)
+            try:
+                from ..photo_utils import save_uploaded_photo
+                full_path, thumb_path = await save_uploaded_photo(file, f"article_{article_id}", article_image=True)
+                image_path = full_path
+            except:
+                # If file save fails, still return base64 (this is for Render compatibility)
+                image_path = ""
+        elif not base64_data and not file:
+            raise HTTPException(status_code=400, detail="No image data provided")
 
         # Create ArticleImage record
         article_image = ArticleImage(
             article_id=article_id,
-            image_path=full_path,
+            image_path=image_path,
+            image_base64=base64_data,
             caption=caption,
             display_order=display_order
         )
@@ -57,7 +91,8 @@ async def upload_article_image(
         db.refresh(article_image)
 
         # Format URL for response
-        article_image.image_path = f"/static/{article_image.image_path}"
+        if article_image.image_path:
+            article_image.image_path = f"/static/{article_image.image_path}"
 
         return article_image
 
@@ -115,10 +150,11 @@ async def associate_existing_image(
         raise HTTPException(status_code=404, detail="Article not found")
 
     try:
-        # Create ArticleImage record with existing image path
+        # Create ArticleImage record with existing image path and base64
         article_image = ArticleImage(
             article_id=article_id,
             image_path=image_data.image_path,
+            image_base64=image_data.image_base64,
             caption=image_data.caption,
             display_order=image_data.display_order
         )

@@ -19,8 +19,7 @@ async def test_endpoint(db: Session = Depends(get_db)):
 
 @router.get("/articles/", response_model=List[ArticleApiResponse])
 async def get_all_articles(db: Session = Depends(get_db)) -> List[ArticleApiResponse]:
-    articles = db.query(Article).filter(Article.published ==
-                                        True).order_by(Article.created_at.desc()).all()
+    articles = db.query(Article).order_by(Article.created_at.desc()).all()
 
     # Format photo URLs for proper display (backward compatibility)
     for article in articles:

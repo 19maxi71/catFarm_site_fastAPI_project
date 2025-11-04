@@ -12,6 +12,7 @@ from .models import Cat, Article
 from .api.cats import router as cats_router
 from .api.articles import router as articles_router
 from .api.article_images import router as article_images_router
+from .api.adoption import router as adoption_router
 from .upload_api import router as upload_router
 from .auth import authenticate_user
 
@@ -52,6 +53,7 @@ app.include_router(cats_router, prefix="/api", tags=["cats"])
 app.include_router(articles_router, prefix="/api", tags=["articles"])
 app.include_router(article_images_router, prefix="/api",
                    tags=["article-images"])
+app.include_router(adoption_router, prefix="/api", tags=["adoption"])
 app.include_router(upload_router, prefix="/api", tags=["uploads"])
 
 # Admin authentication middleware
@@ -207,3 +209,33 @@ async def custom_admin(request: Request):
 async def article_admin(request: Request):
     """Serve custom admin interface for article management."""
     return templates.TemplateResponse("article_admin.html", {"request": request})
+
+
+@app.get("/admin/adoption-questions")
+async def adoption_questions_admin(request: Request):
+    """Serve custom admin interface for adoption questions management."""
+    return templates.TemplateResponse("adoption_questions_admin.html", {"request": request})
+
+
+@app.get("/adoption-form")
+async def adoption_form(request: Request):
+    """Serve adoption request form for customers."""
+    return templates.TemplateResponse("adoption_form.html", {"request": request})
+
+
+@app.get("/adoption-terms")
+async def adoption_terms(request: Request):
+    """Serve adoption terms and conditions page."""
+    return templates.TemplateResponse("adoption_terms.html", {"request": request})
+
+
+@app.get("/privacy-policy")
+async def privacy_policy(request: Request):
+    """Serve privacy policy page."""
+    return templates.TemplateResponse("privacy_policy.html", {"request": request})
+
+
+@app.get("/admin/adoption-requests")
+async def adoption_requests_admin(request: Request):
+    """Serve custom admin interface for adoption requests management."""
+    return templates.TemplateResponse("adoption_requests_admin.html", {"request": request})

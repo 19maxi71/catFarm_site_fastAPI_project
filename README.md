@@ -45,7 +45,7 @@ Initialize the database:
 alembic upgrade head
 ```
 
-Add some sample cats and articles (optional, but makes it look nice):
+Add some sample cats and articles (optional scripts):
 
 ```bash
 python add_sample_cats.py

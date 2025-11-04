@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Adoption Request - RocKaRan Cat Farm{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">🐱 Adoption Request</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Ready to welcome a Siberian cat into your home? Please fill out this form so we can learn more about you and ensure the best match.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+            <form id="adoptionForm">
+                <!-- Basic Information -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Contact Information</h3>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                        <input type="email" id="customer_email" name="customer_email" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                        <input type="text" id="customer_name" name="customer_name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Dynamic Questions -->
+                <div id="dynamicQuestions" class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Additional Information</h3>
+                    <div class="text-center">
+                        <div class="spinner-border text-amber-600" role="status">
+                            <span class="visually-hidden">Loading questions...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms Agreement -->
+                <div class="mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <input type="checkbox" id="terms_agreed" name="terms_agreed" required
+                                   class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                            <label for="terms_agreed" class="ml-2 block text-sm text-gray-700">
+                                I have read and agree to the <a href="/adoption-terms" target="_blank" class="text-amber-600 hover:text-amber-700 underline">terms of adoption</a> and <a href="/privacy-policy" target="_blank" class="text-amber-600 hover:text-amber-700 underline">privacy policy</a> *
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscription -->
+                <div class="mb-6">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="subscription" name="subscription"
+                               class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                        <label for="subscription" class="ml-2 block text-sm text-gray-700">
+                            Subscribe to updates about new kittens and farm news
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" id="submitBtn"
+                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-paper-plane mr-2"></i>Submit Adoption Request
+                    </button>
+                </div>
+            </form>
+
+            <!-- Success/Error Messages -->
+            <div id="message" class="mt-6" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadQuestions();
+});
+
+async function loadQuestions() {
+    try {
+        const response = await fetch('/api/adoption/form');
+        const questions = await response.json();
+        renderQuestions(questions);
+    } catch (error) {
+        console.error('Error loading questions:', error);
+        document.getElementById('dynamicQuestions').innerHTML = '<div class="alert alert-warning">Unable to load questions. Please try again later.</div>';
+    }
+}
+
+function renderQuestions(questions) {
+    const container = document.getElementById('dynamicQuestions');
+
+    if (questions.length === 0) {
+        container.innerHTML = '<p class="text-gray-600">No additional questions configured.</p>';
+        return;
+    }
+
+    let html = '';
+    questions.forEach(question => {
+        html += `<div class="mb-4">`;
+        html += `<label class="block text-sm font-medium text-gray-700 mb-2">${question.question_text}${question.is_required ? ' *' : ''}</label>`;
+
+        if (question.question_type === 'text') {
+            html += `<input type="text" name="q_${question.id}" ${question.is_required ? 'required' : ''}
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">`;
+        } else if (question.question_type === 'checkbox') {
+            html += `<div class="flex items-center">
+                        <input type="checkbox" name="q_${question.id}" value="yes"
+                               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                        <label class="ml-2 block text-sm text-gray-700">Yes</label>
+                     </div>`;
+        } else if (question.question_type === 'select' && question.options) {
+            const options = question.options.split('\n').filter(opt => opt.trim());
+            html += `<select name="q_${question.id}" ${question.is_required ? 'required' : ''}
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">`;
+            html += `<option value="">Select an option</option>`;
+            options.forEach(option => {
+                html += `<option value="${option.trim()}">${option.trim()}</option>`;
+            });
+            html += `</select>`;
+        }
+
+        html += `</div>`;
+    });
+
+    container.innerHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">Additional Information</h3>${html}`;
+}
+
+document.getElementById('adoptionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+
+    const formData = new FormData(e.target);
+    const data = {
+        customer_email: formData.get('customer_email'),
+        customer_name: formData.get('customer_name'),
+        phone: formData.get('phone'),
+        custom_answers: {},
+        terms_agreed: formData.get('terms_agreed') === 'on',
+        subscription: formData.get('subscription') === 'on'
+    };
+
+    // Collect dynamic answers
+    for (let [key, value] of formData.entries()) {
+        if (key.startsWith('q_')) {
+            const questionId = key.replace('q_', '');
+            data.custom_answers[questionId] = value;
+        }
+    }
+
+    try {
+        const response = await fetch('/api/adoption/submit', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        const messageDiv = document.getElementById('message');
+
+        if (response.ok) {
+            messageDiv.className = 'alert alert-success';
+            messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Thank you! Your adoption request has been submitted successfully. We will review it and contact you soon.';
+            e.target.reset();
+        } else {
+            messageDiv.className = 'alert alert-danger';
+            messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i>${result.detail || 'An error occurred. Please try again.'}`;
+        }
+
+        messageDiv.style.display = 'block';
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'alert alert-danger';
+        messageDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Network error. Please check your connection and try again.';
+        messageDiv.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+
+<style>
+.spinner-border {
+    border: 0.25em solid #f3f3f3;
+    border-top: 0.25em solid #d97706;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    color: #065f46;
+    background-color: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.alert-danger {
+    color: #991b1b;
+    background-color: #fee2e2;
+    border-color: #fecaca;
+}
+
+.alert-warning {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #fde68a;
+}
+</style>
+
+{% endblock %}

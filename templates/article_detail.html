@@ -58,8 +58,9 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Gallery</h3>
                     <div class="relative">
                         <!-- Main Image Display -->
-                        <div class="mb-4 flex justify-center bg-gray-100 rounded-lg">
-                            <img id="mainImage" src="{{ images[0].image_path }}" alt="{{ images[0].caption or article.title }}" class="max-w-full max-h-screen object-scale-down rounded-lg shadow-lg">
+                        <div class="mb-4 flex justify-center bg-gray-100 rounded-lg cursor-pointer" onclick="openLightbox(0)">
+                            {% set main_src = images[0].image_base64 if images[0].image_base64 else images[0].image_path %}
+                            <img id="mainImage" src="{{ main_src }}" alt="{{ images[0].caption or article.title }}" class="max-w-full max-h-screen object-scale-down rounded-lg shadow-lg hover:shadow-xl transition-shadow">
                             {% if images[0].caption %}
                             <p class="text-sm text-gray-600 mt-2 italic">{{ images[0].caption }}</p>
                             {% endif %}
@@ -68,8 +69,9 @@
                         <!-- Thumbnail Strip -->
                         <div class="flex gap-2 overflow-x-auto pb-2" id="thumbnailStrip">
                             {% for image in images %}
-                            <div class="flex-shrink-0 cursor-pointer transition-all duration-200 hover:scale-105" onclick="changeMainImage('{{ image.image_path }}', '{{ image.caption or article.title }}', {{ loop.index0 }})">
-                                <img src="{{ image.image_path }}" alt="{{ image.caption or article.title }}" class="w-20 h-20 object-scale-down rounded border-2 {% if loop.first %}border-amber-500{% else %}border-gray-300{% endif %} hover:border-amber-400 bg-gray-100">
+                            {% set thumb_src = image.image_base64 if image.image_base64 else image.image_path %}
+                            <div class="flex-shrink-0 cursor-pointer transition-all duration-200 hover:scale-105" onclick="changeMainImage('{{ thumb_src }}', '{{ image.caption or article.title }}', {{ loop.index0 }}); openLightbox({{ loop.index0 }})">
+                                <img src="{{ thumb_src }}" alt="{{ image.caption or article.title }}" class="w-20 h-20 object-scale-down rounded border-2 {% if loop.first %}border-amber-500{% else %}border-gray-300{% endif %} hover:border-amber-400 bg-gray-100">
                             </div>
                             {% endfor %}
                         </div>
@@ -87,6 +89,36 @@
                             </svg>
                         </button>
                         {% endif %}
+                    </div>
+                </div>
+
+                <!-- Lightbox Modal -->
+                <div id="lightboxModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
+                    <div class="relative max-w-4xl max-h-screen p-4">
+                        <!-- Close button -->
+                        <button onclick="closeLightbox()" class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75 transition-all z-10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Main lightbox image -->
+                        <img id="lightboxImage" src="" alt="" class="max-w-full max-h-full object-scale-down rounded-lg">
+
+                        <!-- Caption -->
+                        <p id="lightboxCaption" class="text-white text-center mt-4 text-lg"></p>
+
+                        <!-- Navigation arrows -->
+                        <button id="lightboxPrev" onclick="changeLightboxImage(-1)" class="absolute left-2 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-opacity-75 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="lightboxNext" onclick="changeLightboxImage(1)" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-opacity-75 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 {% endif %}
@@ -198,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
 let currentImageIndex = 0;
 const images = [
     {% for image in images %}
-    {src: '{{ image.image_path }}', caption: '{{ image.caption or article.title }}', alt: '{{ image.caption or article.title }}'}{% if not loop.last %},{% endif %}
+    {src: '{{ image.image_base64 if image.image_base64 else image.image_path }}', caption: '{{ image.caption or article.title }}', alt: '{{ image.caption or article.title }}'}{% if not loop.last %},{% endif %}
     {% endfor %}
 ];
 
@@ -262,6 +294,71 @@ function updateNavigationButtons() {
         nextBtn.style.display = currentImageIndex < images.length - 1 ? 'block' : 'none';
     }
 }
+
+// Lightbox functionality
+function openLightbox(index) {
+    const modal = document.getElementById('lightboxModal');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+
+    currentImageIndex = index;
+    lightboxImage.src = images[index].src;
+    lightboxCaption.textContent = images[index].caption;
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+    updateLightboxNavigation();
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto'; // Restore scrolling
+}
+
+function changeLightboxImage(direction) {
+    const newIndex = currentImageIndex + direction;
+    if (newIndex >= 0 && newIndex < images.length) {
+        currentImageIndex = newIndex;
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxCaption = document.getElementById('lightboxCaption');
+
+        lightboxImage.src = images[newIndex].src;
+        lightboxCaption.textContent = images[newIndex].caption;
+
+        updateLightboxNavigation();
+    }
+}
+
+function updateLightboxNavigation() {
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+
+    prevBtn.style.display = currentImageIndex > 0 ? 'block' : 'none';
+    nextBtn.style.display = currentImageIndex < images.length - 1 ? 'block' : 'none';
+}
+
+// Close lightbox when clicking outside the image
+document.getElementById('lightboxModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeLightbox();
+    }
+});
+
+// Keyboard navigation for lightbox
+document.addEventListener('keydown', function(e) {
+    const modal = document.getElementById('lightboxModal');
+    if (!modal.classList.contains('hidden')) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        } else if (e.key === 'ArrowLeft') {
+            changeLightboxImage(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeLightboxImage(1);
+        }
+    }
+});
 </script>
 
 {% endblock %}

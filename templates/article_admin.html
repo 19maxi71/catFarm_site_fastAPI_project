@@ -228,6 +228,15 @@
             e.stopPropagation();
         }
 
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Remove data:image/... prefix
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         function highlight() {
             uploadArea.classList.add('dragover');
         }
@@ -265,39 +274,55 @@
         }
 
         async function uploadGalleryImage(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('article_image', 'true');
+            // Convert file to base64
+            const base64Data = await fileToBase64(file);
 
-            // If editing, upload to existing article
+            // If editing an existing article, upload directly to article images endpoint
             if (editingArticleId) {
-                formData.append('article_id', editingArticleId);
-            }
+                const imageData = {
+                    image_base64: base64Data,
+                    caption: '',
+                    display_order: galleryImages.length
+                };
 
-            try {
-                const response = await fetch('/api/upload/photo', {
+                const response = await fetch(`/api/articles/${editingArticleId}/images/`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(imageData)
                 });
 
                 const result = await response.json();
 
-                if (result.success) {
+                if (result.id) {  // API returns the image object directly
                     const imageData = {
-                        id: Date.now(), // Temporary ID for new images
-                        image_path: result.data.full_image,
-                        caption: '',
-                        display_order: galleryImages.length,
-                        isNew: true
+                        id: result.id,
+                        image_path: result.image_path ? result.image_path.replace('/static/', '') : '',
+                        image_base64: result.image_base64,
+                        caption: result.caption || '',
+                        display_order: result.display_order,
+                        isNew: false  // Already saved to database
                     };
                     galleryImages.push(imageData);
                     displayGalleryImages();
                     showAlert('Gallery image uploaded successfully!', 'success');
                 } else {
-                    showAlert('Upload failed: ' + result.message, 'danger');
+                    showAlert('Upload failed: ' + (result.detail || 'Unknown error'), 'danger');
                 }
-            } catch (error) {
-                showAlert('Upload error: ' + error.message, 'danger');
+            } else {
+                // For new articles, store temporarily with base64 data
+                const imageData = {
+                    id: Date.now(), // Temporary ID for new images
+                    image_path: '',
+                    image_base64: base64Data,
+                    caption: '',
+                    display_order: galleryImages.length,
+                    isNew: true
+                };
+                galleryImages.push(imageData);
+                displayGalleryImages();
+                showAlert('Gallery image added successfully!', 'success');
             }
         }
 
@@ -309,10 +334,12 @@
                 const col = document.createElement('div');
                 col.className = 'col-md-3 col-sm-6';
 
+                const imageSrc = image.image_base64 || (image.image_path ? `/static/${image.image_path}` : '');
+
                 col.innerHTML = `
                     <div class="position-relative">
-                        <img src="/static/${image.image_path.replace('uploads/', 'thumbnails/').replace('_full.jpg', '_thumb.jpg')}"
-                             class="img-fluid rounded mb-2" alt="Gallery image">
+                        <img src="${imageSrc}"
+                             class="img-fluid rounded mb-2" alt="Gallery image" style="height: 120px; object-fit: cover;">
                         <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1"
                                 onclick="removeGalleryImage(${index})">
                             <i class="fas fa-times"></i>
@@ -364,36 +391,34 @@
 
         async function saveGalleryImages(articleId) {
             try {
-                // First, clear all existing gallery images for this article
-                const clearResponse = await fetch(`/api/articles/${articleId}/images/clear/`, {
-                    method: 'POST'
-                });
-
-                if (!clearResponse.ok) {
-                    console.error('Failed to clear existing gallery images');
-                }
-
-                // Then associate all current gallery images
+                // For new articles, upload gallery images that were added during creation
                 for (let i = 0; i < galleryImages.length; i++) {
                     const image = galleryImages[i];
-                    try {
-                        const response = await fetch(`/api/articles/${articleId}/images/associate/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                image_path: image.image_path,
-                                caption: image.caption || '',
-                                display_order: i
-                            })
-                        });
+                    if (image.isNew) {
+                        // Upload new gallery images to the article
+                        try {
+                            const formData = new FormData();
+                            // We need to convert base64 back to a file for upload
+                            // For now, let's use the associate endpoint with base64 data
+                            const response = await fetch(`/api/articles/${articleId}/images/`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    image_path: image.image_path,
+                                    image_base64: image.image_base64,
+                                    caption: image.caption || '',
+                                    display_order: i
+                                })
+                            });
 
-                        if (!response.ok) {
-                            console.error('Failed to associate gallery image:', image);
+                            if (!response.ok) {
+                                console.error('Failed to save gallery image:', image);
+                            }
+                        } catch (error) {
+                            console.error('Error saving gallery image:', error);
                         }
-                    } catch (error) {
-                        console.error('Error associating gallery image:', error);
                     }
                 }
             } catch (error) {
@@ -433,6 +458,7 @@
                     featuredImages = [{
                         id: Date.now(),
                         image_path: result.data.full_image,
+                        image_base64: result.data.base64_image,
                         isNew: true
                     }];
                     console.log('Added to featuredImages:', featuredImages);
@@ -474,6 +500,7 @@
                 author: document.getElementById('author').value,
                 content: document.getElementById('content').value,
                 featured_image: featuredImages[0]?.image_path || '',
+                featured_image_base64: featuredImages[0]?.image_base64 || null,
                 published: document.getElementById('published').checked
             };
 
@@ -561,32 +588,37 @@
                 const articles = await response.json();
 
                 const html = articles.map(article => `
-                    <div class="article-card">
-                        <div class="row">
-                            <div class="col-md-2">
-                                ${article.featured_image ? `<img src="${article.featured_image}" class="img-fluid rounded" alt="${article.title}">` : '<div class="bg-light d-flex align-items-center justify-content-center" style="height: 80px;"><i class="fas fa-newspaper fa-2x text-muted"></i></div>'}
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 140px; overflow: hidden;">
+                                ${article.featured_image_base64 ? `<img src="${article.featured_image_base64}" class="img-fluid rounded" style="max-height: 140px; object-fit: cover;" alt="${article.title}">` : article.featured_image ? `<img src="${article.featured_image}" class="img-fluid rounded" style="max-height: 140px; object-fit: cover;" alt="${article.title}">` : '<i class="fas fa-newspaper fa-3x text-muted"></i>'}
                             </div>
-                            <div class="col-md-8">
-                                <h6 class="mb-1">${article.title}</h6>
-                                <p class="mb-1 text-muted">By ${article.author} • ${new Date(article.created_at).toLocaleDateString()}</p>
-                                <p class="mb-1">${article.content.substring(0, 100)}${article.content.length > 100 ? '...' : ''}</p>
-                                <small class="text-muted">
-                                    ${article.published ? '<i class="fas fa-eye text-success me-2"></i>Published' : '<i class="fas fa-eye-slash text-warning me-2"></i>Draft'}
-                                </small>
+                            <div class="card-body p-2">
+                                <h6 class="card-title mb-1 text-truncate">${article.title}</h6>
+                                <p class="card-text small mb-1">
+                                    <span class="badge bg-info me-1">${article.author}</span>
+                                    <span class="badge ${article.published ? 'bg-success' : 'bg-warning'}">${article.published ? 'Published' : 'Draft'}</span>
+                                </p>
+                                <p class="card-text small text-muted mb-2">${article.content.substring(0, 80)}${article.content.length > 80 ? '...' : ''}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">${new Date(article.created_at).toLocaleDateString()}</small>
+                                </div>
                             </div>
-                            <div class="col-md-2 text-end">
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editArticle(${article.id})">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteArticle(${article.id}, '${article.title}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
+                            <div class="card-footer p-2 bg-transparent border-0">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editArticle(${article.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteArticle(${article.id}, '${article.title}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `).join('');
 
-                document.getElementById('articlesList').innerHTML = html || '<p class="text-muted">No articles found</p>';
+                document.getElementById('articlesList').innerHTML = articles.length > 0 ? `<div class="row">${html}</div>` : '<p class="text-muted">No articles found</p>';
             } catch (error) {
                 console.error('Error loading articles:', error);
                 document.getElementById('articlesList').innerHTML = '<p class="text-danger">Error loading articles: ' + error.message + '</p>';
@@ -606,10 +638,21 @@
                     document.getElementById('published').checked = article.published || false;
 
                     // Handle featured image
-                    if (article.featured_image) {
+                    if (article.featured_image_base64) {
+                        featuredImages = [{
+                            id: Date.now(),
+                            image_path: article.featured_image || '',
+                            image_base64: article.featured_image_base64,
+                            isNew: false
+                        }];
+                        previewImage.src = article.featured_image_base64;
+                        previewContainer.style.display = 'block';
+                        uploadArea.style.display = 'none';
+                    } else if (article.featured_image) {
                         featuredImages = [{
                             id: Date.now(),
                             image_path: article.featured_image.replace('/static/', ''),
+                            image_base64: null,
                             isNew: false
                         }];
                         previewImage.src = article.featured_image;
@@ -645,6 +688,7 @@
                     galleryImages = images.map(img => ({
                         id: img.id,
                         image_path: img.image_path.replace('/static/', ''),
+                        image_base64: img.image_base64,
                         caption: img.caption || '',
                         display_order: img.display_order,
                         isNew: false
