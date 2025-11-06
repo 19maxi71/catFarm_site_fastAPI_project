@@ -200,7 +200,13 @@ async def admin_logout(request: Request):
 
 
 @app.get("/admin")
-async def custom_admin(request: Request):
+async def admin_dashboard(request: Request):
+    """Serve main admin dashboard with navigation to all admin sections."""
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+
+@app.get("/admin/cats")
+async def cat_admin(request: Request):
     """Serve custom admin interface for cat management."""
     return templates.TemplateResponse("cat_admin.html", {"request": request})
 

@@ -7,7 +7,7 @@ class AdoptionQuestionCreate(BaseModel):
     question_type: str
     options: Optional[str] = None
     is_required: bool = True
-    order: int = 0
+    display_order: int = 0
 
 class AdoptionQuestionResponse(BaseModel):
     id: int
@@ -15,7 +15,7 @@ class AdoptionQuestionResponse(BaseModel):
     question_type: str
     options: Optional[str]
     is_required: bool
-    order: int
+    display_order: int
 
     class Config:
         from_attributes = True
@@ -24,6 +24,7 @@ class AdoptionSubmitRequest(BaseModel):
     customer_email: str
     customer_name: str
     phone: Optional[str] = None
+    litter_code: Optional[str] = None
     custom_answers: Dict[str, str]
     terms_agreed: bool
     privacy_consent: bool
@@ -34,10 +35,11 @@ class AdoptionRequestResponse(BaseModel):
     customer_email: str
     customer_name: str
     phone: Optional[str]
+    litter_code: Optional[str]
     custom_answers: Optional[str]
-    terms_agreed: bool
-    privacy_consent: bool
-    subscription: bool
+    terms_agreed: Optional[bool]
+    privacy_consent: Optional[bool]
+    subscription: Optional[bool]
     submitted_at: datetime
     status: str
     notification_sent_at: Optional[datetime]

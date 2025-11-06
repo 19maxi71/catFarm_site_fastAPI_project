@@ -1,8 +1,29 @@
-{% extends "base.html" %}
-
-{% block title %}Adoption Request - RocKaRan Cat Farm{% endblock %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adoption Request - RocKaRan Cat Farm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'beige': '#F5F5DC',
+                        'warm-beige': '#F0E8D8',
+                        'soft-gray': '#E5E5E5',
+                        'dusty-rose': '#D4A4A4',
+                        'muted-pink': '#E8D5D5'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+    </style>
+</head>
+<body>
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
     <div class="container mx-auto px-4 py-12">
         <!-- Header -->
@@ -34,6 +55,19 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                         <input type="tel" id="phone" name="phone"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Litter Selection -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Cat Selection</h3>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Which litter are you interested in? *</label>
+                        <select id="litter_code" name="litter_code" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                            <option value="">Select a litter...</option>
+                        </select>
                     </div>
                 </div>
 
@@ -101,8 +135,36 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    loadLitters();
     loadQuestions();
 });
+
+async function loadLitters() {
+    try {
+        const response = await fetch('/api/cats/');
+        const cats = await response.json();
+
+        const litterSelect = document.getElementById('litter_code');
+        const litters = new Set();
+
+        // Collect unique available litters
+        cats.forEach(cat => {
+            if (cat.is_available) {
+                litters.add(cat.litter_code);
+            }
+        });
+
+        // Add options to select
+        Array.from(litters).sort().forEach(litter => {
+            const option = document.createElement('option');
+            option.value = litter;
+            option.textContent = `Litter ${litter}`;
+            litterSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading litters:', error);
+    }
+}
 
 async function loadQuestions() {
     try {
@@ -132,10 +194,17 @@ function renderQuestions(questions) {
             html += `<input type="text" name="q_${question.id}" ${question.is_required ? 'required' : ''}
                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">`;
         } else if (question.question_type === 'checkbox') {
-            html += `<div class="flex items-center">
-                        <input type="checkbox" name="q_${question.id}" value="yes"
-                               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
-                        <label class="ml-2 block text-sm text-gray-700">Yes</label>
+            html += `<div class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="radio" name="q_${question.id}" value="yes" ${question.is_required ? 'required' : ''}
+                                   class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                            <label class="ml-2 block text-sm text-gray-700">Yes</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" name="q_${question.id}" value="no" ${question.is_required ? 'required' : ''}
+                                   class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                            <label class="ml-2 block text-sm text-gray-700">No</label>
+                        </div>
                      </div>`;
         } else if (question.question_type === 'select' && question.options) {
             const options = question.options.split('\n').filter(opt => opt.trim());
@@ -178,8 +247,10 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
         customer_email: formData.get('customer_email'),
         customer_name: formData.get('customer_name'),
         phone: formData.get('phone'),
+        litter_code: formData.get('litter_code'),
         custom_answers: {},
         terms_agreed: formData.get('terms_agreed') === 'on',
+        privacy_consent: formData.get('privacy_consent') === 'on',
         subscription: formData.get('subscription') === 'on'
     };
 
@@ -192,7 +263,7 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
     }
 
     try {
-        const response = await fetch('/api/submit', {
+        const response = await fetch('/api/adoption/submit', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -265,5 +336,5 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
     border-color: #fde68a;
 }
 </style>
-
-{% endblock %}
+</body>
+</html>

@@ -3,83 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adoption Requests Management - RocKaRan Admin</title>
+    <title>Adoption Requests - RocKaRan Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .status-pending { color: #856404; background-color: #fff3cd; }
-        .status-approved { color: #155724; background-color: #d4edda; }
-        .status-rejected { color: #721c24; background-color: #f8d7da; }
-        .request-card { border: 1px solid #e9ecef; border-radius: 10px; padding: 20px; margin-bottom: 20px; transition: box-shadow 0.3s ease; }
-        .request-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        body {
+            background-color: #f8f9fa;
+        }
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .request-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .request-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .nav-link {
+            color: #495057;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            background-color: #e9ecef;
+            color: #667eea;
+            text-decoration: none;
+        }
+        .nav-link.active {
+            background-color: #667eea;
+            color: white;
+        }
+        .btn-action {
+            border-radius: 20px;
+            padding: 0.375rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
     </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/admin">
-                <i class="fas fa-home me-2"></i>
-                RocKaRan Admin
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="/admin">
+                <i class="fas fa-cat me-2"></i>RocKaRan Admin
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/admin">Cats</a>
-                <a class="nav-link" href="/admin/articles">Articles</a>
-                <a class="nav-link" href="/admin/adoption-questions">Questions</a>
-                <a class="nav-link active" href="/admin/adoption-requests">Requests</a>
-                <a class="nav-link" href="/admin/logout">Logout</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/cats">
+                            <i class="fas fa-cat me-1"></i>Cats
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/articles">
+                            <i class="fas fa-newspaper me-1"></i>Articles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/adoption-requests">
+                            <i class="fas fa-clipboard-list me-1"></i>Adoption Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/adoption-questions">
+                            <i class="fas fa-question-circle me-1"></i>Adoption Questions
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" target="_blank">
+                            <i class="fas fa-external-link-alt me-1"></i>View Site
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-clipboard-list me-2"></i>Adoption Requests</h1>
-            <button class="btn btn-success" onclick="exportRequests()">
-                <i class="fas fa-download me-2"></i>Export CSV
-            </button>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="h3 mb-0 text-dark">
+                    <i class="fas fa-clipboard-list me-2 text-info"></i>Adoption Requests
+                </h1>
+                <p class="text-muted mt-1">Review and manage adoption applications from potential cat parents.</p>
+            </div>
         </div>
 
         <!-- Stats Cards -->
-        <div class="row mb-4" id="stats">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Total</h5>
-                        <h2 id="totalRequests">0</h2>
+        <div class="row mb-4" id="statsContainer">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-number" id="totalRequests">-</div>
+                            <div class="stats-label">Total Requests</div>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">Pending</h5>
-                        <h2 id="pendingRequests">0</h2>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-number" id="pendingRequests">-</div>
+                            <div class="stats-label">Pending Review</div>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">Approved</h5>
-                        <h2 id="approvedRequests">0</h2>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-number" id="approvedRequests">-</div>
+                            <div class="stats-label">Approved</div>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-number" id="rejectedRequests">-</div>
+                            <div class="stats-label">Rejected</div>
+                        </div>
+                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card request-card">
                     <div class="card-body">
-                        <h5 class="card-title text-danger">Rejected</h5>
-                        <h2 id="rejectedRequests">0</h2>
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label for="statusFilter" class="form-label me-2 mb-0 fw-semibold">Filter by Status:</label>
+                                    <select class="form-select" id="statusFilter" style="width: auto;">
+                                        <option value="all">All Requests</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a href="/api/adoption/requests/export" class="btn btn-success btn-action">
+                                    <i class="fas fa-download me-1"></i>Export to CSV
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Requests List -->
-        <div id="requestsList">
-            <div class="text-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        <div class="row">
+            <div class="col-12">
+                <div id="requestsContainer">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mt-3">Loading adoption requests...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,180 +223,726 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Adoption Request Details</h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2"></i>Adoption Request Details
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="requestDetails">
                     <!-- Request details will be loaded here -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="approveBtn" onclick="updateStatus('approved')">Approve</button>
-                    <button type="button" class="btn btn-danger" id="rejectBtn" onclick="updateStatus('rejected')">Reject</button>
+                    <button type="button" class="btn btn-secondary btn-action" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-danger btn-action" id="rejectBtn">
+                        <i class="fas fa-times me-1"></i>Reject
+                    </button>
+                    <button type="button" class="btn btn-success btn-action" id="approveBtn">
+                        <i class="fas fa-check me-1"></i>Approve
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let allRequests = [];
         let currentRequestId = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadRequests();
-        });
+        // Load requests on page load
+        document.addEventListener('DOMContentLoaded', loadRequests);
+
+        // Filter functionality
+        document.getElementById('statusFilter').addEventListener('change', filterRequests);
 
         async function loadRequests() {
             try {
-                const response = await fetch('/api/adoption/requests');
-                const requests = await response.json();
-                displayRequests(requests);
-                updateStats(requests);
+                const response = await fetch('/api/adoption/requests/');
+                if (!response.ok) {
+                    throw new Error('Failed to load requests');
+                }
+                allRequests = await response.json();
+                updateStats();
+                displayRequests(allRequests);
             } catch (error) {
                 console.error('Error loading requests:', error);
-                document.getElementById('requestsList').innerHTML = '<div class="alert alert-danger">Error loading requests</div>';
+                document.getElementById('requestsContainer').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Failed to load adoption requests. Please try refreshing the page.
+                    </div>
+                `;
             }
         }
 
-        function updateStats(requests) {
-            const stats = {
-                total: requests.length,
-                pending: requests.filter(r => r.status === 'pending').length,
-                approved: requests.filter(r => r.status === 'approved').length,
-                rejected: requests.filter(r => r.status === 'rejected').length
-            };
+        function updateStats() {
+            const total = allRequests.length;
+            const pending = allRequests.filter(r => r.status === 'pending').length;
+            const approved = allRequests.filter(r => r.status === 'approved').length;
+            const rejected = allRequests.filter(r => r.status === 'rejected').length;
 
-            document.getElementById('totalRequests').textContent = stats.total;
-            document.getElementById('pendingRequests').textContent = stats.pending;
-            document.getElementById('approvedRequests').textContent = stats.approved;
-            document.getElementById('rejectedRequests').textContent = stats.rejected;
+            document.getElementById('totalRequests').textContent = total;
+            document.getElementById('pendingRequests').textContent = pending;
+            document.getElementById('approvedRequests').textContent = approved;
+            document.getElementById('rejectedRequests').textContent = rejected;
+        }
+
+        function filterRequests() {
+            const filter = document.getElementById('statusFilter').value;
+            const filtered = filter === 'all' ? allRequests : allRequests.filter(r => r.status === filter);
+            displayRequests(filtered);
         }
 
         function displayRequests(requests) {
-            const container = document.getElementById('requestsList');
+            const container = document.getElementById('requestsContainer');
 
             if (requests.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">No adoption requests yet.</div>';
+                container.innerHTML = `
+                    <div class="card request-card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No adoption requests found</h5>
+                            <p class="text-muted">There are no requests matching your current filter.</p>
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = requests.map(request => `
-                <div class="request-card">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <h5>${request.customer_name}</h5>
-                            <p class="mb-1"><strong>Email:</strong> ${request.customer_email}</p>
-                            ${request.phone ? `<p class="mb-1"><strong>Phone:</strong> ${request.phone}</p>` : ''}
-                            <p class="mb-1"><strong>Submitted:</strong> ${new Date(request.submitted_at).toLocaleDateString()}</p>
-                            <p class="mb-1"><strong>Subscription:</strong> ${request.subscription ? 'Yes' : 'No'}</p>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge ${getStatusClass(request.status)} p-2 mb-2">${request.status.toUpperCase()}</span>
-                            <br>
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewRequest(${request.id})">
-                                <i class="fas fa-eye"></i> View
-                            </button>
+            const html = requests.map(request => `
+                <div class="card request-card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h6 class="mb-1 fw-bold">${request.customer_name}</h6>
+                                <p class="mb-1 text-muted small">
+                                    <i class="fas fa-envelope me-1"></i>${request.customer_email}
+                                </p>
+                                ${request.phone ? `
+                                    <p class="mb-0 text-muted small">
+                                        <i class="fas fa-phone me-1"></i>${request.phone}
+                                    </p>
+                                ` : ''}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <span class="badge ${getStatusBadgeClass(request.status)} status-badge">
+                                        ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                    </span>
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    ${new Date(request.submitted_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fw-semibold text-primary">
+                                    <i class="fas fa-tag me-1"></i>Litter: ${request.litter_code || 'Not specified'}
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button onclick="viewRequest(${request.id})" class="btn btn-outline-primary btn-action btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+
+            container.innerHTML = html;
         }
 
-        function getStatusClass(status) {
-            switch(status) {
-                case 'pending': return 'status-pending';
-                case 'approved': return 'status-approved';
-                case 'rejected': return 'status-rejected';
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'pending': return 'bg-warning text-dark';
+                case 'approved': return 'bg-success';
+                case 'rejected': return 'bg-danger';
                 default: return 'bg-secondary';
             }
         }
 
         async function viewRequest(requestId) {
+            currentRequestId = requestId;
+            const modal = new bootstrap.Modal(document.getElementById('requestModal'));
+            modal.show();
+
             try {
                 const response = await fetch(`/api/adoption/requests/${requestId}`);
-                const request = await response.json();
-
-                currentRequestId = requestId;
-
-                const details = document.getElementById('requestDetails');
-                const customAnswers = JSON.parse(request.custom_answers || '{}');
-
-                details.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Contact Information</h6>
-                            <p><strong>Name:</strong> ${request.customer_name}</p>
-                            <p><strong>Email:</strong> ${request.customer_email}</p>
-                            ${request.phone ? `<p><strong>Phone:</strong> ${request.phone}</p>` : ''}
-                            <p><strong>Submitted:</strong> ${new Date(request.submitted_at).toLocaleString()}</p>
-                            <p><strong>Status:</strong> <span class="badge ${getStatusClass(request.status)}">${request.status.toUpperCase()}</span></p>
-                            <p><strong>Terms Agreed:</strong> ${request.terms_agreed ? 'Yes' : 'No'}</p>
-                            <p><strong>Newsletter:</strong> ${request.subscription ? 'Yes' : 'No'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Questionnaire Responses</h6>
-                            ${Object.keys(customAnswers).length > 0 ?
-                                Object.entries(customAnswers).map(([key, value]) =>
-                                    `<p><strong>Question ${key}:</strong> ${value}</p>`
-                                ).join('') :
-                                '<p>No responses recorded.</p>'
-                            }
-                        </div>
-                    </div>
-                `;
-
-                // Update button states
-                const approveBtn = document.getElementById('approveBtn');
-                const rejectBtn = document.getElementById('rejectBtn');
-
-                if (request.status === 'pending') {
-                    approveBtn.style.display = 'inline-block';
-                    rejectBtn.style.display = 'inline-block';
-                } else {
-                    approveBtn.style.display = 'none';
-                    rejectBtn.style.display = 'none';
+                if (!response.ok) {
+                    throw new Error('Failed to load request details');
                 }
-
-                new bootstrap.Modal(document.getElementById('requestModal')).show();
+                const request = await response.json();
+                displayRequestDetails(request);
             } catch (error) {
                 console.error('Error loading request details:', error);
-                alert('Error loading request details');
+                document.getElementById('requestDetails').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Failed to load request details. Please try again.
+                    </div>
+                `;
             }
         }
 
-        async function updateStatus(status) {
-            if (!currentRequestId) return;
+        function displayRequestDetails(request) {
+            const answers = JSON.parse(request.custom_answers || '{}');
 
+            const detailsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-user-circle me-2 text-primary"></i>Contact Information
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Name</label>
+                            <p class="mb-1">${request.customer_name}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <p class="mb-1">${request.customer_email}</p>
+                        </div>
+                        ${request.phone ? `
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Phone</label>
+                                <p class="mb-1">${request.phone}</p>
+                            </div>
+                        ` : ''}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Litter Code</label>
+                            <p class="mb-1">${request.litter_code || 'Not specified'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Submitted</label>
+                            <p class="mb-1">${new Date(request.submitted_at).toLocaleString()}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Status</label>
+                            <p class="mb-1">
+                                <span class="badge ${getStatusBadgeClass(request.status)} status-badge">
+                                    ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-question-circle me-2 text-info"></i>Application Answers
+                        </h6>
+                        ${Object.keys(answers).length > 0 ? Object.entries(answers).map(([key, value]) => `
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Question ${key.replace('question_', '')}</label>
+                                <p class="mb-1">${value}</p>
+                            </div>
+                        `).join('') : '<p class="text-muted">No custom answers provided.</p>'}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-file-contract me-2 text-success"></i>Legal Agreements
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" disabled ${request.terms_agreed ? 'checked' : ''}>
+                                    <label class="form-check-label">
+                                        Terms & Conditions
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" disabled ${request.privacy_consent ? 'checked' : ''}>
+                                    <label class="form-check-label">
+                                        Privacy Policy
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" disabled ${request.subscription ? 'checked' : ''}>
+                                    <label class="form-check-label">
+                                        Newsletter Subscription
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('requestDetails').innerHTML = detailsHTML;
+
+            // Update button states
+            const approveBtn = document.getElementById('approveBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+
+            if (request.status === 'approved') {
+                approveBtn.disabled = true;
+                approveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Already Approved';
+                rejectBtn.disabled = true;
+                rejectBtn.innerHTML = '<i class="fas fa-ban me-1"></i>Cannot Reject';
+            } else if (request.status === 'rejected') {
+                approveBtn.disabled = true;
+                approveBtn.innerHTML = '<i class="fas fa-ban me-1"></i>Cannot Approve';
+                rejectBtn.disabled = true;
+                rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i>Already Rejected';
+            } else {
+                approveBtn.disabled = false;
+                approveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Approve';
+                rejectBtn.disabled = false;
+                rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i>Reject';
+            }
+
+            // Add event listeners
+            approveBtn.onclick = () => updateRequestStatus(requestId, 'approved');
+            rejectBtn.onclick = () => updateRequestStatus(requestId, 'rejected');
+        }
+
+        async function updateRequestStatus(requestId, status) {
             try {
-                const response = await fetch(`/api/adoption/requests/${currentRequestId}`, {
+                const response = await fetch(`/api/adoption/requests/${requestId}`, {
                     method: 'PUT',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({status: status})
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: status })
                 });
 
-                if (response.ok) {
-                    bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
-                    loadRequests();
-                    showAlert(`Request ${status} successfully!`, 'success');
-                } else {
-                    showAlert('Error updating request status', 'danger');
+                if (!response.ok) {
+                    throw new Error('Failed to update request status');
                 }
-            } catch (error) {
-                console.error('Error updating status:', error);
-                showAlert('Error updating request status', 'danger');
-            }
-        }
 
-        function exportRequests() {
-            // Simple CSV export - in production, you'd want server-side generation
-            window.location.href = '/api/adoption/requests/export';
+                // Close modal and reload requests
+                bootstrap.Modal.getInstance(document.getElementById('requestModal')).hide();
+                await loadRequests();
+
+                // Show success message
+                showAlert(`Request ${status} successfully!`, 'success');
+            } catch (error) {
+                console.error('Error updating request status:', error);
+                showAlert('Failed to update request status. Please try again.', 'danger');
+            }
         }
 
         function showAlert(message, type) {
-            // Simple alert - could be enhanced with Bootstrap alerts
-            alert(message);
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alertDiv);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
         }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Requests</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="total-count">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="pending-count">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Approved</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="approved-count">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Rejected</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="rejected-count">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Table -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Adoption Requests</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Review and manage adoption applications</p>
+            </div>
+            <div id="requestsTable" class="border-t border-gray-200">
+                <div class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p class="mt-2 text-sm text-gray-500">Loading requests...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Details Modal -->
+<div id="requestModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Adoption Request Details</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="requestDetails" class="space-y-6">
+                <!-- Loading state -->
+                <div class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p class="mt-2 text-sm text-gray-500">Loading request details...</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-6 border-t">
+                <button id="rejectBtn" onclick="updateStatus('rejected')" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Reject Request
+                </button>
+                <button id="approveBtn" onclick="updateStatus('approved')" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Approve Request
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRequestId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadRequests();
+    });
+
+    async function loadRequests() {
+        try {
+            const response = await fetch('/api/adoption/requests');
+            if (!response.ok) {
+                throw new Error('Failed to load requests');
+            }
+            const requests = await response.json();
+            displayRequests(requests);
+            updateStats(requests);
+        } catch (error) {
+            console.error('Error loading requests:', error);
+            document.getElementById('requestsTable').innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Error loading requests</h3>
+                    <p class="mt-1 text-sm text-gray-500">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    function displayRequests(requests) {
+        if (requests.length === 0) {
+            document.getElementById('requestsTable').innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No adoption requests</h3>
+                    <p class="mt-1 text-sm text-gray-500">No adoption requests have been submitted yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const tableHTML = `
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Litter Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    ${requests.map(request => `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${request.customer_name}</div>
+                                ${request.phone ? `<div class="text-sm text-gray-500">${request.phone}</div>` : ''}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${request.customer_email}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${request.litter_code || 'N/A'}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${new Date(request.submitted_at).toLocaleDateString()}</div>
+                                <div class="text-sm text-gray-500">${new Date(request.submitted_at).toLocaleTimeString()}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClass(request.status)}">
+                                    ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="viewRequest(${request.id})" class="text-blue-600 hover:text-blue-900 mr-3">View Details</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        document.getElementById('requestsTable').innerHTML = tableHTML;
+    }
+
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'approved': return 'bg-green-100 text-green-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function updateStats(requests) {
+        const stats = {
+            total: requests.length,
+            pending: requests.filter(r => r.status === 'pending').length,
+            approved: requests.filter(r => r.status === 'approved').length,
+            rejected: requests.filter(r => r.status === 'rejected').length
+        };
+
+        document.getElementById('total-count').textContent = stats.total;
+        document.getElementById('pending-count').textContent = stats.pending;
+        document.getElementById('approved-count').textContent = stats.approved;
+        document.getElementById('rejected-count').textContent = stats.rejected;
+    }
+
+    async function viewRequest(requestId) {
+        currentRequestId = requestId;
+        document.getElementById('requestModal').classList.remove('hidden');
+
+        try {
+            const response = await fetch(`/api/adoption/requests/${requestId}`);
+            if (!response.ok) {
+                throw new Error('Failed to load request details');
+            }
+            const request = await response.json();
+            displayRequestDetails(request);
+        } catch (error) {
+            console.error('Error loading request details:', error);
+            document.getElementById('requestDetails').innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-red-800">Error loading details</h3>
+                    <p class="mt-1 text-sm text-red-600">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    function displayRequestDetails(request) {
+        const answers = JSON.parse(request.custom_answers || '{}');
+
+        const detailsHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Contact Information</h4>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Name</dt>
+                            <dd class="text-sm text-gray-900">${request.customer_name}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Email</dt>
+                            <dd class="text-sm text-gray-900">${request.customer_email}</dd>
+                        </div>
+                        ${request.phone ? `
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                            <dd class="text-sm text-gray-900">${request.phone}</dd>
+                        </div>
+                        ` : ''}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Litter Code</dt>
+                            <dd class="text-sm text-gray-900">${request.litter_code || 'N/A'}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Submitted</dt>
+                            <dd class="text-sm text-gray-900">${new Date(request.submitted_at).toLocaleString()}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                            <dd class="text-sm">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClass(request.status)}">
+                                    ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div>
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Application Answers</h4>
+                    <dl class="space-y-3">
+                        ${Object.entries(answers).map(([key, value]) => `
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Question ${key.replace('question_', '')}</dt>
+                                <dd class="text-sm text-gray-900">${value}</dd>
+                            </div>
+                        `).join('')}
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="text-md font-medium text-gray-900 mb-4">Legal Agreements</h4>
+                <dl class="space-y-3">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Terms Agreed</dt>
+                        <dd class="text-sm text-gray-900">${request.terms_agreed ? 'Yes' : 'No'}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Privacy Consent</dt>
+                        <dd class="text-sm text-gray-900">${request.privacy_consent ? 'Yes' : 'No'}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Newsletter Subscription</dt>
+                        <dd class="text-sm text-gray-900">${request.subscription ? 'Yes' : 'No'}</dd>
+                    </div>
+                </dl>
+            </div>
+        `;
+
+        document.getElementById('requestDetails').innerHTML = detailsHTML;
+
+        // Update button states based on current status
+        const approveBtn = document.getElementById('approveBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+
+        if (request.status === 'approved') {
+            approveBtn.disabled = true;
+            approveBtn.textContent = 'Already Approved';
+            rejectBtn.disabled = true;
+            rejectBtn.textContent = 'Cannot Reject Approved';
+        } else if (request.status === 'rejected') {
+            approveBtn.disabled = true;
+            approveBtn.textContent = 'Cannot Approve Rejected';
+            rejectBtn.disabled = true;
+            rejectBtn.textContent = 'Already Rejected';
+        } else {
+            approveBtn.disabled = false;
+            approveBtn.textContent = 'Approve Request';
+            rejectBtn.disabled = false;
+            rejectBtn.textContent = 'Reject Request';
+        }
+    }
+
+    async function updateStatus(newStatus) {
+        if (!currentRequestId) return;
+
+        try {
+            const response = await fetch(`/api/adoption/requests/${currentRequestId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update request status');
+            }
+
+            const result = await response.json();
+            alert(`Request ${newStatus} successfully!`);
+
+            // Close modal and reload requests
+            closeModal();
+            loadRequests();
+
+        } catch (error) {
+            console.error('Error updating status:', error);
+            alert(`Error updating request: ${error.message}`);
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('requestModal').classList.add('hidden');
+        currentRequestId = null;
+    }
+</script>
+
+{% endblock %}
