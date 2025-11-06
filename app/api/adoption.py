@@ -3,46 +3,16 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import AdoptionQuestion, AdoptionRequest
-from pydantic import BaseModel
+from ..schemas import (
+    AdoptionQuestionCreate,
+    AdoptionQuestionResponse,
+    AdoptionSubmitRequest,
+    AdoptionRequestResponse
+)
 from typing import List, Optional, Dict
 from datetime import datetime
 
 router = APIRouter()
-
-class AdoptionQuestionCreate(BaseModel):
-    question_text: str
-    question_type: str
-    options: Optional[str] = None
-    is_required: bool = True
-    order: int = 0
-
-class AdoptionQuestionResponse(BaseModel):
-    id: int
-    question_text: str
-    question_type: str
-    options: Optional[str]
-    is_required: bool
-    order: int
-
-class AdoptionSubmitRequest(BaseModel):
-    customer_email: str
-    customer_name: str
-    phone: Optional[str] = None
-    custom_answers: Dict[str, str]
-    terms_agreed: bool
-    subscription: bool = False
-
-class AdoptionRequestResponse(BaseModel):
-    id: int
-    customer_email: str
-    customer_name: str
-    phone: Optional[str]
-    custom_answers: Optional[str]
-    terms_agreed: bool
-    subscription: bool
-    submitted_at: datetime
-    status: str
-    notification_sent_at: Optional[datetime]
 
 @router.get("/requests", response_model=List[AdoptionRequestResponse])
 async def get_adoption_requests(db: Session = Depends(get_db)):
@@ -88,7 +58,7 @@ async def export_adoption_requests(db: Session = Depends(get_db)):
     # Write header
     writer.writerow([
         'ID', 'Customer Name', 'Email', 'Phone', 'Status', 'Submitted At',
-        'Terms Agreed', 'Subscription', 'Notification Sent At'
+        'Terms Agreed', 'Privacy Consent', 'Subscription', 'Notification Sent At'
     ])
 
     # Write data
@@ -101,6 +71,7 @@ async def export_adoption_requests(db: Session = Depends(get_db)):
             request.status,
             request.submitted_at.isoformat() if request.submitted_at else '',
             'Yes' if request.terms_agreed else 'No',
+            'Yes' if request.privacy_consent else 'No',
             'Yes' if request.subscription else 'No',
             request.notification_sent_at.isoformat() if request.notification_sent_at else ''
         ])
@@ -119,6 +90,9 @@ async def submit_adoption_request(request: AdoptionSubmitRequest, db: Session = 
     if not request.terms_agreed:
         raise HTTPException(status_code=400, detail="You must read and agree to the terms to submit an adoption request.")
 
+    if not request.privacy_consent:
+        raise HTTPException(status_code=400, detail="You must consent to the privacy policy to submit an adoption request.")
+
     # Convert custom_answers dict to JSON string for storage
     import json
     custom_answers_json = json.dumps(request.custom_answers)
@@ -129,6 +103,7 @@ async def submit_adoption_request(request: AdoptionSubmitRequest, db: Session = 
         phone=request.phone,
         custom_answers=custom_answers_json,
         terms_agreed=request.terms_agreed,
+        privacy_consent=request.privacy_consent,
         subscription=request.subscription
     )
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from .database import Base, engine, get_db
-from .models import Cat, Article
+from .models import Cat, Article, AdoptionQuestion, AdoptionRequest
 from .api.cats import router as cats_router
 from .api.articles import router as articles_router
 from .api.article_images import router as article_images_router

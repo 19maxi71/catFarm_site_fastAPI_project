@@ -7,3 +7,9 @@ from .article import (
     CreateArticleImageRequest,
     ArticleImageResponse
 )
+from .adoption import (
+    AdoptionQuestionCreate,
+    AdoptionQuestionResponse,
+    AdoptionSubmitRequest,
+    AdoptionRequestResponse
+)

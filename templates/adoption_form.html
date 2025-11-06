@@ -54,7 +54,20 @@
                             <input type="checkbox" id="terms_agreed" name="terms_agreed" required
                                    class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                             <label for="terms_agreed" class="ml-2 block text-sm text-gray-700">
-                                I have read and agree to the <a href="/adoption-terms" target="_blank" class="text-amber-600 hover:text-amber-700 underline">terms of adoption</a> and <a href="/privacy-policy" target="_blank" class="text-amber-600 hover:text-amber-700 underline">privacy policy</a> *
+                                I have read and agree to the <a href="/adoption-terms" target="_blank" class="text-amber-600 hover:text-amber-700 underline">terms of adoption</a> *
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Consent -->
+                <div class="mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <input type="checkbox" id="privacy_consent" name="privacy_consent" required
+                                   class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                            <label for="privacy_consent" class="ml-2 block text-sm text-gray-700">
+                                I consent to the collection and use of my personal information as described in the <a href="/privacy-policy" target="_blank" class="text-amber-600 hover:text-amber-700 underline">privacy policy</a> *
                             </label>
                         </div>
                     </div>
@@ -144,6 +157,17 @@ function renderQuestions(questions) {
 document.getElementById('adoptionForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Client-side validation
+    const termsAgreed = document.getElementById('terms_agreed').checked;
+    if (!termsAgreed) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'alert alert-danger';
+        messageDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>You must agree to the terms and conditions to submit this form.';
+        messageDiv.style.display = 'block';
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
+
     const submitBtn = document.getElementById('submitBtn');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
@@ -168,7 +192,7 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
     }
 
     try {
-        const response = await fetch('/api/adoption/submit', {
+        const response = await fetch('/api/submit', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

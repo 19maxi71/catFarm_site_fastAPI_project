@@ -14,6 +14,9 @@ class AdoptionQuestion(Base):
     is_required = Column(Boolean, default=True)
     order = Column(Integer, default=0)
 
+    def __repr__(self):
+        return f"<AdoptionQuestion(id={self.id}, question_text='{self.question_text[:50]}...', type='{self.question_type}')>"
+
 
 class AdoptionRequest(Base):
     __tablename__ = "adoption_requests"
@@ -24,7 +27,11 @@ class AdoptionRequest(Base):
     phone = Column(String(50), nullable=True)
     custom_answers = Column(Text, nullable=True)  # JSON string
     terms_agreed = Column(Boolean, default=False)
+    privacy_consent = Column(Boolean, default=False)
     subscription = Column(Boolean, default=False)
     submitted_at = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String(50), default="pending")  # 'pending', 'approved', 'rejected'
     notification_sent_at = Column(DateTime(timezone=True), nullable=True)
+
+    def __repr__(self):
+        return f"<AdoptionRequest(id={self.id}, customer='{self.customer_name}', email='{self.customer_email}', status='{self.status}')>"
