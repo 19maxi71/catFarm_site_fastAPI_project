@@ -1,4 +1,55 @@
-#!/usr/bin/env python3
+🐱 Adoption Request
+Ready to welcome a Siberian cat into your home? Please fill out this form so we can learn more about you and ensure the best match.
+
+Contact Information
+Email Address *
+vtr03@tutamail.com
+Full Name *
+HUAREZ
+Phone Number
+Cat Selection
+Which litter are you interested in? *
+
+Litter L004
+Additional Information
+11111TEST111111 *
+Why do you want to adopt a cat? *
+What is your email address? *
+DO YOU HAVE OTHER ANIMALS AT HOME? WHICH ONE? *
+WHAT OTHER ANIMALS DO YOU HAVE AT HOME? *
+Do you have experience with cats? *
+What is your full name? *
+What is your phone number?
+Do you have any previous experience with cats? *
+
+Select an option
+Do you have any allergies to cats? *
+
+Yes
+
+No
+What type of home do you live in? *
+
+Select an option
+What type of cat are you interested in? *
+
+Select an option
+How many hours per day will the cat be left alone? *
+
+Select an option
+Do you agree to provide regular veterinary care? *
+
+Yes
+
+No
+Any additional comments or questions?
+
+I have read and agree to the terms of adoption *
+
+I consent to the collection and use of my personal information as described in the privacy policy *
+
+Subscribe to updates about new kittens and farm news
+Submit Adoption Request#!/usr/bin/env python3
 """
 Script to add sample adoption questions to the database for testing
 """
