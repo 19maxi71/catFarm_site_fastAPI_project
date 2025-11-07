@@ -5,6 +5,7 @@ from ..database import get_db
 from ..models import AdoptionQuestion, AdoptionRequest
 from ..schemas import (
     AdoptionQuestionCreate,
+    AdoptionQuestionUpdate,
     AdoptionQuestionResponse,
     AdoptionSubmitRequest,
     AdoptionRequestResponse
@@ -250,12 +251,13 @@ async def get_adoption_question(question_id: int, db: Session = Depends(get_db))
     return question
 
 @router.put("/questions/{question_id}", response_model=AdoptionQuestionResponse)
-async def update_adoption_question(question_id: int, question: AdoptionQuestionCreate, db: Session = Depends(get_db)):
+async def update_adoption_question(question_id: int, question: AdoptionQuestionUpdate, db: Session = Depends(get_db)):
     db_question = db.query(AdoptionQuestion).filter(AdoptionQuestion.id == question_id).first()
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
 
-    for key, value in question.dict().items():
+    update_data = question.dict(exclude_unset=True)
+    for key, value in update_data.items():
         setattr(db_question, key, value)
 
     db.commit()
@@ -271,3 +273,14 @@ async def delete_adoption_question(question_id: int, db: Session = Depends(get_d
     db.delete(db_question)
     db.commit()
     return {"message": "Question deleted successfully"}
+
+@router.post("/questions/renumber")
+async def renumber_questions(db: Session = Depends(get_db)):
+    """Renumber all questions sequentially starting from 0."""
+    questions = db.query(AdoptionQuestion).order_by(AdoptionQuestion.display_order, AdoptionQuestion.id).all()
+
+    for i, question in enumerate(questions):
+        question.display_order = i
+
+    db.commit()
+    return {"message": f"Renumbered {len(questions)} questions"}

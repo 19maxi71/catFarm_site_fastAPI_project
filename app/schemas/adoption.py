@@ -9,6 +9,13 @@ class AdoptionQuestionCreate(BaseModel):
     is_required: bool = True
     display_order: int = 0
 
+class AdoptionQuestionUpdate(BaseModel):
+    question_text: Optional[str] = None
+    question_type: Optional[str] = None
+    options: Optional[str] = None
+    is_required: Optional[bool] = None
+    display_order: Optional[int] = None
+
 class AdoptionQuestionResponse(BaseModel):
     id: int
     question_text: str

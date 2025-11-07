@@ -9,6 +9,7 @@ from .article import (
 )
 from .adoption import (
     AdoptionQuestionCreate,
+    AdoptionQuestionUpdate,
     AdoptionQuestionResponse,
     AdoptionSubmitRequest,
     AdoptionRequestResponse

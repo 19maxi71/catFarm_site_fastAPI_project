@@ -171,7 +171,9 @@
                             <label for="questionType" class="form-label fw-semibold">Question Type *</label>
                             <select id="questionType" name="question_type" class="form-select" required>
                                 <option value="text">Text Input</option>
+                                <option value="textarea">Text Area</option>
                                 <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio Buttons</option>
                                 <option value="select">Select Dropdown</option>
                             </select>
                         </div>
@@ -214,10 +216,10 @@
         // Load questions on page load
         document.addEventListener('DOMContentLoaded', loadQuestions);
 
-        // Show options field when select type is chosen
+        // Show options field when select or radio type is chosen
         document.getElementById('questionType').addEventListener('change', function() {
             const optionsGroup = document.getElementById('optionsGroup');
-            if (this.value === 'select') {
+            if (this.value === 'select' || this.value === 'radio') {
                 optionsGroup.style.display = 'block';
             } else {
                 optionsGroup.style.display = 'none';
@@ -231,6 +233,20 @@
                     throw new Error('Failed to load questions');
                 }
                 questions = await response.json();
+
+                // Check for duplicate display orders and renumber if needed
+                const orders = questions.map(q => q.display_order);
+                const uniqueOrders = new Set(orders);
+                if (orders.length !== uniqueOrders.size) {
+                    console.log('Duplicate display orders detected, renumbering...');
+                    await fetch('/api/adoption/questions/renumber', { method: 'POST' });
+                    // Reload questions after renumbering
+                    const response2 = await fetch('/api/adoption/questions/');
+                    if (response2.ok) {
+                        questions = await response2.json();
+                    }
+                }
+
                 displayQuestions(questions);
             } catch (error) {
                 console.error('Error loading questions:', error);
@@ -327,7 +343,7 @@
             document.getElementById('isRequired').checked = question.is_required;
             document.getElementById('order').value = question.display_order;
 
-            if (question.question_type === 'select') {
+            if (question.question_type === 'select' || question.question_type === 'radio') {
                 document.getElementById('optionsGroup').style.display = 'block';
                 document.getElementById('options').value = question.options || '';
             } else {
@@ -413,21 +429,46 @@
             const question = questions.find(q => q.id === questionId);
             if (!question) return;
 
-            const currentOrder = question.display_order;
-            const newOrder = direction === 'up' ? currentOrder - 1 : currentOrder + 1;
+            // Find the target question to swap with
+            let targetQuestion = null;
+            if (direction === 'up') {
+                // Find the question with the next lower display_order
+                const sortedQuestions = [...questions].sort((a, b) => a.display_order - b.display_order);
+                const currentIndex = sortedQuestions.findIndex(q => q.id === questionId);
+                if (currentIndex > 0) {
+                    targetQuestion = sortedQuestions[currentIndex - 1];
+                }
+            } else {
+                // Find the question with the next higher display_order
+                const sortedQuestions = [...questions].sort((a, b) => a.display_order - b.display_order);
+                const currentIndex = sortedQuestions.findIndex(q => q.id === questionId);
+                if (currentIndex < sortedQuestions.length - 1) {
+                    targetQuestion = sortedQuestions[currentIndex + 1];
+                }
+            }
 
-            if (newOrder < 0) return; // Can't move above 0
+            if (!targetQuestion) return; // Can't move further
 
             try {
-                const response = await fetch(`/api/adoption/questions/${questionId}`, {
+                // Swap the display orders
+                const tempOrder = question.display_order;
+                question.display_order = targetQuestion.display_order;
+                targetQuestion.display_order = tempOrder;
+
+                // Update both questions
+                const response1 = await fetch(`/api/adoption/questions/${question.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ display_order: newOrder })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ display_order: question.display_order })
                 });
 
-                if (!response.ok) {
+                const response2 = await fetch(`/api/adoption/questions/${targetQuestion.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ display_order: targetQuestion.display_order })
+                });
+
+                if (!response1.ok || !response2.ok) {
                     throw new Error('Failed to move question');
                 }
 
