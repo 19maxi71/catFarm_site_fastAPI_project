@@ -15,10 +15,11 @@ from datetime import datetime
 import os
 import json
 
+
 async def send_adoption_email_notification(request: AdoptionRequest, custom_answers: Dict[str, str], db: Session):
     """Send email notification to admin about new adoption request."""
     # Get admin email from environment variable
-    admin_email = os.getenv('ADMIN_EMAIL', 'admin@rockaran.com')
+    admin_email = os.getenv('ADMIN_EMAIL', 'admin@lavandercats.com')
 
     # Get question texts for the email
     question_texts = {}
@@ -43,7 +44,8 @@ Questionnaire Responses:
 """
 
     for question_id, answer in custom_answers.items():
-        question_text = question_texts.get(question_id, f"Question {question_id}")
+        question_text = question_texts.get(
+            question_id, f"Question {question_id}")
         body += f"- {question_text}: {answer}\n"
 
     body += f"""
@@ -70,7 +72,7 @@ Please review this application in the admin panel.
     #
     # msg = MIMEText(body)
     # msg['Subject'] = subject
-    # msg['From'] = 'noreply@rockaran.com'
+    # msg['From'] = 'noreply@lavandercats.com'
     # msg['To'] = admin_email
     #
     # # Send email using SMTP
@@ -82,6 +84,7 @@ Please review this application in the admin panel.
 
 router = APIRouter(prefix="/adoption")
 
+
 @router.get("/requests/export")
 async def export_adoption_requests(db: Session = Depends(get_db)):
     """Export adoption requests as CSV."""
@@ -89,7 +92,8 @@ async def export_adoption_requests(db: Session = Depends(get_db)):
     import csv
     import io
 
-    requests = db.query(AdoptionRequest).order_by(AdoptionRequest.submitted_at.desc()).all()
+    requests = db.query(AdoptionRequest).order_by(
+        AdoptionRequest.submitted_at.desc()).all()
 
     # Create CSV content
     output = io.StringIO()
@@ -126,23 +130,31 @@ async def export_adoption_requests(db: Session = Depends(get_db)):
     )
     return response
 
+
 @router.get("/requests", response_model=List[AdoptionRequestResponse])
 async def get_adoption_requests(db: Session = Depends(get_db)):
-    requests = db.query(AdoptionRequest).order_by(AdoptionRequest.submitted_at.desc()).all()
+    requests = db.query(AdoptionRequest).order_by(
+        AdoptionRequest.submitted_at.desc()).all()
     return requests
+
 
 @router.get("/requests/{request_id}", response_model=AdoptionRequestResponse)
 async def get_adoption_request(request_id: int, db: Session = Depends(get_db)):
-    request = db.query(AdoptionRequest).filter(AdoptionRequest.id == request_id).first()
+    request = db.query(AdoptionRequest).filter(
+        AdoptionRequest.id == request_id).first()
     if not request:
-        raise HTTPException(status_code=404, detail="Adoption request not found")
+        raise HTTPException(
+            status_code=404, detail="Adoption request not found")
     return request
+
 
 @router.put("/requests/{request_id}")
 async def update_adoption_request(request_id: int, request_data: dict, db: Session = Depends(get_db)):
-    db_request = db.query(AdoptionRequest).filter(AdoptionRequest.id == request_id).first()
+    db_request = db.query(AdoptionRequest).filter(
+        AdoptionRequest.id == request_id).first()
     if not db_request:
-        raise HTTPException(status_code=404, detail="Adoption request not found")
+        raise HTTPException(
+            status_code=404, detail="Adoption request not found")
 
     status = request_data.get("status")
     if status:
@@ -188,13 +200,16 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
         headers={"Content-Disposition": "attachment; filename=adoption_requests.csv"}
     )
 
+
 @router.post("/submit")
 async def submit_adoption_request(request: AdoptionSubmitRequest, db: Session = Depends(get_db)):
     if not request.terms_agreed:
-        raise HTTPException(status_code=400, detail="You must read and agree to the terms to submit an adoption request.")
+        raise HTTPException(
+            status_code=400, detail="You must read and agree to the terms to submit an adoption request.")
 
     if not request.privacy_consent:
-        raise HTTPException(status_code=400, detail="You must consent to the privacy policy to submit an adoption request.")
+        raise HTTPException(
+            status_code=400, detail="You must consent to the privacy policy to submit an adoption request.")
 
     # Convert custom_answers dict to JSON string for storage
     import json
@@ -224,16 +239,21 @@ async def submit_adoption_request(request: AdoptionSubmitRequest, db: Session = 
 
     return {"message": "Adoption request submitted successfully", "request_id": db_request.id}
 
+
 @router.get("/form", response_model=List[AdoptionQuestionResponse])
 async def get_adoption_form(db: Session = Depends(get_db)):
     """Get questions for the adoption form."""
-    questions = db.query(AdoptionQuestion).order_by(AdoptionQuestion.display_order).all()
+    questions = db.query(AdoptionQuestion).order_by(
+        AdoptionQuestion.display_order).all()
     return questions
+
 
 @router.get("/questions/", response_model=List[AdoptionQuestionResponse])
 async def get_adoption_questions(db: Session = Depends(get_db)):
-    questions = db.query(AdoptionQuestion).order_by(AdoptionQuestion.display_order).all()
+    questions = db.query(AdoptionQuestion).order_by(
+        AdoptionQuestion.display_order).all()
     return questions
+
 
 @router.post("/questions/", response_model=AdoptionQuestionResponse)
 async def create_adoption_question(question: AdoptionQuestionCreate, db: Session = Depends(get_db)):
@@ -243,16 +263,20 @@ async def create_adoption_question(question: AdoptionQuestionCreate, db: Session
     db.refresh(db_question)
     return db_question
 
+
 @router.get("/questions/{question_id}", response_model=AdoptionQuestionResponse)
 async def get_adoption_question(question_id: int, db: Session = Depends(get_db)):
-    question = db.query(AdoptionQuestion).filter(AdoptionQuestion.id == question_id).first()
+    question = db.query(AdoptionQuestion).filter(
+        AdoptionQuestion.id == question_id).first()
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return question
 
+
 @router.put("/questions/{question_id}", response_model=AdoptionQuestionResponse)
 async def update_adoption_question(question_id: int, question: AdoptionQuestionUpdate, db: Session = Depends(get_db)):
-    db_question = db.query(AdoptionQuestion).filter(AdoptionQuestion.id == question_id).first()
+    db_question = db.query(AdoptionQuestion).filter(
+        AdoptionQuestion.id == question_id).first()
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
 
@@ -264,9 +288,11 @@ async def update_adoption_question(question_id: int, question: AdoptionQuestionU
     db.refresh(db_question)
     return db_question
 
+
 @router.delete("/questions/{question_id}")
 async def delete_adoption_question(question_id: int, db: Session = Depends(get_db)):
-    db_question = db.query(AdoptionQuestion).filter(AdoptionQuestion.id == question_id).first()
+    db_question = db.query(AdoptionQuestion).filter(
+        AdoptionQuestion.id == question_id).first()
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
 
@@ -274,10 +300,12 @@ async def delete_adoption_question(question_id: int, db: Session = Depends(get_d
     db.commit()
     return {"message": "Question deleted successfully"}
 
+
 @router.post("/questions/renumber")
 async def renumber_questions(db: Session = Depends(get_db)):
     """Renumber all questions sequentially starting from 0."""
-    questions = db.query(AdoptionQuestion).order_by(AdoptionQuestion.display_order, AdoptionQuestion.id).all()
+    questions = db.query(AdoptionQuestion).order_by(
+        AdoptionQuestion.display_order, AdoptionQuestion.id).all()
 
     for i, question in enumerate(questions):
         question.display_order = i

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LavanderCats - Sales Contract</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                maxWidth: 'none',
+                                color: '#374151',
+                                a: {
+                                    color: '#059669',
+                                    '&:hover': {
+                                        color: '#047857',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baguet+Script&display=swap');
+        .contract-title {
+            font-family: 'Baguet Script', cursive;
+            font-size: 3rem;
+            color: #fef8fb;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .contract-subtitle {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .contract-text {
+            font-size: 1.125rem;
+            line-height: 1.75;
+        }
+        .contract-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 2rem 0;
+        }
+        .contract-table td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+        .contract-table .seller-cell {
+            text-align: center;
+        }
+        .contract-table .buyer-cell {
+            text-align: left;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 200px;
+            margin: 0 0.5rem;
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .print-button:hover {
+            background: #047857;
+        }
+        @media print {
+            .print-button {
+                display: none;
+            }
+            body {
+                font-size: 12pt;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <a href="#" onclick="window.print()" class="print-button">Print Contract</a>
+    <a href="/contract/pdf" class="print-button" style="right: 140px;">Download PDF</a>
+
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 m-8">
+        <div class="bg-pink-100 p-6 rounded-lg mb-8">
+            <h1 class="contract-title">LavanderCats</h1>
+            <h2 class="contract-subtitle text-gray-800">Kitten Sales Contract</h2>
+        </div>
+
+        <div class="prose prose-lg max-w-none contract-text">
+            <p class="text-center mb-8">
+                A contract must be signed &amp; notarized before purchasing our Siberian kittens. This contract is designed to protect the buyer, the seller and the welfare of the Siberian kitten. Please take this contract to your veterinarian's office with the kitten so they are aware of the contract agreement.
+            </p>
+
+            <p class="text-center mb-8">
+                Date of Deposit: <span class="signature-line"></span> Date of Sale <span class="signature-line"></span>
+            </p>
+
+            <table class="contract-table">
+                <tr>
+                    <td class="seller-cell">
+                        <p><strong>Seller:</strong></p>
+                        <p>Oresta Koshyk</p>
+                    </td>
+                    <td class="buyer-cell">
+                        <p><strong>Buyer:</strong></p>
+                        <p><span class="signature-line"></span></p>
+                        <p><span class="signature-line"></span></p>
+                        <p><span class="signature-line"></span></p>
+                        <p><span class="signature-line"></span></p>
+                    </td>
+                </tr>
+            </table>
+
+            <h3 class="text-xl font-bold mt-8 mb-4">Description of Kitten:</h3>
+            <p>Name: <span class="signature-line"></span></p>
+            <p>Breed: <em>Siberian</em></p>
+            <p>Color/Pattern: <span class="signature-line"></span></p>
+            <p>Date of Birth: <span class="signature-line"></span></p>
+            <p>Sex: <span class="signature-line"></span></p>
+            <p>Purchase Amount: <span class="signature-line"></span></p>
+            <p>Sire: <span class="signature-line"></span></p>
+            <p>Dam: <span class="signature-line"></span></p>
+            <p>Microchip #: <span class="signature-line"></span></p>
+            <p>Non-Refundable Deposit Amount: <span class="signature-line"></span></p>
+            <p>Balance Due: $<span class="signature-line"></span></p>
+
+            <h3 class="text-xl font-bold mt-8 mb-4">Condition of the Sale</h3>
+            <ol class="list-decimal pl-6 space-y-4">
+                <li>The Seller guarantees that this kitten is healthy to the best of their knowledge, that the kitten will have been examined by a licensed veterinarian and is currently on vaccinations.</li>
+                <li>The Buyer is advised to take the kitten to the vet for a health exam within 72 hours; if any health concerns are found, the Buyer may return the kitten to the seller within 72 hours with a written explanation from the attending vet, for a full refund or exchange upon availability of a kitten. No medical or travel charges will be refunded.</li>
+                <li>During the first 72 hours kittens should be isolated from any other pets and monitored for health, eating, litter box usage, and activity level. The Seller is not responsible for any injury or illness to other pets caused by exposure to this kitten.</li>
+                <li>Due to the controversy of the FELV/FIV vaccine we recommend that this vaccine should NOT be given to our kittens as they are not outdoor cats and should not encounter this. Our cats are not to be left outdoors, nor should they be exposed to cats with FELV/FIV.</li>
+                <li>Whenever a vaccine is being administered, only ONE vaccine should be given at a time. Seller doesn't guarantee kittens wellbeing due to adverse reactions to future vaccinations.</li>
+                <li>The Seller guarantees the kitten described above is free of FELV (Feline Leukemia) and FIV (Feline AIDS) at the time of shipment, pick-up or delivery. One kitten from each litter will have been tested for FELV/FIV.</li>
+            </ol>
+
+            <p class="mt-6">Initials: <span class="signature-line"></span> Date: <span class="signature-line"></span></p>
+
+            <h3 class="text-xl font-bold mt-8 mb-4">7. This kitten is not to be declawed under ANY circumstances. The Buyer will be pay fine of $5,000.00 if any kitten bought from LavanderCats cattery will be declawed.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">8. Under no circumstances will this kitten be sold, leased or given away to any pet store, research laboratory, breeding mill or similar facility. If you can no longer keep this kitten, you <strong>MUST</strong> contact the Seller.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">9. If this kitten dies of FIP it will be replaced if FIP virus RealPCR test (code 3630) is performed on peritoneal fluid, pleural fluid, CFF, tissue biopsy, or aspirate.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">10. All our Siberian kittens are guaranteed for 2 (two) years against genetic defects, in particular and specifically HCM (hypertrophic cardiomyopathy) and PKD. In particular and specifically HCM (hypertrophic cardiomyopathy), if a kitten tests is HCM positive within 2 years of birth, the echocardiogram results must accompany the request of replacement. The echocardiogram must be performed by a licensed feline cardiac specialist and the results must accompany the request for replacement in writing and supported by the signed medical records and test results. The replacement kitten authorization will be determined upon receipt of said documentation and will depend on availability. Any kitten for which the Buyer is seeking a replacement must be properly identified by pictures for verification and made available to the Seller. Any unsanctioned destruction/termination of the kitten will render this guarantee NULL and VOID. If said documentation is not provided to the Seller, this contract and guarantee will be considered fulfilled by the Seller, with the Buyer surrendering all current and future rights to claim another kitten. No veterinarian expenses will be reimbursed, nor will any travel costs or expenses be reimbursed.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">11. If the kitten described above dies due to items (4), (5), (7), (10), the Seller will not replace the kitten, and the entire Health Guarantee becomes NULL and VOID.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">12. Should the kitten die within 2 (two) years as a result of an unknown or latent defect, said kitten will be replaced only if an appropriate autopsy is performed by a licensed veterinarian and all accompanying documentation from the observing veterinarian will be provided to the Seller. Trauma, abuse or neglect of this kitten's health as well as neglect notifying the seller of the intent to terminate this kitten life will void any warranty associated with this kitten. Under no circumstances will a kitten be destroyed prior notification of the Seller. The documentation required as proof will be the written and signed documentation by the attending veterinarian as to the cause of death along with all associated documentation containing laboratory results, blood and tissue sample results, x-rays, shot records, picture and description of the kitten and the kitten registration papers are to be given to the Seller before replacement authorization is granted. If said documentation is not provided to the seller, this contract and guarantee will be considered fulfilled by the Seller, with the Buyer surrendering all current and future rights to claim another kitten from the Seller.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">13. The Seller is not responsible for any delivery charges or costs associated with the transfer of this kitten or any tests and/or veterinarian expenses incurred by the buyer.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">14. If the Seller replaces any kitten for any reason described in this contract, the Seller is not obligated to replace the exact color pattern as purchased with this contract.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">15. The Seller is not obligated to replace the kitten for any other reasons, other than stated in this contract, and the agreement of the alteration will be strictly adhered to.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">16. This kitten must be altered prior to 6 months of age and proof of alteration must be submitted to the Seller (ref. # 19).</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">17. The Buyer must be 18 years of age or older and in full mental capacity to sign this agreement. Deposits are to be made by a check payable to Oresta Koshyk. <strong>Deposits are non-refundable and are meant to hold a kitten for you. Final payment of the balance is in CASH only; no exceptions will be made.</strong></h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">18. The Seller may terminate the sale of the kitten's placement does not seem beneficial to the kitten or the cattery. In this case the deposit is 100% refundable.</h3>
+
+            <h3 class="text-xl font-bold mt-6 mb-4">19. By signing this agreement, you are guaranteeing this kitten will undergo surgery for alteration prior to 6 months of age and proof of said alteration will be supplied to the seller at the address on this contract. Once proof of the alteration is received TICA registration for this kitten will be provided. Proof of alteration is to be supplied by the attending licensed veterinarian and MUST include the microchip of the kitten being altered. No compensation is being received with this contract for a breeding cat and the agreement of the alteration will be strictly adhered to.</h3>
+
+            <p class="mt-8">
+                The Seller must be immediately (within 72 hours of finding) notified in writing of any disputes encountered. If any provision of this contract is deemed to be invalid or unenforceable, it does not invalidate the enforceability of any other provision, clause or condition set forth in the reminder of this contract. If any litigation occurs as a result of this contract by the Buyer or the Seller, it is understood by the Buyer that all such legal action will be filed and performed at the Doylestown Borough County Seat, Pennsylvania, USA, regardless of the Buyer's place of residence and agrees that any judgement obtained is enforceable within the Buyer's jurisdiction that they reside in, as if obtained within that jurisdiction.
+            </p>
+
+            <p class="mt-6">
+                Should any slander, causing any type of damage the reputation of LavanderCats and/or its owner, resulting from any disputes associated with this agreement and the aforementioned kitten, or should any part of this contract be violated, the Buyer agrees to pay fines of $10,000 in addition but not limited to, collection costs, attorney fees, court costs and all other expenses of enforcing the rights of the Seller under this agreement. Defamation, slander, and accusation are inclusive of, but not limited to all social limited platforms.
+            </p>
+
+            <div class="mt-12 space-y-4">
+                <p>Signature of Purchaser: <span class="signature-line"></span></p>
+                <p>Date: <span class="signature-line"></span></p>
+                <p>Commonwealth of <span class="signature-line"></span></p>
+                <p>County of <span class="signature-line"></span></p>
+                <p>On this, the _____ day of _________________________________________, 20___, before me A NOTARY PUBLIC, personally appeared __________________________________________________ known to me (or satisfactorily proven) to be the person whose name is subscribed to the within instrument, and acknowledged that he/she executed the same for the purpose therein contained.</p>
+                <p>In witness whereof, I hereunto set my hand and official seal.</p>
+                <p class="text-center"><span class="signature-line"></span></p>
+                <p class="text-center">Notary Public</p>
+            </div>
+
+            <div class="mt-16 border-t-2 border-gray-300 pt-8">
+                <h2 class="text-3xl font-bold text-center mb-8">NOTE TO VETERINARIAN</h2>
+                <p class="text-center text-xl mb-8">Thank you in advance for your care and compassion for your new patient.</p>
+
+                <p class="mb-6">
+                    The standard of a Siberian is a barrel shaped body. They are very muscular and active cats with dog-like demeanor, not very vocal. The first year they gain weight quickly, with males reaching 8-12 lbs. and by maturity anywhere from 12 to 20 lbs. A female is roughly 8-12 lbs.
+                </p>
+
+                <p class="mb-6">
+                    We require our kitten to be altered prior to 6 months of age. As proof of the alteration, we do require a written notification from the attending veterinarian that includes the MICROCHIP number which will correspond with the microchip number on the contract.
+                </p>
+
+                <p class="mb-6">
+                    Siberian's Fel d 1 level fluctuates with the hormone levels, so when a cat is nursing, pregnant or in heat, the Fel d 1 level rises and can affect allergy symptoms in allergy sufferers. Therefore, it is very beneficial for the family to have the kitten altered as soon as possible. We understand that each veterinary practice has their preference of when to alter, which we understand.
+                </p>
+
+                <div class="border-t border-gray-300 pt-6 mt-8">
+                    <p class="italic text-center mb-4">I certify that I have rendered the kitten presented to me with microchip number ____________________________________________ incapable of breeding by alteration/neutering. I also authorize the verification of this altering by phone call or correspondence.</p>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <span class="signature-line"></span>
+                            <p class="text-sm italic mt-2">Attending Veterinarian Signature</p>
+                        </div>
+                        <div>
+                            <span class="signature-line"></span>
+                            <p class="text-sm italic mt-2">Date</p>
+                        </div>
+                    </div>
+                    <p class="text-sm italic mt-4">Attach business card here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

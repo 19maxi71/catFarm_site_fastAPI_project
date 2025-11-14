@@ -15,15 +15,15 @@ try:
     # Sample articles
     sample_articles = [
         {
-            "title": "Welcome to RocKaRan Cat Farm!",
-            "content": """Welcome to RocKaRan Cat Farm, your premier destination for beautiful Siberian cats!
+            "title": "Welcome to LavanderCats Cat Farm!",
+            "content": """Welcome to LavanderCats Cat Farm, your premier destination for beautiful Siberian cats!
 
 Our farm is dedicated to breeding healthy, happy, and well-socialized Siberian cats. We believe in ethical breeding practices and prioritize the health and well-being of our cats above all else.
 
 Our Siberian cats are known for their stunning blue eyes, luxurious triple coat, and affectionate personalities. Whether you're looking for a new family member or a show-quality cat, we have something special for everyone.
 
 Visit us to meet our current litter of kittens and learn more about the wonderful world of Siberian cats!""",
-            "author": "RocKaRan Team",
+            "author": "LavanderCats Team",
             "featured_image": "",
             "published": True
         },
@@ -44,7 +44,7 @@ Siberian cats are generally healthy, but regular veterinary check-ups are essent
 Siberians are known for being affectionate, intelligent, and playful. They often form strong bonds with their owners and enjoy interactive play.
 
 Remember, every cat is unique, so observe your cat's individual needs and preferences!""",
-            "author": "Dr. Sarah Johnson",
+            "author": "LavanderCats Team",
             "featured_image": "",
             "published": True
         },
@@ -66,7 +66,7 @@ All kittens come from championship bloodlines and will be ready for their new ho
 If you're interested in reserving a kitten from this litter, please contact us as soon as possible. Spaces fill up quickly!
 
 We also have several adult cats available for adoption, including some beautiful adults from previous litters.""",
-            "author": "RocKaRan Team",
+            "author": "LavanderCats Team",
             "featured_image": "",
             "published": True
         },

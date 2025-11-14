@@ -17,7 +17,7 @@ from .upload_api import router as upload_router
 from .auth import authenticate_user
 
 
-app = FastAPI(title="RocKaRan Cat Farm",
+app = FastAPI(title="LavanderCats Cat Farm",
               description="Siberian Cat Breeding Farm")
 
 # Add CORS middleware
@@ -245,3 +245,51 @@ async def privacy_policy(request: Request):
 async def adoption_requests_admin(request: Request):
     """Serve custom admin interface for adoption requests management."""
     return templates.TemplateResponse("adoption_requests_admin.html", {"request": request})
+
+
+@app.get("/documents")
+async def documents_page(request: Request):
+    """Serve documents index page with available documents."""
+    return templates.TemplateResponse("documents.html", {"request": request})
+
+
+@app.get("/contract")
+async def contract_page(request: Request):
+    """Serve sales contract page."""
+    return templates.TemplateResponse("contract.html", {"request": request})
+
+
+@app.get("/departure-instructions")
+async def departure_instructions_page(request: Request):
+    """Serve departure instructions page."""
+    return templates.TemplateResponse("departure_instructions.html", {"request": request})
+
+
+@app.get("/contract/pdf")
+async def download_contract_pdf():
+    """Generate and download sales contract as PDF."""
+    from .pdf_utils import create_contract_pdf
+    pdf_buffer = create_contract_pdf()
+
+    from fastapi.responses import StreamingResponse
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": "attachment; filename=lavandercats_sales_contract.pdf"}
+    )
+
+
+@app.get("/departure-instructions/pdf")
+async def download_departure_pdf():
+    """Generate and download departure instructions as PDF."""
+    from .pdf_utils import create_departure_instructions_pdf
+    pdf_buffer = create_departure_instructions_pdf()
+
+    from fastapi.responses import StreamingResponse
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": "attachment; filename=lavandercats_departure_instructions.pdf"}
+    )
