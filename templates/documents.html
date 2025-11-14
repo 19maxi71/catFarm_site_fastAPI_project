@@ -5,63 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LavanderCats - Documents</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dusty-rose': '#D4A4A4',
+                        'muted-pink': '#E8D5D5',
+                        'warm-beige': '#F0E8D8',
+                        'soft-gray': '#E5E5E5'
+                    }
+                }
+            }
+        }
+    </script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        .document-card {
-            transition: transform 0.2s ease-in-out;
-        }
-        .document-card:hover {
-            transform: translateY(-2px);
-        }
         .modal-overlay {
             backdrop-filter: blur(4px);
+        }
+        .a4-modal {
+            max-width: 210mm;
+            max-height: 90vh;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .a4-modal {
+                max-width: 95vw;
+                max-height: 85vh;
+            }
         }
     </style>
 </head>
 <body class="bg-gray-50" x-data="{ selectedDoc: null, showModal: false }">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="/" class="text-xl font-bold text-pink-600">LavanderCats</a>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-pink-600">Home</a>
-                    <a href="/cats" class="text-gray-700 hover:text-pink-600">Our Cats</a>
-                    <a href="/documents" class="text-pink-600 font-medium">Documents</a>
-                    <a href="/news" class="text-gray-700 hover:text-pink-600">News</a>
-                </div>
+    <nav class="bg-warm-beige border-b border-soft-gray p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-black">LavanderCats</a>
+            <div class="hidden md:flex space-x-6">
+                <a href="/" class="text-black hover:text-dusty-rose transition-colors">Home</a>
+                <a href="/our-cats" class="text-black hover:text-dusty-rose transition-colors">Our Cats</a>
+                <a href="/cats" class="text-black hover:text-dusty-rose transition-colors">Available Kittens</a>
+                <a href="/news" class="text-black hover:text-dusty-rose transition-colors">News</a>
+                <a href="/documents" class="text-black font-bold text-dusty-rose">Documents</a>
+                <a href="/adoption-terms" class="text-black hover:text-dusty-rose transition-colors">Terms</a>
+                <a href="/privacy-policy" class="text-black hover:text-dusty-rose transition-colors">Privacy</a>
             </div>
+            <button class="md:hidden" @click="mobileMenu = !mobileMenu">☰</button>
+        </div>
+        <div class="md:hidden absolute right-0 top-16 hidden bg-warm-beige border border-soft-gray rounded-lg shadow-lg p-4 z-50" id="mobile-menu" x-show="mobileMenu">
+            <a href="/" class="block py-2 text-black hover:text-dusty-rose transition-colors">🏠 Home</a>
+            <a href="/our-cats" class="block py-2 text-black hover:text-dusty-rose transition-colors">👑 Our Cats</a>
+            <a href="/cats" class="block py-2 text-black hover:text-dusty-rose transition-colors">🐱 Available Kittens</a>
+            <a href="/news" class="block py-2 text-black hover:text-dusty-rose transition-colors">📰 News</a>
+            <a href="/documents" class="block py-2 text-black font-bold text-dusty-rose">📄 Documents</a>
+            <a href="/adoption-terms" class="block py-2 text-black hover:text-dusty-rose transition-colors">📋 Terms</a>
+            <a href="/privacy-policy" class="block py-2 text-black hover:text-dusty-rose transition-colors">🔒 Privacy</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <div class="bg-pink-50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Important Documents</h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+    <div class="bg-muted-pink py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-black mb-4">Important Documents</h1>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">
                 Access our sales contract and departure instructions for new kitten owners.
-                All documents are available for preview and download.
             </p>
         </div>
     </div>
 
     <!-- Documents Grid -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-6xl mx-auto px-4 py-12">
         <div class="grid md:grid-cols-2 gap-8">
 
             <!-- Sales Contract Card -->
-            <div class="document-card bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-soft-gray">
                 <div class="p-6">
                     <div class="flex items-center mb-4">
-                        <div class="bg-pink-100 p-3 rounded-lg">
-                            <svg class="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-muted-pink p-3 rounded-lg">
+                            <svg class="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-xl font-semibold text-gray-900">Sales Contract</h3>
+                            <h3 class="text-xl font-semibold text-black">Sales Contract</h3>
                             <p class="text-gray-600">Official kitten purchase agreement</p>
                         </div>
                     </div>
@@ -72,31 +99,31 @@
                     <div class="flex space-x-3">
                         <button
                             @click="selectedDoc = 'contract'; showModal = true"
-                            class="flex-1 bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors"
+                            class="flex-1 bg-dusty-rose text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
                         >
-                            Preview
+                            View Document
                         </button>
                         <a
-                            href="/contract"
-                            class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-center"
+                            href="/contract/pdf"
+                            class="flex-1 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors text-center"
                         >
-                            Full Page
+                            Download PDF
                         </a>
                     </div>
                 </div>
             </div>
 
             <!-- Departure Instructions Card -->
-            <div class="document-card bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-soft-gray">
                 <div class="p-6">
                     <div class="flex items-center mb-4">
-                        <div class="bg-green-100 p-3 rounded-lg">
-                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-muted-pink p-3 rounded-lg">
+                            <svg class="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-xl font-semibold text-gray-900">Departure Instructions</h3>
+                            <h3 class="text-xl font-semibold text-black">Departure Instructions</h3>
                             <p class="text-gray-600">New kitten owner guide</p>
                         </div>
                     </div>
@@ -107,15 +134,15 @@
                     <div class="flex space-x-3">
                         <button
                             @click="selectedDoc = 'departure'; showModal = true"
-                            class="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                            class="flex-1 bg-dusty-rose text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
                         >
-                            Preview
+                            View Document
                         </button>
                         <a
-                            href="/departure-instructions"
-                            class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-center"
+                            href="/departure-instructions/pdf"
+                            class="flex-1 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors text-center"
                         >
-                            Full Page
+                            Download PDF
                         </a>
                     </div>
                 </div>
@@ -123,9 +150,9 @@
         </div>
 
         <!-- Additional Info -->
-        <div class="mt-12 bg-blue-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-blue-900 mb-4">Document Information</h3>
-            <ul class="text-blue-800 space-y-2">
+        <div class="mt-12 bg-warm-beige rounded-lg p-6 border border-soft-gray">
+            <h3 class="text-lg font-semibold text-black mb-4">Document Information</h3>
+            <ul class="text-gray-700 space-y-2">
                 <li>• All documents are printable and can be saved as PDF</li>
                 <li>• Sales contract must be signed and notarized before kitten purchase</li>
                 <li>• Departure instructions should be reviewed before bringing your kitten home</li>
@@ -143,7 +170,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 modal-overlay"
+        class="fixed inset-0 z-50 modal-overlay bg-black bg-opacity-50"
         style="display: none;"
         @click.self="showModal = false"
     >
@@ -156,108 +183,330 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 scale-100"
                 x-transition:leave-end="opacity-0 scale-95"
-                class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+                class="bg-white rounded-lg shadow-xl a4-modal overflow-hidden"
                 style="display: none;"
             >
                 <!-- Modal Header -->
-                <div class="flex items-center justify-between p-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-900" x-text="selectedDoc === 'contract' ? 'Sales Contract Preview' : 'Departure Instructions Preview'"></h3>
-                    <button @click="showModal = false" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                <div class="flex items-center justify-between p-4 border-b border-soft-gray bg-warm-beige">
+                    <h3 class="text-lg font-semibold text-black" x-text="selectedDoc === 'contract' ? 'Sales Contract' : 'Departure Instructions'"></h3>
+                    <button @click="showModal = false" class="text-gray-600 hover:text-black text-2xl font-bold">
+                        ×
                     </button>
                 </div>
 
                 <!-- Modal Content -->
-                <div class="p-4 max-h-[70vh] overflow-y-auto">
-                    <div x-show="selectedDoc === 'contract'" class="prose prose-sm max-w-none">
-                        <div class="bg-pink-50 p-4 rounded mb-4">
-                            <h4 class="text-lg font-bold text-center text-pink-800">LavanderCats</h4>
-                            <h5 class="text-center">Kitten Sales Contract</h5>
+                <div class="p-6 max-h-[80vh] overflow-y-auto bg-white">
+                    <div x-show="selectedDoc === 'contract'" class="prose prose-lg max-w-none">
+                        <div class="bg-muted-pink p-6 rounded-lg mb-8">
+                            <h1 class="text-4xl font-bold text-center text-black mb-2">LavanderCats</h1>
+                            <h2 class="text-2xl text-center text-gray-800">Kitten Sales Contract</h2>
                         </div>
-                        <p class="text-sm text-center mb-4">
-                            A contract must be signed &amp; notarized before purchasing our Siberian kittens. This contract is designed to protect the buyer, the seller and the welfare of the Siberian kitten.
+
+                        <p class="text-center mb-8 text-lg">
+                            A contract must be signed &amp; notarized before purchasing our Siberian kittens. This contract is designed to protect the buyer, the seller and the welfare of the Siberian kitten. Please take this contract to your veterinarian's office with the kitten so they are aware of the contract agreement.
                         </p>
-                        <div class="bg-gray-50 p-3 rounded mb-4">
-                            <h6 class="font-semibold mb-2">Key Terms:</h6>
-                            <ul class="text-sm space-y-1">
-                                <li>• Seller guarantees kitten health and vaccinations</li>
-                                <li>• 72-hour health check period with refund option</li>
-                                <li>• 2-year genetic health guarantee</li>
-                                <li>• Kitten must be altered by 6 months</li>
-                                <li>• No declawing policy ($5,000 fine)</li>
-                            </ul>
+
+                        <p class="text-center mb-8">
+                            Date of Deposit: <span class="border-b border-gray-400 inline-block min-w-32"></span> Date of Sale <span class="border-b border-gray-400 inline-block min-w-32"></span>
+                        </p>
+
+                        <table class="border-collapse border border-gray-300 w-full mb-8">
+                            <tr>
+                                <td class="border border-gray-300 p-4 text-center">
+                                    <p><strong>Seller:</strong></p>
+                                    <p>Oresta Koshyk</p>
+                                </td>
+                                <td class="border border-gray-300 p-4">
+                                    <p><strong>Buyer:</strong></p>
+                                    <p><span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                                    <p><span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                                    <p><span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                                    <p><span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h3 class="text-xl font-bold mt-8 mb-4">Description of Kitten:</h3>
+                        <p>Name: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Breed: <em>Siberian</em></p>
+                        <p>Color/Pattern: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Date of Birth: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Sex: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Purchase Amount: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Sire: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Dam: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Microchip #: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Non-Refundable Deposit Amount: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                        <p>Balance Due: $<span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+
+                        <h3 class="text-xl font-bold mt-8 mb-4">Condition of the Sale</h3>
+                        <ol class="list-decimal pl-6 space-y-4">
+                            <li>The Seller guarantees that this kitten is healthy to the best of their knowledge, that the kitten will have been examined by a licensed veterinarian and is currently on vaccinations.</li>
+                            <li>The Buyer is advised to take the kitten to the vet for a health exam within 72 hours; if any health concerns are found, the Buyer may return the kitten to the seller within 72 hours with a written explanation from the attending vet, for a full refund or exchange upon availability of a kitten. No medical or travel charges will be refunded.</li>
+                            <li>During the first 72 hours kittens should be isolated from any other pets and monitored for health, eating, litter box usage, and activity level. The Seller is not responsible for any injury or illness to other pets caused by exposure to this kitten.</li>
+                            <li>Due to the controversy of the FELV/FIV vaccine we recommend that this vaccine should NOT be given to our kittens as they are not outdoor cats and should not encounter this. Our cats are not to be left outdoors, nor should they be exposed to cats with FELV/FIV.</li>
+                            <li>Whenever a vaccine is being administered, only ONE vaccine should be given at a time. Seller doesn't guarantee kittens wellbeing due to adverse reactions to future vaccinations.</li>
+                            <li>The Seller guarantees the kitten described above is free of FELV (Feline Leukemia) and FIV (Feline AIDS) at the time of shipment, pick-up or delivery. One kitten from each litter will have been tested for FELV/FIV.</li>
+                        </ol>
+
+                        <p class="mt-6">Initials: <span class="border-b border-gray-400 inline-block min-w-32"></span> Date: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+
+                        <h3 class="text-xl font-bold mt-8 mb-4">7. This kitten is not to be declawed under ANY circumstances. The Buyer will be pay fine of $5,000.00 if any kitten bought from LavanderCats cattery will be declawed.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">8. Under no circumstances will this kitten be sold, leased or given away to any pet store, research laboratory, breeding mill or similar facility. If you can no longer keep this kitten, you <strong>MUST</strong> contact the Seller.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">9. If this kitten dies of FIP it will be replaced if FIP virus RealPCR test (code 3630) is performed on peritoneal fluid, pleural fluid, CFF, tissue biopsy, or aspirate.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">10. All our Siberian kittens are guaranteed for 2 (two) years against genetic defects, in particular and specifically HCM (hypertrophic cardiomyopathy) and PKD. In particular and specifically HCM (hypertrophic cardiomyopathy), if a kitten tests is HCM positive within 2 years of birth, the echocardiogram results must accompany the request of replacement. The echocardiogram must be performed by a licensed feline cardiac specialist and the results must accompany the request for replacement in writing and supported by the signed medical records and test results. The replacement kitten authorization will be determined upon receipt of said documentation and will depend on availability. Any kitten for which the Buyer is seeking a replacement must be properly identified by pictures for verification and made available to the Seller. Any unsanctioned destruction/termination of the kitten will render this guarantee NULL and VOID. If said documentation is not provided to the Seller, this contract and guarantee will be considered fulfilled by the Seller, with the Buyer surrendering all current and future rights to claim another kitten. No veterinarian expenses will be reimbursed, nor will any travel costs or expenses be reimbursed.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">11. If the kitten described above dies due to items (4), (5), (7), (10), the Seller will not replace the kitten, and the entire Health Guarantee becomes NULL and VOID.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">12. Should the kitten die within 2 (two) years as a result of an unknown or latent defect, said kitten will be replaced only if an appropriate autopsy is performed by a licensed veterinarian and all accompanying documentation from the observing veterinarian will be provided to the Seller. Trauma, abuse or neglect of this kitten's health as well as neglect notifying the seller of the intent to terminate this kitten life will void any warranty associated with this kitten. Under no circumstances will a kitten be destroyed prior notification of the Seller. The documentation required as proof will be the written and signed documentation by the attending veterinarian as to the cause of death along with all associated documentation containing laboratory results, blood and tissue sample results, x-rays, shot records, picture and description of the kitten and the kitten registration papers are to be given to the Seller before replacement authorization is granted. If said documentation is not provided to the seller, this contract and guarantee will be considered fulfilled by the Seller, with the Buyer surrendering all current and future rights to claim another kitten from the Seller.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">13. The Seller is not responsible for any delivery charges or costs associated with the transfer of this kitten or any tests and/or veterinarian expenses incurred by the buyer.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">14. If the Seller replaces any kitten for any reason described in this contract, the Seller is not obligated to replace the exact color pattern as purchased with this contract.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">15. The Seller is not obligated to replace the kitten for any other reasons, other than stated in this contract, and the agreement of the alteration will be strictly adhered to.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">16. This kitten must be altered prior to 6 months of age and proof of alteration must be submitted to the Seller (ref. # 19).</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">17. The Buyer must be 18 years of age or older and in full mental capacity to sign this agreement. Deposits are to be made by a check payable to Oresta Koshyk. <strong>Deposits are non-refundable and are meant to hold a kitten for you. Final payment of the balance is in CASH only; no exceptions will be made.</strong></h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">18. The Seller may terminate the sale of the kitten's placement does not seem beneficial to the kitten or the cattery. In this case the deposit is 100% refundable.</h3>
+
+                        <h3 class="text-xl font-bold mt-6 mb-4">19. By signing this agreement, you are guaranteeing this kitten will undergo surgery for alteration prior to 6 months of age and proof of said alteration will be supplied to the seller at the address on this contract. Once proof of the alteration is received TICA registration for this kitten will be provided. Proof of alteration is to be supplied by the attending licensed veterinarian and MUST include the microchip of the kitten being altered. No compensation is being received with this contract for a breeding cat and the agreement of the alteration will be strictly adhered to.</h3>
+
+                        <p class="mt-8">
+                            The Seller must be immediately (within 72 hours of finding) notified in writing of any disputes encountered. If any provision of this contract is deemed to be invalid or unenforceable, it does not invalidate the enforceability of any other provision, clause or condition set forth in the reminder of this contract. If any litigation occurs as a result of this contract by the Buyer or the Seller, it is understood by the Buyer that all such legal action will be filed and performed at the Doylestown Borough County Seat, Pennsylvania, USA, regardless of the Buyer's place of residence and agrees that any judgement obtained is enforceable within the Buyer's jurisdiction that they reside in, as if obtained within that jurisdiction.
+                        </p>
+
+                        <p class="mt-6">
+                            Should any slander, causing any type of damage the reputation of LavanderCats and/or its owner, resulting from any disputes associated with this agreement and the aforementioned kitten, or should any part of this contract be violated, the Buyer agrees to pay fines of $10,000 in addition but not limited to, collection costs, attorney fees, court costs and all other expenses of enforcing the rights of the Seller under this agreement. Defamation, slander, and accusation are inclusive of, but not limited to all social limited platforms.
+                        </p>
+
+                        <div class="mt-12 space-y-4">
+                            <p>Signature of Purchaser: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                            <p>Date: <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                            <p>Commonwealth of <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                            <p>County of <span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                            <p>On this, the _____ day of _________________________________________, 20___, before me A NOTARY PUBLIC, personally appeared __________________________________________________ known to me (or satisfactorily proven) to be the person whose name is subscribed to the within instrument, and acknowledged that he/she executed the same for the purpose therein contained.</p>
+                            <p>In witness whereof, I hereunto set my hand and official seal.</p>
+                            <p class="text-center"><span class="border-b border-gray-400 inline-block min-w-32"></span></p>
+                            <p class="text-center">Notary Public</p>
                         </div>
-                        <p class="text-sm text-center text-gray-600">
-                            <em>This is a preview. Click "Full Page" for complete contract details.</em>
-                        </p>
+
+                        <div class="mt-16 border-t-2 border-gray-300 pt-8">
+                            <h2 class="text-3xl font-bold text-center mb-8">NOTE TO VETERINARIAN</h2>
+                            <p class="text-center text-xl mb-8">Thank you in advance for your care and compassion for your new patient.</p>
+
+                            <p class="mb-6">
+                                The standard of a Siberian is a barrel shaped body. They are very muscular and active cats with dog-like demeanor, not very vocal. The first year they gain weight quickly, with males reaching 8-12 lbs. and by maturity anywhere from 12 to 20 lbs. A female is roughly 8-12 lbs.
+                            </p>
+
+                            <p class="mb-6">
+                                We require our kitten to be altered prior to 6 months of age. As proof of the alteration, we do require a written notification from the attending veterinarian that includes the MICROCHIP number which will correspond with the microchip number on the contract.
+                            </p>
+
+                            <p class="mb-6">
+                                Siberian's Fel d 1 level fluctuates with the hormone levels, so when a cat is nursing, pregnant or in heat, the Fel d 1 level rises and can affect allergy symptoms in allergy sufferers. Therefore, it is very beneficial for the family to have the kitten altered as soon as possible. We understand that each veterinary practice has their preference of when to alter, which we understand.
+                            </p>
+
+                            <div class="border-t border-gray-300 pt-6 mt-8">
+                                <p class="italic text-center mb-4">I certify that I have rendered the kitten presented to me with microchip number ____________________________________________ incapable of breeding by alteration/neutering. I also authorize the verification of this altering by phone call or correspondence.</p>
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <span class="border-b border-gray-400 inline-block min-w-32"></span>
+                                        <p class="text-sm italic mt-2">Attending Veterinarian Signature</p>
+                                    </div>
+                                    <div>
+                                        <span class="border-b border-gray-400 inline-block min-w-32"></span>
+                                        <p class="text-sm italic mt-2">Date</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm italic mt-4">Attach business card here</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div x-show="selectedDoc === 'departure'" class="prose prose-sm max-w-none">
-                        <div class="bg-green-50 p-4 rounded mb-4">
-                            <h4 class="text-lg font-bold text-center text-green-800">DEPARTURE INSTRUCTIONS</h4>
-                            <h5 class="text-center">Welcome to the Siberian cat world!</h5>
+                    <div x-show="selectedDoc === 'departure'" class="prose prose-lg max-w-none">
+                        <div class="bg-muted-pink p-6 rounded-lg mb-8 text-center">
+                            <h1 class="text-4xl font-bold text-black mb-2">DEPARTURE INSTRUCTIONS</h1>
+                            <h2 class="text-2xl text-gray-700">Welcome to the Siberian cat world!</h2>
+                            <p class="text-lg mt-2">Congratulations on the new family member!</p>
                         </div>
-                        <div class="space-y-4">
-                            <div class="bg-blue-50 p-3 rounded">
-                                <h6 class="font-semibold text-blue-800">SAFE HEAVEN</h6>
-                                <p class="text-sm">When bringing home a new kitten, expect it to be nervous. Provide a small room with food, water, and litter box separated. Build trust gradually over the first few days.</p>
-                            </div>
-                            <div class="bg-yellow-50 p-3 rounded">
-                                <h6 class="font-semibold text-yellow-800">NIBBLING</h6>
-                                <p class="text-sm">Nibbling should not be permitted. Redirect to toys and use firm "NO!" if needed. Do not scruff kittens older than 8 months.</p>
-                            </div>
-                            <div class="bg-purple-50 p-3 rounded">
-                                <h6 class="font-semibold text-purple-800">FOOD & CARE</h6>
-                                <p class="text-sm">Feed 3x daily with high-quality kitten food. No cow's milk or people food. Regular vet visits and vaccinations required.</p>
-                            </div>
-                        </div>
-                        <p class="text-sm text-center text-gray-600 mt-4">
-                            <em>This is a preview. Click "Full Page" for complete care instructions.</em>
-                        </p>
-                    </div>
-                </div>
 
-                <!-- Modal Footer -->
-                <div class="flex items-center justify-between p-4 border-t bg-gray-50">
-                    <div class="text-sm text-gray-600">
-                        <span x-show="selectedDoc === 'contract'">Sales Contract</span>
-                        <span x-show="selectedDoc === 'departure'">Departure Instructions</span>
-                        - Preview Mode
-                    </div>
-                    <div class="flex space-x-3">
-                        <a
-                            x-show="selectedDoc === 'contract'"
-                            href="/contract/pdf"
-                            class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm"
-                        >
-                            Download PDF
-                        </a>
-                        <a
-                            x-show="selectedDoc === 'departure'"
-                            href="/departure-instructions/pdf"
-                            class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm"
-                        >
-                            Download PDF
-                        </a>
-                        <a
-                            x-show="selectedDoc === 'contract'"
-                            href="/contract"
-                            class="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 text-sm"
-                        >
-                            View Full Contract
-                        </a>
-                        <a
-                            x-show="selectedDoc === 'departure'"
-                            href="/departure-instructions"
-                            class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm"
-                        >
-                            View Full Instructions
-                        </a>
-                        <button @click="showModal = false" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm">
-                            Close
-                        </button>
+                        <p class="text-center mb-8 text-lg">
+                            This guide covers key topics and answers common questions for the coming weeks and months. For any questions, text me at 267-538-8590 or call in an emergency. While we previously met families in person to discuss all concerns and get acquainted, we've adapted to changing times.
+                        </p>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">SAFE HEAVEN</h3>
+                            <p class="mb-4">
+                                When bringing home a new kitten, expect it to be nervous and miss its mother and siblings. Please provide a towel for sleeping, plus food, water, and a litter box.
+                            </p>
+                            <p class="mb-4">
+                                To help the kitten adjust, place it in your smallest room (the smaller the better) with food and water <strong>SEPARATED</strong> from the litter box. After an hour, you may enter, play with, and hold the kitten; keep it in your arms to build trust rather than letting it roam.
+                            </p>
+                            <p class="mb-4">
+                                After one hour, return the kitten to the litter box and close the door. Allow approximately 15 minutes before repeating this process.
+                            </p>
+                            <p class="mb-4">
+                                By the third day, the kitten should begin seeking your attention. At this stage, you may open the door and permit the kitten to explore independently; it has already been learned how to return to the litter box when necessary.
+                            </p>
+                            <p>
+                                Once the kitten has adjusted to its new environment and you prefer not to keep a litter box in your bathroom, purchase an additional box and place it in the designated permanent area. Keep the original box in its current location for about a month to ensure the kitten consistently uses the new box.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">NIBBLING</h3>
+                            <p class="mb-4">
+                                Nibbling should not be permitted. If redirecting your kitten to a toy is ineffective, it may be appropriate to gently scruff the kitten, lift it by the scruff, firmly say "<strong>NO!</strong>," place the kitten on the floor, and then ignore it for a while.
+                            </p>
+                            <p class="mb-4">
+                                While nibbling may not cause harm now, kittens eventually mature and will develop stronger hunting behaviors. Then nibbling won't be so cute anymore. Cats love attention, so if you teach them there is a consequence for their naughty behavior, they will soon learn.
+                            </p>
+                            <p class="font-semibold">
+                                It is important NOT TO PICK UP YOUR CAT BY THE SCRUFF ONCE IT IS OLDER THAN EIGHT (8) MONTHS. Teach it the basics while it's little.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">BATHING</h3>
+                            <p class="mb-4">
+                                You can bathe your kitten, but I suggest wiping them with a wet towel. Gently rub the cat down with the damp towel, taking away the surface dander that causes the allergies.
+                            </p>
+                            <p class="mb-4">
+                                Some cat owners prefer to buy wipes in a pet store, but, honestly, they have nothing special in them (producers cannot put anything on them because it will harm a cat when it licks its fur). Give a small treat after you wipe your kitten and after 2nd bath they will look forward to it.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">FOOD</h3>
+                            <p class="mb-4">
+                                Feed your kitten 3 times a day. I recommend Royal Canin Mother & Baby cat food for kittens. It is very high quality and has all the nutrients they need. You can buy it at Petco or online.
+                            </p>
+                            <p class="mb-4">
+                                Do not give your kitten cow's milk. It will cause diarrhea. If you want to give milk, buy cat milk from the pet store.
+                            </p>
+                            <p class="mb-4">
+                                Do not give people food. It can cause serious health issues. No chocolate, onions, garlic, grapes, raisins, etc.
+                            </p>
+                            <p>
+                                Fresh water should always be available. Change it daily.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">LITTER BOX</h3>
+                            <p class="mb-4">
+                                Use clumping litter. I recommend Fresh Step or World's Best Cat Litter. Clean the box daily. If you have multiple cats, have multiple boxes.
+                            </p>
+                            <p class="mb-4">
+                                If your kitten has accidents outside the box, clean it thoroughly with enzymatic cleaner (available at pet stores). Regular cleaners don't remove the scent that attracts cats back to the same spot.
+                            </p>
+                            <p>
+                                Never punish your kitten for accidents. They are learning and it takes time.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">SCRATCHING</h3>
+                            <p class="mb-4">
+                                Provide scratching posts. Cats need to scratch to keep their claws healthy and to mark territory. Buy tall posts that they can stretch on.
+                            </p>
+                            <p class="mb-4">
+                                If they scratch furniture, gently redirect them to the post. You can also use double-sided tape on furniture temporarily.
+                            </p>
+                            <p>
+                                Keep claws trimmed. You can do this yourself with cat nail clippers or have a groomer do it.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">PLAYTIME</h3>
+                            <p class="mb-4">
+                                Kittens need lots of playtime to stay healthy and happy. Play with interactive toys like laser pointers, feather wands, and balls.
+                            </p>
+                            <p class="mb-4">
+                                Play multiple short sessions throughout the day rather than one long session.
+                            </p>
+                            <p>
+                                This also helps prevent behavioral issues from boredom.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">VETERINARIAN</h3>
+                            <p class="mb-4">
+                                Take your kitten to the vet within 72 hours of pickup. They need to check for health issues and start vaccinations.
+                            </p>
+                            <p class="mb-4">
+                                Keep up with vaccination schedule. Kittens need multiple rounds of vaccines.
+                            </p>
+                            <p class="mb-4">
+                                Discuss spaying/neutering. This should be done around 6 months of age.
+                            </p>
+                            <p>
+                                Regular check-ups are important for preventive care.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">BEHAVIOR</h3>
+                            <p class="mb-4">
+                                Kittens are curious and will get into everything. Keep dangerous items out of reach.
+                            </p>
+                            <p class="mb-4">
+                                They may be shy at first. Give them time to adjust and don't force interaction.
+                            </p>
+                            <p class="mb-4">
+                                Some kittens are more active than others. Respect their individual personality.
+                            </p>
+                            <p>
+                                If you have concerns about behavior, consult a veterinarian or animal behaviorist.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">HEALTH CONCERNS</h3>
+                            <p class="mb-4">
+                                Watch for signs of illness: lethargy, not eating, vomiting, diarrhea, sneezing, discharge from eyes/nose.
+                            </p>
+                            <p class="mb-4">
+                                Contact vet immediately if you notice any concerning symptoms.
+                            </p>
+                            <p class="mb-4">
+                                Siberian cats can have some health issues. Regular vet visits help catch problems early.
+                            </p>
+                            <p>
+                                Keep emergency vet number handy.
+                            </p>
+                        </div>
+
+                        <div class="bg-warm-beige border-l-4 border-dusty-rose p-4 mb-6">
+                            <h3 class="text-xl font-bold text-black mb-4">CONTACT INFORMATION</h3>
+                            <p class="mb-4">
+                                For questions or concerns: Text 267-538-8590
+                            </p>
+                            <p class="mb-4">
+                                Emergency situations: Call your local emergency vet
+                            </p>
+                            <p>
+                                Remember, we're here to help you and your new family member adjust to each other!
+                            </p>
+                        </div>
+
+                        <div class="mt-12 p-6 bg-muted-pink rounded-lg border border-soft-gray">
+                            <h3 class="text-xl font-bold text-center mb-4">Final Notes</h3>
+                            <p class="text-center mb-4">
+                                Bringing home a kitten is a big responsibility and a wonderful experience. With patience, love, and proper care, you'll have a healthy, happy companion for many years.
+                            </p>
+                            <p class="text-center font-semibold">
+                                Welcome to the LavanderCats family! 🐱
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,10 +514,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; 2024 LavanderCats Cat Farm. All rights reserved.</p>
-            <p class="mt-2">Contact: info@lavandercats.com | Phone: 267-538-8590</p>
+    <footer class="bg-warm-beige border-t border-soft-gray py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-black">&copy; 2024 LavanderCats Cat Farm. All rights reserved.</p>
+            <p class="mt-2 text-gray-700">Contact: info@lavandercats.com | Phone: 267-538-8590</p>
         </div>
     </footer>
 </body>
