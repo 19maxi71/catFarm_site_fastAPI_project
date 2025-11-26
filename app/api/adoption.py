@@ -157,11 +157,16 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
             status_code=404, detail="Adoption request not found")
 
     status = request_data.get("status")
+    rejection_reason = request_data.get("rejection_reason")
+
     if status:
         db_request.status = status
         if status in ['approved', 'rejected']:
             from datetime import datetime, timezone
             db_request.notification_sent_at = datetime.now(timezone.utc)
+
+    if rejection_reason is not None:
+        db_request.rejection_reason = rejection_reason
 
     db.commit()
     db.refresh(db_request)
@@ -171,7 +176,7 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
 
     # Write header
     writer.writerow([
-        'ID', 'Customer Name', 'Email', 'Phone', 'Litter Code', 'Status', 'Submitted At',
+        'ID', 'Customer Name', 'Email', 'Phone', 'Litter Code', 'Status', 'Rejection Reason', 'Submitted At',
         'Terms Agreed', 'Privacy Consent', 'Subscription', 'Notification Sent At'
     ])
 
@@ -184,6 +189,7 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
             request.phone or '',
             request.litter_code,
             request.status,
+            request.rejection_reason or '',
             request.submitted_at.isoformat() if request.submitted_at else '',
             'Yes' if request.terms_agreed else 'No',
             'Yes' if request.privacy_consent else 'No',

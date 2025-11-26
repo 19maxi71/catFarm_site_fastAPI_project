@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
 
+
 class AdoptionQuestionCreate(BaseModel):
     question_text: str
     question_type: str
@@ -9,12 +10,14 @@ class AdoptionQuestionCreate(BaseModel):
     is_required: bool = True
     display_order: int = 0
 
+
 class AdoptionQuestionUpdate(BaseModel):
     question_text: Optional[str] = None
     question_type: Optional[str] = None
     options: Optional[str] = None
     is_required: Optional[bool] = None
     display_order: Optional[int] = None
+
 
 class AdoptionQuestionResponse(BaseModel):
     id: int
@@ -27,6 +30,7 @@ class AdoptionQuestionResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class AdoptionSubmitRequest(BaseModel):
     customer_email: str
     customer_name: str
@@ -36,6 +40,7 @@ class AdoptionSubmitRequest(BaseModel):
     terms_agreed: bool
     privacy_consent: bool
     subscription: bool = False
+
 
 class AdoptionRequestResponse(BaseModel):
     id: int
@@ -49,6 +54,7 @@ class AdoptionRequestResponse(BaseModel):
     subscription: Optional[bool]
     submitted_at: datetime
     status: str
+    rejection_reason: Optional[str]
     notification_sent_at: Optional[datetime]
 
     class Config:

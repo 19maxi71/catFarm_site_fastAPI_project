@@ -9,7 +9,8 @@ class AdoptionQuestion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     question_text = Column(String(500), nullable=False)
-    question_type = Column(String(50), nullable=False)  # 'text', 'checkbox', 'select'
+    # 'text', 'checkbox', 'select'
+    question_type = Column(String(50), nullable=False)
     options = Column(Text, nullable=True)  # JSON string for select options
     is_required = Column(Boolean, default=True)
     display_order = Column(Integer, default=0)
@@ -31,7 +32,9 @@ class AdoptionRequest(Base):
     privacy_consent = Column(Boolean, default=False)
     subscription = Column(Boolean, default=False)
     submitted_at = Column(DateTime(timezone=True), server_default=func.now())
-    status = Column(String(50), default="pending")  # 'pending', 'approved', 'rejected'
+    # 'pending', 'approved', 'rejected'
+    status = Column(String(50), default="pending")
+    rejection_reason = Column(Text, nullable=True)  # Reason for rejection
     notification_sent_at = Column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self):
