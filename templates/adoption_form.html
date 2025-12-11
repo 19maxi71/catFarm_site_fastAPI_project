@@ -151,6 +151,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadLitters();
     loadQuestions();
+
+    // Check if litter is passed in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const litterCode = urlParams.get('litter');
+    if (litterCode) {
+        // Wait a bit for litters to load, then select the one from URL
+        setTimeout(() => {
+            const litterSelect = document.getElementById('litter_code');
+            const option = Array.from(litterSelect.options).find(opt => opt.value === litterCode);
+            if (option) {
+                litterSelect.value = litterCode;
+            }
+        }, 500);
+    }
 });
 
 async function loadLitters() {
@@ -211,36 +225,79 @@ function renderQuestions(questions) {
             html += `<textarea name="q_${question.id}" rows="4" ${question.is_required ? 'required' : ''}
                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>`;
         } else if (question.question_type === 'checkbox') {
+            // Render as Yes/No radio buttons for better UX
+            html += `<div class="space-y-2">`;
             html += `<div class="flex items-center">
-                        <input type="checkbox" name="q_${question.id}" value="yes" ${question.is_required ? 'required' : ''}
-                               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                        <input type="radio" name="q_${question.id}" value="Yes" ${question.is_required ? 'required' : ''}
+                               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
                         <label class="ml-2 block text-sm text-gray-700">Yes</label>
                      </div>`;
-        } else if (question.question_type === 'radio' && question.options) {
-            const options = question.options.split('\n').filter(opt => opt.trim());
-            html += `<div class="space-y-2">`;
-            options.forEach(option => {
-                html += `<div class="flex items-center">
-                            <input type="radio" name="q_${question.id}" value="${option.trim()}" ${question.is_required ? 'required' : ''}
-                                   class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
-                            <label class="ml-2 block text-sm text-gray-700">${option.trim()}</label>
-                         </div>`;
-            });
+            html += `<div class="flex items-center">
+                        <input type="radio" name="q_${question.id}" value="No" ${question.is_required ? 'required' : ''}
+                               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                        <label class="ml-2 block text-sm text-gray-700">No</label>
+                     </div>`;
             html += `</div>`;
-        } else if (question.question_type === 'select' && question.options) {
-            const options = question.options.split('\n').filter(opt => opt.trim());
-            html += `<select name="q_${question.id}" ${question.is_required ? 'required' : ''}
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">`;
-            html += `<option value="">Select an option</option>`;
-            options.forEach(option => {
-                html += `<option value="${option.trim()}">${option.trim()}</option>`;
-            });
-            html += `</select>`;
+        } else if (question.question_type === 'radio') {
+            if (question.options && question.options.trim()) {
+                // Handle both comma-separated and newline-separated options
+                let options = [];
+                if (question.options.includes('\n')) {
+                    options = question.options.split('\n').filter(opt => opt.trim());
+                } else if (question.options.includes(',')) {
+                    options = question.options.split(',').filter(opt => opt.trim());
+                } else {
+                    options = [question.options];
+                }
+
+                html += `<div class="space-y-2">`;
+                options.forEach(option => {
+                    html += `<div class="flex items-center">
+                                <input type="radio" name="q_${question.id}" value="${option.trim()}" ${question.is_required ? 'required' : ''}
+                                       class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                                <label class="ml-2 block text-sm text-gray-700">${option.trim()}</label>
+                             </div>`;
+                });
+                html += `</div>`;
+            } else {
+                // No options provided - show error message
+                html += `<div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                            Error: No options configured for this radio question. Please contact the administrator.
+                         </div>`;
+            }
+        } else if (question.question_type === 'select') {
+            if (question.options && question.options.trim()) {
+                // Handle both comma-separated and newline-separated options
+                let options = [];
+                if (question.options.includes('\n')) {
+                    options = question.options.split('\n').filter(opt => opt.trim());
+                } else if (question.options.includes(',')) {
+                    options = question.options.split(',').filter(opt => opt.trim());
+                } else {
+                    options = [question.options];
+                }
+
+                html += `<select name="q_${question.id}" ${question.is_required ? 'required' : ''}
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">`;
+                html += `<option value="">Select an option</option>`;
+                options.forEach(option => {
+                    html += `<option value="${option.trim()}">${option.trim()}</option>`;
+                });
+                html += `</select>`;
+            } else {
+                // No options provided - show error message
+                html += `<div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                            Error: No options configured for this select question. Please contact the administrator.
+                         </div>`;
+            }
         } else {
             // Fallback for unknown types
-            html += `<input type="text" name="q_${question.id}" ${question.is_required ? 'required' : ''}
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                     placeholder="Unknown question type: ${question.question_type}">`;
+            html += `<div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
+                        <p class="font-semibold mb-1">Unknown question type: ${question.question_type}</p>
+                        <input type="text" name="q_${question.id}" ${question.is_required ? 'required' : ''}
+                               class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                               placeholder="Please enter your answer">
+                     </div>`;
         }
 
         html += `</div>`;
@@ -287,15 +344,6 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
             data.custom_answers[questionId] = value;
         }
     }
-
-    // Handle checkboxes that weren't checked (they won't appear in formData)
-    const allCheckboxes = document.querySelectorAll('input[type="checkbox"][name^="q_"]');
-    allCheckboxes.forEach(checkbox => {
-        const questionId = checkbox.name.replace('q_', '');
-        if (!data.custom_answers.hasOwnProperty(questionId)) {
-            data.custom_answers[questionId] = 'no';
-        }
-    });
 
     try {
         const response = await fetch('/api/adoption/submit', {

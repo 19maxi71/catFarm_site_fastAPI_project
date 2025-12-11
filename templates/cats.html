@@ -160,8 +160,12 @@ function closeModal() {
 }
 
 function openAdoption() {
-    // Redirect to the proper adoption form page
-    window.location.href = '/adoption-form';
+    // Redirect to adoption form with litter code from currently selected cat
+    if (currentCat && currentCat.litter_code) {
+        window.location.href = `/adoption-form?litter=${encodeURIComponent(currentCat.litter_code)}`;
+    } else {
+        window.location.href = '/adoption-form';
+    }
 }
 
 // Event listeners
@@ -188,21 +192,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (!document.getElementById('adoptionModal').classList.contains('hidden')) {
-                closeAdoptionModal();
-            } else if (!document.getElementById('catModal').classList.contains('hidden')) {
-                closeModal();
-            }
+        if (e.key === 'Escape' && !document.getElementById('catModal').classList.contains('hidden')) {
+            closeModal();
         }
-    });
-
-    // Form submission
-    document.getElementById('adoptionForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Thank you for your interest in adopting from litter ' + currentCat.litter_code + '! We will contact you soon.');
-        this.reset();
-        closeAdoptionModal();
     });
 });
 </script>

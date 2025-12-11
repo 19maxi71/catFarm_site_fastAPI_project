@@ -363,9 +363,27 @@
                 display_order: parseInt(formData.get('order')) || 0
             };
 
-            if (questionData.question_type === 'select') {
-                questionData.options = formData.get('options');
+            // Save options for select and radio types
+            if (questionData.question_type === 'select' || questionData.question_type === 'radio') {
+                const rawOptions = formData.get('options');
+                console.log('Raw options from FormData:', rawOptions);
+                console.log('Options field value:', document.getElementById('options').value);
+                console.log('Options type:', typeof rawOptions);
+                console.log('Options length:', rawOptions ? rawOptions.length : 0);
+
+                // Validate that options are provided for select/radio types
+                if (!rawOptions || !rawOptions.trim()) {
+                    console.error('ERROR: Options are required for select/radio question types!');
+                    showAlert('Please provide options for this question type (one per line)', 'danger');
+                    return;
+                }
+
+                questionData.options = rawOptions.trim();
             }
+
+            // Debug logging
+            console.log('Final question data being sent:', questionData);
+            console.log('JSON stringified:', JSON.stringify(questionData));
 
             try {
                 let response;
@@ -386,6 +404,10 @@
                         body: JSON.stringify(questionData)
                     });
                 }
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
 
                 if (!response.ok) {
                     throw new Error('Failed to save question');
