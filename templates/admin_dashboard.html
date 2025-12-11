@@ -335,7 +335,7 @@
                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                     <div class="flex-shrink-0 me-3">
                         ${cat.photo_base64 ?
-                            `<img src="data:image/jpeg;base64,${cat.photo_base64}" class="rounded" width="40" height="40" style="object-fit: cover;">` :
+                            `<img src="${cat.photo_base64.startsWith('data:image') ? cat.photo_base64 : `data:image/jpeg;base64,${cat.photo_base64}`}" class="rounded" width="40" height="40" style="object-fit: cover;">` :
                             '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="fas fa-cat text-muted"></i></div>'
                         }
                     </div>

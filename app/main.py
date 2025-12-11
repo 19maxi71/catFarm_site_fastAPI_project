@@ -147,10 +147,13 @@ async def article_detail_page(article_id: int, request: Request, db: Session = D
     images = db.query(ArticleImage).filter(
         ArticleImage.article_id == article_id).order_by(ArticleImage.display_order).all()
 
-    # Format image URLs for template display
+    # Format image URLs and base64 data for template display
     for image in images:
         if image.image_path and not image.image_path.startswith(('http://', 'https://', '/static/')):
             image.image_path = f"/static/{image.image_path}"
+        # Ensure base64 images have the proper data URI prefix
+        if image.image_base64 and not image.image_base64.startswith('data:'):
+            image.image_base64 = f"data:image/jpeg;base64,{image.image_base64}"
 
     return templates.TemplateResponse("article_detail.html", {
         "request": request,
