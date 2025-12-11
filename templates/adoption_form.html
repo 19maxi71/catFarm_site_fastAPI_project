@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adoption Request - LavanderCats Cat Farm</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -20,12 +21,25 @@
             }
         }
     </script>
-    <style>
-    </style>
 </head>
 <body>
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
     <div class="container mx-auto px-4 py-12">
+        <!-- Back/Close Button -->
+        <div class="mb-6 flex justify-between items-center max-w-2xl mx-auto">
+            <a href="/cats" class="inline-flex items-center text-amber-600 hover:text-amber-700 transition-colors font-semibold">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Available Kittens
+            </a>
+            <button onclick="window.location.href='/cats'" class="text-gray-500 hover:text-gray-700 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-12">
             <h1 class="text-5xl font-bold text-gray-800 mb-4">🐱 Adoption Request</h1>
