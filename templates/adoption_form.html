@@ -23,7 +23,72 @@
     </script>
 </head>
 <body>
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
+<script>
+function formModals() {
+    return {
+        termsModalOpen: false,
+        privacyModalOpen: false,
+        termsContent: '',
+        privacyContent: '',
+        async loadTerms() {
+            if (this.termsContent) {
+                this.termsModalOpen = true;
+                return;
+            }
+            try {
+                const response = await fetch('/adoption-terms');
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const content = doc.querySelector('main') || doc.querySelector('body');
+
+                // Remove navigation/back buttons from content
+                const nav = content.querySelector('nav');
+                if (nav) nav.remove();
+                const backButtons = content.querySelectorAll('a[href*="adoption-form"], a[href*="/cats"], button[onclick*="back"]');
+                backButtons.forEach(btn => btn.remove());
+
+                this.termsContent = content.innerHTML;
+                this.termsModalOpen = true;
+            } catch (error) {
+                console.error('Error loading terms:', error);
+                alert('Unable to load terms. Please try again.');
+            }
+        },
+        async loadPrivacy() {
+            if (this.privacyContent) {
+                this.privacyModalOpen = true;
+                return;
+            }
+            try {
+                const response = await fetch('/privacy-policy');
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const content = doc.querySelector('main') || doc.querySelector('body');
+
+                // Remove navigation/back buttons from content
+                const nav = content.querySelector('nav');
+                if (nav) nav.remove();
+                const backButtons = content.querySelectorAll('a[href*="adoption-form"], a[href*="/cats"], button[onclick*="back"]');
+                backButtons.forEach(btn => btn.remove());
+
+                this.privacyContent = content.innerHTML;
+                this.privacyModalOpen = true;
+            } catch (error) {
+                console.error('Error loading privacy policy:', error);
+                alert('Unable to load privacy policy. Please try again.');
+            }
+        }
+    }
+}
+</script>
+
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50" x-data="formModals()" @keydown.escape.window="termsModalOpen = false; privacyModalOpen = false">
     <div class="container mx-auto px-4 py-12">
         <!-- Back/Close Button -->
         <div class="mb-6 flex justify-between items-center max-w-2xl mx-auto">
@@ -102,7 +167,7 @@
                             <input type="checkbox" id="terms_agreed" name="terms_agreed" required
                                    class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                             <label for="terms_agreed" class="ml-2 block text-sm text-gray-700">
-                                I have read and agree to the <a href="/adoption-terms" target="_blank" class="text-amber-600 hover:text-amber-700 underline">terms of adoption</a> *
+                                I have read and agree to the <a href="#" @click.prevent="loadTerms()" class="text-amber-600 hover:text-amber-700 underline cursor-pointer">terms of adoption</a> *
                             </label>
                         </div>
                     </div>
@@ -115,7 +180,7 @@
                             <input type="checkbox" id="privacy_consent" name="privacy_consent" required
                                    class="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                             <label for="privacy_consent" class="ml-2 block text-sm text-gray-700">
-                                I consent to the collection and use of my personal information as described in the <a href="/privacy-policy" target="_blank" class="text-amber-600 hover:text-amber-700 underline">privacy policy</a> *
+                                I consent to the collection and use of my personal information as described in the <a href="#" @click.prevent="loadPrivacy()" class="text-amber-600 hover:text-amber-700 underline cursor-pointer">privacy policy</a> *
                             </label>
                         </div>
                     </div>
@@ -143,6 +208,36 @@
 
             <!-- Success/Error Messages -->
             <div id="message" class="mt-6" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div x-show="termsModalOpen" x-cloak @click="termsModalOpen = false" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div @click.stop class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-orange-50">
+                <h2 class="text-2xl font-bold text-gray-800">Terms of Adoption</h2>
+                <button @click="termsModalOpen = false" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-88px)]" x-html="termsContent"></div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div x-show="privacyModalOpen" x-cloak @click="privacyModalOpen = false" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div @click.stop class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-orange-50">
+                <h2 class="text-2xl font-bold text-gray-800">Privacy Policy</h2>
+                <button @click="privacyModalOpen = false" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-88px)]" x-html="privacyContent"></div>
         </div>
     </div>
 </div>

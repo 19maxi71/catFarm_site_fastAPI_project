@@ -3,7 +3,11 @@
 {% block title %}Available Kittens - LavanderCats Cat Farm{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-8">
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-8" x-data="{ showOnlyAvailable: false }">
     <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="text-center mb-12">
@@ -11,16 +15,42 @@
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our adorable Siberian kittens looking for their forever homes.</p>
         </div>
 
+        <!-- Filter Toggle -->
+        <div class="flex justify-center mb-8">
+            <label class="inline-flex items-center cursor-pointer bg-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <input type="checkbox" x-model="showOnlyAvailable" class="sr-only peer">
+                <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                <span class="ms-3 text-sm font-medium text-gray-700">Show only available kittens</span>
+            </label>
+        </div>
+
+        <!-- No Available Kittens Message -->
+        {% set available_count = cats | selectattr('is_available') | list | length %}
+        <div x-show="showOnlyAvailable && {{ available_count }} === 0" x-cloak class="text-center py-12 bg-white rounded-xl shadow-lg mx-auto max-w-2xl mb-8">
+            <div class="p-8">
+                <div class="text-6xl mb-4">😿</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">No Kittens Available Right Now</h2>
+                <p class="text-gray-600 mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
+                <p class="text-gray-700 mb-6 font-medium">Want to be first in line when new kittens arrive?</p>
+                <a href="/adoption-form" class="inline-block bg-amber-500 text-white py-3 px-8 rounded-lg hover:bg-amber-600 transition-colors font-semibold text-lg">
+                    📝 Submit a Spontaneous Request
+                </a>
+                <p class="text-sm text-gray-500 mt-4">We'll contact you as soon as new kittens are available!</p>
+            </div>
+        </div>
+
         <!-- Kittens Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {% for cat in cats %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cat-card cursor-pointer">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cat-card cursor-pointer"
+                 {% if not cat.is_available %}x-show="!showOnlyAvailable"{% endif %}
+                 data-cat-id="{{ cat.id }}">
                 <div class="relative overflow-hidden group">
                     {% set photo_src = cat.photo_base64 if cat.photo_base64 else cat.photo_url %}
                     {% if photo_src %}
                         <img src="{{ photo_src }}" alt="Litter {{ cat.litter_code }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
                     {% else %}
-                        <div class="w-full h-72 bg-gradient-to-br from-dusty-rose to-muted-pink flex items-center justify-content-center">
+                        <div class="w-full h-72 bg-gradient-to-br from-dusty-rose to-muted-pink flex items-center justify-center">
                             <span class="text-6xl text-white">🐱</span>
                         </div>
                     {% endif %}
@@ -160,7 +190,6 @@ function closeModal() {
 }
 
 function openAdoption() {
-    // Redirect to adoption form with litter code from currently selected cat
     if (currentCat && currentCat.litter_code) {
         window.location.href = `/adoption-form?litter=${encodeURIComponent(currentCat.litter_code)}`;
     } else {
