@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: catfarm
+      POSTGRES_USER: catfarm_user
+      POSTGRES_PASSWORD: catfarm_password_change_this
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./static:/app/static
+      - ./uploads:/app/uploads
+    environment:
+      - DATABASE_URL=postgresql://catfarm_user:catfarm_password_change_this@db:5432/catfarm
+      - SECRET_KEY=your-secret-key-here-change-in-production
+      - PYTHONPATH=/app
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  postgres_data:
