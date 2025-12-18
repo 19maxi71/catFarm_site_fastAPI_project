@@ -34,9 +34,9 @@ def upgrade() -> None:
     # Update existing records with meaningful data based on their names/positions
     op.execute("UPDATE cats SET gender = 'female' WHERE id % 2 = 0")
     op.execute("UPDATE cats SET gender = 'male' WHERE id % 2 = 1")
-    op.execute("UPDATE cats SET litter_code = 'L' || SUBSTR('000' || id, -3)")
+    op.execute("UPDATE cats SET litter_code = 'L' || LPAD(id::text, 3, '0')")
     op.execute(
-        "UPDATE cats SET date_of_birth = DATE('2024-01-01', '+' || (id * 30) || ' days')")
+        "UPDATE cats SET date_of_birth = '2024-01-01'::date + (id * 30) * interval '1 day'")
     op.execute("UPDATE cats SET description = 'Migrated from previous cat profile: ' || COALESCE(bio, 'No description available')")
     op.execute("UPDATE cats SET is_available = 1")
 
