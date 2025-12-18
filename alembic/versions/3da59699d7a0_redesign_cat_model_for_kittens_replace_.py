@@ -38,7 +38,7 @@ def upgrade() -> None:
     op.execute(
         "UPDATE cats SET date_of_birth = '2024-01-01'::date + (id * 30) * interval '1 day'")
     op.execute("UPDATE cats SET description = 'Migrated from previous cat profile: ' || COALESCE(bio, 'No description available')")
-    op.execute("UPDATE cats SET is_available = 1")
+    op.execute("UPDATE cats SET is_available = true")
 
     # Create unique constraint on litter_code
     op.create_unique_constraint(None, 'cats', ['litter_code'])
