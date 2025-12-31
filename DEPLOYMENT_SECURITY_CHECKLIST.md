@@ -22,7 +22,7 @@
 ## ⚠️ BEFORE DEPLOYMENT - CHANGE THESE!
 
 ### 🔐 Step 1: Update Admin Password
-**Current:** `CHANGE_ME_NOW_LavanderCats2024!`
+**Current:** `Bonjour2026!`
 
 Edit `.env` file and change:
 ```bash
