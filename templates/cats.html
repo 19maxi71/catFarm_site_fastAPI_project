@@ -83,9 +83,17 @@
 
         <!-- No cats message -->
         {% if not cats %}
-        <div class="text-center py-12">
-            <h2 class="text-2xl font-bold text-gray-600 mb-4">No cats available right now</h2>
-            <p class="text-gray-500">Please check back later for our feline friends!</p>
+        <div class="text-center py-12 bg-white rounded-xl shadow-lg mx-auto max-w-2xl">
+            <div class="p-8">
+                <div class="text-6xl mb-4">😿</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">No Kittens Available Right Now</h2>
+                <p class="text-gray-600 mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
+                <p class="text-gray-700 mb-6 font-medium">Want to be first in line when new kittens arrive?</p>
+                <a href="/adoption-form" class="inline-block bg-amber-500 text-white py-3 px-8 rounded-lg hover:bg-amber-600 transition-colors font-semibold text-lg">
+                    📝 Submit a Spontaneous Request
+                </a>
+                <p class="text-sm text-gray-500 mt-4">We'll contact you as soon as new kittens are available!</p>
+            </div>
         </div>
         {% endif %}
     </div>
