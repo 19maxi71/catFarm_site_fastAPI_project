@@ -19,11 +19,16 @@ services:
       - ./uploads:/app/uploads
     environment:
       - DATABASE_URL=postgresql://catfarm_user:catfarm_password_change_this@db:5432/catfarm
-      - SECRET_KEY=your-secret-key-here-change-in-production
+      - SECRET_KEY=${SECRET_KEY}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       - PYTHONPATH=/app
     depends_on:
       - db
     restart: always
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
