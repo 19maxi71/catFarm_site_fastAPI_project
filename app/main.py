@@ -1,11 +1,13 @@
 from starlette.responses import RedirectResponse
 from starlette.requests import Request
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import os
 from .database import Base, engine, get_db
 from .models import Cat, Article, AdoptionQuestion, AdoptionRequest
@@ -38,6 +40,69 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory="templates")
+
+
+# Custom error handlers
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    """Handle 404 Not Found errors with custom template."""
+    return templates.TemplateResponse(
+        "error_404.html",
+        {"request": request},
+        status_code=404
+    )
+
+
+@app.exception_handler(500)
+async def internal_error_handler(request: Request, exc):
+    """Handle 500 Internal Server Error with custom template."""
+    return templates.TemplateResponse(
+        "error_500.html",
+        {"request": request},
+        status_code=500
+    )
+
+
+@app.exception_handler(403)
+async def forbidden_handler(request: Request, exc):
+    """Handle 403 Forbidden errors with custom template."""
+    return templates.TemplateResponse(
+        "error_403.html",
+        {"request": request},
+        status_code=403
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Handle all other HTTP exceptions."""
+    # For specific error codes, use custom templates
+    if exc.status_code == 404:
+        return templates.TemplateResponse(
+            "error_404.html",
+            {"request": request},
+            status_code=404
+        )
+    elif exc.status_code == 403:
+        return templates.TemplateResponse(
+            "error_403.html",
+            {"request": request},
+            status_code=403
+        )
+    elif exc.status_code == 500:
+        return templates.TemplateResponse(
+            "error_500.html",
+            {"request": request},
+            status_code=500
+        )
+    # For other errors, show 500 page with generic message
+    else:
+        return templates.TemplateResponse(
+            "error_500.html",
+            {"request": request},
+            status_code=exc.status_code
+        )
+
 
 # Create database tables
 Base.metadata.create_all(bind=engine)

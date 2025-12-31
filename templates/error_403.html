@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
+    <div class="max-w-2xl w-full text-center">
+        <!-- Logo -->
+        <div class="flex justify-center mb-8">
+            <div class="relative">
+                <div class="absolute inset-0 bg-white rounded-full shadow-2xl"></div>
+                <img src="/static/images/logo.svg" alt="LavanderCats Logo" class="relative h-32 w-32 object-contain p-4">
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="bg-gradient-to-br from-lavender-light to-soft-purple rounded-3xl p-12 shadow-2xl">
+            <h1 class="text-8xl font-display font-bold text-lavender-darker mb-4">403</h1>
+            <h2 class="text-3xl font-display font-semibold text-lavender-darker mb-6">Access Not Allowed</h2>
+
+            <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+                This area is like our cats' favorite hiding spot - access is restricted!
+                <br>You'll need special permissions to view this page.
+            </p>
+
+            <!-- Guardian cat emoji decoration -->
+            <div class="text-6xl mb-8 opacity-50">
+                🛡️
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/" class="inline-block bg-lavender hover:bg-lavender-dark text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Back to Home
+                </a>
+                <a href="/admin/login" class="inline-block bg-accent-gold hover:bg-white text-lavender-darker hover:text-lavender font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                    Admin Login
+                </a>
+            </div>
+
+            <!-- Info box -->
+            <div class="mt-12 pt-8 border-t border-lavender-light/30">
+                <p class="text-sm text-gray-600 italic">
+                    If you believe you should have access to this page, please contact the administrator.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
