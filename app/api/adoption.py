@@ -209,6 +209,11 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
 
 @router.post("/submit")
 async def submit_adoption_request(request: AdoptionSubmitRequest, db: Session = Depends(get_db)):
+    # Honeypot validation - reject if the hidden field is filled (bot detection)
+    if request.website:
+        raise HTTPException(
+            status_code=400, detail="Invalid submission detected.")
+
     if not request.terms_agreed:
         raise HTTPException(
             status_code=400, detail="You must read and agree to the terms to submit an adoption request.")

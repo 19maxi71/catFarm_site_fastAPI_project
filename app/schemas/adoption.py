@@ -40,6 +40,7 @@ class AdoptionSubmitRequest(BaseModel):
     terms_agreed: bool
     privacy_consent: bool
     subscription: bool = False
+    website: Optional[str] = None  # Honeypot field for spam prevention
 
 
 class AdoptionRequestResponse(BaseModel):

@@ -3,14 +3,14 @@
 {% block title %}Our Cats - LavanderCats Cat Farm{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+<div class="min-h-screen">
     <!-- Hero Section -->
-    <div class="relative bg-gradient-to-r from-amber-600 to-orange-500 text-white py-20">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
+    <div class="relative bg-gradient-to-r from-lavender to-lavender-light text-white py-20 shadow-lg">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-lavender-dark/20"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center max-w-4xl mx-auto">
-                <h1 class="text-6xl font-bold mb-6">🐾 Our Magnificent Cats</h1>
-                <p class="text-xl leading-relaxed">Meet the extraordinary Siberian cats who are the heart and soul of LavanderCats Cat Farm. Each one carefully selected for their exceptional temperament, stunning beauty, and champion bloodlines.</p>
+                <h1 class="text-5xl md:text-6xl font-display font-bold mb-6 drop-shadow-lg">Our Magnificent Cats</h1>
+                <p class="text-xl md:text-2xl leading-relaxed font-medium">Meet the extraordinary Siberian cats who are the heart and soul of LavanderCats Cat Farm. Each one carefully selected for their exceptional temperament, stunning beauty, and champion bloodlines.</p>
             </div>
         </div>
     </div>
@@ -22,24 +22,24 @@
 
         <!-- Madame de Récamier aka Simba - Spirit of the House -->
         <div class="mb-20">
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-lavender-lighter hover:border-lavender transition-all">
                 <div class="lg:flex">
                     <!-- Image -->
                     <div class="lg:w-1/2">
                         <div class="relative h-96 lg:h-full overflow-hidden">
                             <img src="/static/uploads/cats/article_None_20250918_230550_55d6c11b_full.jpg"
                                  alt="Madame de Récamier aka Simba"
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                         </div>
                     </div>
 
                     <!-- Content -->
                     <div class="lg:w-1/2 p-8 lg:p-12">
                         <div class="flex items-center mb-4">
-                            <h2 class="text-4xl font-bold text-gray-800 mr-4">Madame de Récamier</h2>
-                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">✨ Spirit</span>
+                            <h2 class="text-4xl font-display font-bold text-lavender-dark mr-4">Madame de Récamier</h2>
+                            <span class="bg-lavender-lighter text-lavender-dark px-4 py-2 rounded-full text-sm font-semibold">✨ Spirit</span>
                         </div>
-                        <p class="text-xl text-gray-600 italic mb-6">aka Simba</p>
+                        <p class="text-xl text-gray-600 italic mb-6 font-medium">aka Simba</p>
 
                         <div class="space-y-4 mb-6">
                             <div class="flex items-center text-gray-600">
@@ -68,9 +68,9 @@
                         </div>
 
                         <div class="flex flex-wrap gap-2">
-                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">👑 Matriarch</span>
-                            <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm">✨ Guardian Spirit</span>
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">💫 Wise Soul</span>
+                            <span class="bg-lavender-lighter text-lavender-dark px-4 py-2 rounded-full text-sm font-semibold">👑 Matriarch</span>
+                            <span class="bg-soft-purple text-lavender-dark px-4 py-2 rounded-full text-sm font-semibold">✨ Guardian Spirit</span>
+                            <span class="bg-lavender-lighter text-lavender-dark px-4 py-2 rounded-full text-sm font-semibold">💫 Wise Soul</span>
                         </div>
                     </div>
                 </div>
@@ -79,14 +79,14 @@
 
         <!-- Coming Soon - Second Cat -->
         <div class="mb-20">
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-dashed border-gray-300">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-dashed border-lavender-light">
                 <div class="lg:flex lg:flex-row-reverse">
                     <!-- Placeholder Image -->
                     <div class="lg:w-1/2">
-                        <div class="relative h-96 lg:h-full bg-gradient-to-br from-warm-beige to-muted-pink flex items-center justify-center">
+                        <div class="relative h-96 lg:h-full bg-gradient-to-br from-lavender-lighter to-soft-purple flex items-center justify-center">
                             <div class="text-center">
-                                <span class="text-8xl mb-4 block">🐱</span>
-                                <p class="text-2xl font-semibold text-gray-600">Coming Soon</p>
+                                <div class="text-8xl mb-4 text-lavender font-display">?</div>
+                                <p class="text-2xl font-display font-semibold text-lavender-dark">Coming Soon</p>
                             </div>
                         </div>
                     </div>
@@ -94,8 +94,8 @@
                     <!-- Content -->
                     <div class="lg:w-1/2 p-8 lg:p-12 flex items-center">
                         <div class="w-full">
-                            <h2 class="text-4xl font-bold text-gray-800 mb-6">Meet Our Next Star</h2>
-                            <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                            <h2 class="text-4xl font-display font-bold text-lavender-dark mb-6">Meet Our Next Star</h2>
+                            <p class="text-gray-700 text-lg leading-relaxed mb-6">
                                 We're preparing to introduce another wonderful member of our LavanderCats family. Stay tuned to meet our next magnificent Siberian cat who will soon grace these pages with their unique personality and charm.
                             </p>
                             <div class="bg-muted-pink rounded-lg p-6">

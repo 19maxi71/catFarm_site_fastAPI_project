@@ -2,11 +2,11 @@
 
 {% block content %}
 <!-- Hero section -->
-<div class="bg-muted-pink rounded-lg p-8 mb-8 text-center">
-    <h1 class="text-4xl font-bold text-black mb-4">Welcome to LavanderCats Cat Farm</h1>
-    <p class="text-lg text-gray-700 mb-6">Beautiful Siberian cats for loving families</p>
-    <a href="/cats" class="bg-dusty-rose text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
-        View Available Cats
+<div class="bg-gradient-to-br from-lavender to-lavender-light rounded-2xl p-12 mb-12 text-center shadow-2xl">
+    <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6 drop-shadow-lg">Welcome to LavanderCats</h1>
+    <p class="text-xl md:text-2xl text-lavender-lighter mb-8 font-medium">Beautiful Siberian Cats for Loving Families</p>
+    <a href="/cats" class="inline-block bg-accent-gold hover:bg-white text-lavender-darker hover:text-lavender font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-lg">
+        View Available Kittens
     </a>
 </div>
 
@@ -61,66 +61,66 @@
         </template>
     </div>
 
-    <!-- Current slide info -->
-    <div class="absolute top-4 left-4 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm z-20">
+    <!-- Current slide info (hidden) -->
+    <div class="hidden absolute top-4 left-4 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm z-20">
         <span x-text="(active + 1) + ' / ' + images.length"></span>
     </div>
 
-    <!-- Auto-play status -->
-    <div class="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded-full text-xs z-20">
+    <!-- Auto-play status (hidden) -->
+    <div class="hidden absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded-full text-xs z-20">
         <span x-text="autoPlayInterval ? '⏸️' : '▶️'"></span>
     </div>
 </div>
 
 <!-- About section -->
-<div class="bg-white rounded-lg p-6 mb-8">
-    <h2 class="text-2xl font-bold text-black mb-4">About Our Farm</h2>
-    <p class="text-gray-700 leading-relaxed mb-4">
+<div class="bg-white rounded-2xl p-8 mb-10 shadow-lg border-2 border-soft-purple">
+    <h2 class="text-4xl font-display font-bold text-lavender mb-6">About Our Farm</h2>
+    <p class="text-gray-700 text-lg leading-relaxed mb-4">
         LavanderCats Cat Farm specializes in breeding beautiful, healthy Siberian cats.
         Our cats are raised in a loving family environment and are perfect companions
         for families with allergies due to their hypoallergenic qualities.
     </p>
-    <p class="text-gray-700 leading-relaxed">
+    <p class="text-gray-700 text-lg leading-relaxed">
         We focus on health, temperament, and socialization to ensure each kitten
         becomes a wonderful addition to your family.
     </p>
 </div>
 
 <!-- Why Siberian Cats section -->
-<div class="bg-warm-beige rounded-lg p-6 mb-8">
-    <h2 class="text-2xl font-bold text-black mb-4">Why Siberian Cats?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <h3 class="text-lg font-semibold text-black mb-2">Hypoallergenic</h3>
-            <p class="text-gray-700">Lower levels of Fel d 1 protein make them suitable for many allergy sufferers.</p>
+<div class="bg-gradient-to-br from-soft-purple to-lavender-lighter/30 rounded-2xl p-8 mb-10 shadow-lg">
+    <h2 class="text-4xl font-display font-bold text-lavender-dark mb-8 text-center">Why Siberian Cats?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow">
+            <h3 class="text-2xl font-display font-semibold text-lavender mb-3">Hypoallergenic</h3>
+            <p class="text-gray-700 text-base leading-relaxed">Lower levels of Fel d 1 protein make them suitable for many allergy sufferers.</p>
         </div>
-        <div>
-            <h3 class="text-lg font-semibold text-black mb-2">Gentle Nature</h3>
-            <p class="text-gray-700">Known for their calm, affectionate temperament and love for families.</p>
+        <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow">
+            <h3 class="text-2xl font-display font-semibold text-lavender mb-3">Gentle Nature</h3>
+            <p class="text-gray-700 text-base leading-relaxed">Known for their calm, affectionate temperament and love for families.</p>
         </div>
-        <div>
-            <h3 class="text-lg font-semibold text-black mb-2">Beautiful Coats</h3>
-            <p class="text-gray-700">Stunning semi-long coats in various colors and patterns.</p>
+        <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow">
+            <h3 class="text-2xl font-display font-semibold text-lavender mb-3">Beautiful Coats</h3>
+            <p class="text-gray-700 text-base leading-relaxed">Stunning semi-long coats in various colors and patterns.</p>
         </div>
-        <div>
-            <h3 class="text-lg font-semibold text-black mb-2">Healthy Breed</h3>
-            <p class="text-gray-700">Hardy, robust cats with excellent health and longevity.</p>
+        <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow">
+            <h3 class="text-2xl font-display font-semibold text-lavender mb-3">Healthy Breed</h3>
+            <p class="text-gray-700 text-base leading-relaxed">Hardy, robust cats with excellent health and longevity.</p>
         </div>
     </div>
 </div>
 
 <!-- Contact section -->
-<div class="bg-white rounded-lg p-6">
-    <h2 class="text-2xl font-bold text-black mb-4">Contact Us</h2>
-    <p class="text-gray-700 mb-4">
+<div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-soft-purple">
+    <h2 class="text-4xl font-display font-bold text-lavender mb-6">Contact Us</h2>
+    <p class="text-gray-700 text-lg leading-relaxed mb-6">
         Interested in welcoming a Siberian cat into your family?
         Get in touch to learn about available kittens and our adoption process.
     </p>
-    <div class="flex space-x-4">
-        <a href="/cats" class="bg-dusty-rose text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors">
-            Available Cats
+    <div class="flex flex-col sm:flex-row gap-4">
+        <a href="/cats" class="bg-lavender hover:bg-lavender-dark text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all text-center text-lg">
+            Available Kittens
         </a>
-        <a href="/news" class="bg-soft-gray text-black px-4 py-2 rounded hover:bg-dusty-rose transition-colors">
+        <a href="/news" class="bg-accent-gold hover:bg-lavender-light text-lavender-darker hover:text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all text-center text-lg">
             Latest News
         </a>
     </div>

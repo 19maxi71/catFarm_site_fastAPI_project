@@ -5,15 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LavanderCats - Documents</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'dusty-rose': '#D4A4A4',
-                        'muted-pink': '#E8D5D5',
-                        'warm-beige': '#F0E8D8',
-                        'soft-gray': '#E5E5E5'
+                        'lavender': '#7373b9',
+                        'lavender-light': '#9b9bdb',
+                        'lavender-lighter': '#c5c5eb',
+                        'lavender-dark': '#5858a6',
+                        'lavender-darker': '#454580',
+                        'cream': '#f8f6f3',
+                        'soft-purple': '#e8e4f3',
+                        'accent-gold': '#d4af37'
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Montserrat', 'sans-serif']
                     }
                 }
             }
@@ -24,52 +35,61 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50" x-data="{ selectedDoc: null, showModal: false, mobileMenu: false }">
+<body class="bg-cream font-body antialiased" x-data="{ selectedDoc: null, showModal: false, mobileMenu: false }">
     <!-- Navigation -->
-    <nav class="bg-gradient-to-r from-warm-beige to-muted-pink border-b-2 border-dusty-rose shadow-md">
+    <nav class="bg-gradient-to-r from-lavender to-lavender-light shadow-lg border-b-2 border-lavender-dark/30">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4 md:py-5">
-                <a href="/" class="flex items-center space-x-3">
+            <div class="flex justify-between items-center py-5 md:py-6">
+                <a href="/" class="flex items-center space-x-4 group">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-white rounded-full shadow-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
+                        <img src="/static/images/logo.svg" alt="LavanderCats Logo" class="relative h-16 w-16 md:h-20 md:w-20 object-contain p-2">
+                    </div>
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">LavanderCats</h1>
-                        <p class="text-xs md:text-sm text-gray-600 font-medium">Siberian Cat Farm</p>
+                        <h1 class="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-white tracking-wide drop-shadow-md group-hover:text-accent-gold transition-colors">LavanderCats</h1>
+                        <p class="text-sm md:text-base text-lavender-lighter font-medium tracking-wide">Siberian Cat Farm</p>
                     </div>
                 </a>
-                <div class="hidden md:flex space-x-1 lg:space-x-2">
-                    <a href="/" class="px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all duration-200">Home</a>
-                    <a href="/our-cats" class="px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all duration-200">Our Cats</a>
-                    <a href="/cats" class="px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all duration-200">Available Kittens</a>
-                    <a href="/news" class="px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all duration-200">News</a>
-                    <a href="/documents" class="px-4 py-2 text-base font-medium text-white bg-dusty-rose rounded-lg shadow-md">Documents</a>
-                    <a href="/privacy-policy" class="px-4 py-2 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all duration-200">Privacy</a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Home</a>
+                    <span class="text-white/40 text-xl">•</span>
+                    <a href="/our-cats" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Our Cats</a>
+                    <span class="text-white/40 text-xl">•</span>
+                    <a href="/cats" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Available Kittens</a>
+                    <span class="text-white/40 text-xl">•</span>
+                    <a href="/news" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">News</a>
+                    <span class="text-white/40 text-xl">•</span>
+                    <a href="/documents" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-lavender bg-white rounded-lg shadow-lg">Documents</a>
+                    <span class="text-white/40 text-xl">•</span>
+                    <a href="/privacy-policy" class="px-4 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Privacy</a>
                 </div>
-                <button class="md:hidden bg-dusty-rose hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors" @click="mobileMenu = !mobileMenu">
+                <button class="md:hidden bg-white hover:bg-lavender-lighter text-lavender px-4 py-3 rounded-lg transition-all shadow-md" @click="mobileMenu = !mobileMenu">
                     <div class="w-6 h-6 flex flex-col justify-center items-center">
-                        <div class="w-6 h-0.5 bg-white"></div>
-                        <div class="w-6 h-0.5 bg-white mt-1.5"></div>
-                        <div class="w-6 h-0.5 bg-white mt-1.5"></div>
+                        <div class="w-6 h-0.5 bg-lavender"></div>
+                        <div class="w-6 h-0.5 bg-lavender mt-1.5"></div>
+                        <div class="w-6 h-0.5 bg-lavender mt-1.5"></div>
                     </div>
                 </button>
             </div>
         </div>
-        <div x-show="mobileMenu" x-cloak @click.away="mobileMenu = false" class="md:hidden absolute right-4 top-20 bg-white border-2 border-dusty-rose rounded-lg shadow-xl p-3 z-50 min-w-56">
+        <div x-show="mobileMenu" x-cloak @click.away="mobileMenu = false" class="md:hidden absolute right-4 top-20 bg-white border-2 border-lavender-light rounded-xl shadow-2xl p-4 z-50 min-w-64">
             <div class="flex flex-col space-y-2">
-                <a href="/" class="px-4 py-2.5 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all">🏠 Home</a>
-                <a href="/our-cats" class="px-4 py-2.5 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all">👑 Our Cats</a>
-                <a href="/cats" class="px-4 py-2.5 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all">🐱 Available Kittens</a>
-                <a href="/news" class="px-4 py-2.5 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all">📰 News</a>
-                <a href="/documents" class="px-4 py-2.5 text-base font-medium text-white bg-dusty-rose rounded-lg shadow-md">📄 Documents</a>
-                <a href="/privacy-policy" class="px-4 py-2.5 text-base font-medium text-gray-700 hover:text-white hover:bg-dusty-rose rounded-lg transition-all">🔒 Privacy</a>
+                <a href="/" class="px-5 py-3 text-base font-medium text-gray-700 hover:text-white hover:bg-lavender rounded-lg transition-all">🏠 Home</a>
+                <a href="/our-cats" class="px-5 py-3 text-base font-medium text-gray-700 hover:text-white hover:bg-lavender rounded-lg transition-all">👑 Our Cats</a>
+                <a href="/cats" class="px-5 py-3 text-base font-medium text-gray-700 hover:text-white hover:bg-lavender rounded-lg transition-all">🐱 Available Kittens</a>
+                <a href="/news" class="px-5 py-3 text-base font-medium text-gray-700 hover:text-white hover:bg-lavender rounded-lg transition-all">📰 News</a>
+                <a href="/documents" class="px-5 py-3 text-base font-medium text-white bg-lavender rounded-lg shadow-md">📄 Documents</a>
+                <a href="/privacy-policy" class="px-5 py-3 text-base font-medium text-gray-700 hover:text-white hover:bg-lavender rounded-lg transition-all">🔒 Privacy</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <div class="bg-muted-pink py-12">
+    <div class="bg-gradient-to-br from-lavender to-lavender-light py-16">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <h1 class="text-4xl font-bold text-black mb-4">Important Documents</h1>
-            <p class="text-lg text-gray-700 max-w-2xl mx-auto">
-                Access our sales contract and departure instructions for new kitten owners.
+            <h1 class="text-5xl md:text-6xl font-display font-bold text-white mb-6 drop-shadow-lg">Important Documents</h1>
+            <p class="text-xl md:text-2xl text-lavender-lighter max-w-2xl mx-auto font-medium">
+                Access our sales contract and departure instructions for new kitten owners
             </p>
         </div>
     </div>
@@ -78,27 +98,27 @@
     <div class="max-w-6xl mx-auto px-4 py-12">
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Sales Contract Card -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-soft-gray hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="bg-muted-pink p-3 rounded-lg">
-                            <svg class="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-lavender-lighter hover:shadow-2xl hover:border-lavender transition-all">
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-soft-purple p-4 rounded-xl">
+                            <svg class="w-10 h-10 text-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
-                        <div class="ml-4">
-                            <h3 class="text-xl font-semibold text-black">Sales Contract</h3>
-                            <p class="text-gray-600 text-sm">Official kitten purchase agreement</p>
+                        <div class="ml-5">
+                            <h3 class="text-2xl font-display font-bold text-lavender-dark">Sales Contract</h3>
+                            <p class="text-gray-600 text-base">Official kitten purchase agreement</p>
                         </div>
                     </div>
-                    <p class="text-gray-700 mb-6 text-sm">
+                    <p class="text-gray-700 mb-6 text-base leading-relaxed">
                         Our comprehensive sales contract outlines terms, conditions, health guarantees, and responsibilities for both buyer and seller.
                     </p>
-                    <div class="flex space-x-3">
-                        <button @click="selectedDoc = 'contract'; showModal = true" class="flex-1 bg-dusty-rose text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors font-semibold">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button @click="selectedDoc = 'contract'; showModal = true" class="flex-1 bg-lavender text-white px-6 py-3 rounded-xl hover:bg-lavender-dark transition-all font-semibold text-base shadow-md hover:shadow-lg">
                             View Document
                         </button>
-                        <a href="/static/uploads/documents/LavanderCats Sales Contract.docx.pdf" download="LavanderCats_Sales_Contract.pdf" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors text-center font-semibold">
+                        <a href="/static/uploads/documents/LavanderCats Sales Contract.docx.pdf" download="LavanderCats_Sales_Contract.pdf" class="flex-1 bg-accent-gold hover:bg-lavender-light text-lavender-darker hover:text-white px-6 py-3 rounded-xl transition-all text-center font-semibold text-base shadow-md hover:shadow-lg">
                             Download PDF
                         </a>
                     </div>
@@ -106,27 +126,27 @@
             </div>
 
             <!-- Departure Instructions Card -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-soft-gray hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="bg-muted-pink p-3 rounded-lg">
-                            <svg class="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-lavender-lighter hover:shadow-2xl hover:border-lavender transition-all">
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-soft-purple p-4 rounded-xl">
+                            <svg class="w-10 h-10 text-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
                         </div>
-                        <div class="ml-4">
-                            <h3 class="text-xl font-semibold text-black">Departure Instructions</h3>
-                            <p class="text-gray-600 text-sm">New kitten owner guide</p>
+                        <div class="ml-5">
+                            <h3 class="text-2xl font-display font-bold text-lavender-dark">Departure Instructions</h3>
+                            <p class="text-gray-600 text-base">New kitten owner guide</p>
                         </div>
                     </div>
-                    <p class="text-gray-700 mb-6 text-sm">
+                    <p class="text-gray-700 mb-6 text-base leading-relaxed">
                         Essential guide for new kitten owners covering care, feeding, behavior, health concerns, and adjustment tips.
                     </p>
-                    <div class="flex space-x-3">
-                        <button @click="selectedDoc = 'departure'; showModal = true" class="flex-1 bg-dusty-rose text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors font-semibold">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button @click="selectedDoc = 'departure'; showModal = true" class="flex-1 bg-lavender text-white px-6 py-3 rounded-xl hover:bg-lavender-dark transition-all font-semibold text-base shadow-md hover:shadow-lg">
                             View Document
                         </button>
-                        <a href="/static/uploads/documents/Departure Instructions.docx.pdf" download="Departure_Instructions.pdf" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors text-center font-semibold">
+                        <a href="/static/uploads/documents/Departure Instructions.docx.pdf" download="Departure_Instructions.pdf" class="flex-1 bg-accent-gold hover:bg-lavender-light text-lavender-darker hover:text-white px-6 py-3 rounded-xl transition-all text-center font-semibold text-base shadow-md hover:shadow-lg">
                             Download PDF
                         </a>
                     </div>
@@ -135,26 +155,26 @@
         </div>
 
         <!-- Additional Info -->
-        <div class="mt-12 bg-warm-beige rounded-lg p-6 border border-soft-gray">
-            <h3 class="text-lg font-semibold text-black mb-4">Document Information</h3>
-            <ul class="text-gray-700 space-y-2">
-                <li>• All documents are printable and can be saved as PDF</li>
-                <li>• Sales contract must be signed and notarized before kitten purchase</li>
-                <li>• Departure instructions should be reviewed before bringing your kitten home</li>
-                <li>• For questions about these documents, contact us at info@lavandercats.com</li>
+        <div class="mt-12 bg-gradient-to-br from-soft-purple to-lavender-lighter/30 rounded-2xl p-8 border-2 border-lavender-lighter shadow-lg">
+            <h3 class="text-2xl font-display font-bold text-lavender-dark mb-6">Document Information</h3>
+            <ul class="text-gray-700 space-y-3 text-base">
+                <li class="flex items-start"><span class="text-lavender mr-3 text-xl">•</span><span>All documents are printable and can be saved as PDF</span></li>
+                <li class="flex items-start"><span class="text-lavender mr-3 text-xl">•</span><span>Sales contract must be signed and notarized before kitten purchase</span></li>
+                <li class="flex items-start"><span class="text-lavender mr-3 text-xl">•</span><span>Departure instructions should be reviewed before bringing your kitten home</span></li>
+                <li class="flex items-start"><span class="text-lavender mr-3 text-xl">•</span><span>For questions about these documents, contact us at info@lavandercats.com</span></li>
             </ul>
         </div>
     </div>
 
     <!-- Modal -->
-    <div x-show="showModal" x-cloak @click="showModal = false" @keydown.escape.window="showModal = false" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4">
-        <div @click.stop class="bg-white rounded-lg shadow-2xl w-full h-[92vh] sm:h-[90vh] max-w-7xl overflow-hidden flex flex-col">
+    <div x-show="showModal" x-cloak @click="showModal = false" @keydown.escape.window="showModal = false" class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-2 sm:p-4">
+        <div @click.stop class="bg-white rounded-2xl shadow-2xl w-full h-[92vh] sm:h-[90vh] max-w-7xl overflow-hidden flex flex-col border-4 border-lavender">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-orange-50 flex-shrink-0">
-                <h3 class="text-base sm:text-lg font-semibold text-black" x-text="selectedDoc === 'contract' ? 'Sales Contract' : 'Departure Instructions'"></h3>
-                <button @click="showModal = false" class="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0">
-                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <div class="flex items-center justify-between p-4 sm:p-6 border-b-2 border-lavender-lighter bg-gradient-to-r from-lavender to-lavender-light flex-shrink-0">
+                <h3 class="text-lg sm:text-2xl font-display font-bold text-white" x-text="selectedDoc === 'contract' ? 'Sales Contract' : 'Departure Instructions'"></h3>
+                <button @click="showModal = false" class="text-white hover:text-accent-gold transition-colors flex-shrink-0">
+                    <svg class="w-7 h-7 sm:w-9 sm:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
@@ -202,15 +222,28 @@
 
                 <!-- Address -->
                 <div>
-                    <h3 class="text-lg font-semibold text-black mb-4">Visit Us</h3>
-                    <div class="text-gray-700">
+                    <h3 class="text-xl font-display font-semibold text-white mb-5 tracking-wide">Visit Us</h3>
+                    <div class="text-lavender-lighter text-base mb-4">
                         <p class="flex items-start">
-                            <svg class="w-5 h-5 mr-2 mt-1 text-dusty-rose flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 mr-3 mt-1 text-accent-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <span>Your Farm Address<br>City, State ZIP</span>
+                            <span>2240 Brick Tavern Rd<br>Quakertown, PA 18951-3907</span>
                         </p>
+                    </div>
+                    <!-- Map -->
+                    <div class="mt-4 rounded-xl overflow-hidden border-2 border-lavender-lighter shadow-lg">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3040.6547891789895!2d-75.34621492346736!3d40.37719487144313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c42b7f8e8e8e8f%3A0x1234567890abcdef!2s2240%20Brick%20Tavern%20Rd%2C%20Quakertown%2C%20PA%2018951!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                            width="100%"
+                            height="150"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="grayscale hover:grayscale-0 transition-all duration-300">
+                        </iframe>
                     </div>
                 </div>
 

@@ -175,15 +175,26 @@ async def admin_login(request: Request):
     username = form_data.get("username")
     password = form_data.get("password")
 
-    # Simple authentication for now (replace with proper auth later)
-    if username == "admin" and password == "admin123":
+    # Authenticate using environment variables
+    admin_username = os.getenv("ADMIN_USERNAME", "admin")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    if not admin_password:
+        return templates.TemplateResponse(
+            "admin_login.html",
+            {"request": request, "error": "Admin credentials not configured. Please contact administrator."}
+        )
+
+    if username == admin_username and password == admin_password:
         # Create access token (simple cookie-based auth for now)
         response = RedirectResponse(url="/admin", status_code=302)
         response.set_cookie(
             key="access_token",
             value="authenticated",  # Simple token for now
             httponly=True,
-            max_age=3600  # 1 hour
+            max_age=3600,  # 1 hour
+            secure=True,  # Only send over HTTPS in production
+            samesite="lax"  # CSRF protection
         )
         return response
     else:

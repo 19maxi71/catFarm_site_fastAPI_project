@@ -5,11 +5,15 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
+import os
 
-# Security configuration
-SECRET_KEY = "your-secret-key-change-this-in-production"  # Change this!
+# Security configuration - MUST be set via environment variables
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set! Generate one with: python3 -c 'import secrets; print(secrets.token_urlsafe(32))'")
+
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 # Password hashing
 try:
@@ -70,22 +74,36 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         )
 
 
-# Simple user storage (in production, use database)
-ADMIN_USERS = {
-    "admin": {
-        "username": "admin",
-        "hashed_password": "$2b$12$CeDwmSCC4hI13EIzzrITReDYeWJcyBvYOxBbI2kJPPrlkA0zyxPJK",  # admin123
-        "full_name": "Administrator",
-        "disabled": False,
+# Admin user credentials from environment variables
+def _get_admin_users():
+    """Load admin users from environment variables."""
+    admin_username = os.getenv("ADMIN_USERNAME", "admin")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    if not admin_password:
+        raise ValueError("ADMIN_PASSWORD environment variable is not set! This is required for security.")
+
+    # Hash the password from environment variable
+    hashed_password = get_password_hash(admin_password)
+
+    return {
+        admin_username: {
+            "username": admin_username,
+            "hashed_password": hashed_password,
+            "full_name": "Administrator",
+            "disabled": False,
+        }
     }
-}
 
 
 def authenticate_user(username: str, password: str):
     """Authenticate a user."""
-    user = ADMIN_USERS.get(username)
+    admin_users = _get_admin_users()
+    user = admin_users.get(username)
     if not user:
         return False
-    if not verify_password(password, user["hashed_password"]):
+    # Verify against the environment variable password directly for consistency
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    if password != admin_password:
         return False
     return user

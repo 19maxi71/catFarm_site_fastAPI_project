@@ -7,70 +7,70 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-8" x-data="{ showOnlyAvailable: false }">
+<div class="min-h-screen py-10" x-data="{ showOnlyAvailable: false }">
     <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="text-center mb-12">
-            <h1 class="text-5xl font-bold text-gray-800 mb-4">🐱 Available Kittens</h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our adorable Siberian kittens looking for their forever homes.</p>
+            <h1 class="text-5xl md:text-6xl font-display font-bold text-lavender mb-4">🐱 Available Kittens</h1>
+            <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto font-medium">Discover our adorable Siberian kittens looking for their forever homes</p>
         </div>
 
         <!-- Filter Toggle -->
-        <div class="flex justify-center mb-8">
-            <label class="inline-flex items-center cursor-pointer bg-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div class="flex justify-center mb-10">
+            <label class="inline-flex items-center cursor-pointer bg-white px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all border-2 border-lavender-lighter">
                 <input type="checkbox" x-model="showOnlyAvailable" class="sr-only peer">
-                <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                <span class="ms-3 text-sm font-medium text-gray-700">Show only available kittens</span>
+                <div class="relative w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lavender-lighter rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-lavender"></div>
+                <span class="ms-4 text-base font-semibold text-gray-700">Show only available kittens</span>
             </label>
         </div>
 
         <!-- No Available Kittens Message -->
         {% set available_count = cats | selectattr('is_available') | list | length %}
-        <div x-show="showOnlyAvailable && {{ available_count }} === 0" x-cloak class="text-center py-12 bg-white rounded-xl shadow-lg mx-auto max-w-2xl mb-8">
-            <div class="p-8">
-                <div class="text-6xl mb-4">😿</div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">No Kittens Available Right Now</h2>
-                <p class="text-gray-600 mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
-                <p class="text-gray-700 mb-6 font-medium">Want to be first in line when new kittens arrive?</p>
-                <a href="/adoption-form" class="inline-block bg-amber-500 text-white py-3 px-8 rounded-lg hover:bg-amber-600 transition-colors font-semibold text-lg">
+        <div x-show="showOnlyAvailable && {{ available_count }} === 0" x-cloak class="text-center py-12 bg-gradient-to-br from-lavender-lighter to-white rounded-2xl shadow-2xl mx-auto max-w-2xl mb-8 border-2 border-lavender">
+            <div class="p-10">
+                <div class="text-7xl mb-6">😿</div>
+                <h2 class="text-3xl font-display font-bold text-lavender-dark mb-4">No Kittens Available Right Now</h2>
+                <p class="text-gray-700 text-lg mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
+                <p class="text-lavender-dark text-lg mb-6 font-semibold">Want to be first in line when new kittens arrive?</p>
+                <a href="/adoption-form" class="inline-block bg-accent-gold hover:bg-lavender text-lavender-darker hover:text-white py-4 px-10 rounded-xl shadow-lg hover:shadow-xl transition-all font-bold text-lg transform hover:scale-105">
                     📝 Submit a Spontaneous Request
                 </a>
-                <p class="text-sm text-gray-500 mt-4">We'll contact you as soon as new kittens are available!</p>
+                <p class="text-base text-gray-600 mt-6">We'll contact you as soon as new kittens are available!</p>
             </div>
         </div>
 
         <!-- Kittens Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {% for cat in cats %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cat-card cursor-pointer"
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cat-card cursor-pointer border-2 border-lavender-lighter hover:border-lavender transform hover:scale-105"
                  {% if not cat.is_available %}x-show="!showOnlyAvailable"{% endif %}
                  data-cat-id="{{ cat.id }}">
                 <div class="relative overflow-hidden group">
                     {% set photo_src = cat.photo_base64 if cat.photo_base64 else cat.photo_url %}
                     {% if photo_src %}
-                        <img src="{{ photo_src }}" alt="Litter {{ cat.litter_code }}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <img src="{{ photo_src }}" alt="Litter {{ cat.litter_code }}" class="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
                     {% else %}
-                        <div class="w-full h-72 bg-gradient-to-br from-dusty-rose to-muted-pink flex items-center justify-center">
+                        <div class="w-full h-72 bg-gradient-to-br from-lavender to-lavender-light flex items-center justify-center">
                             <span class="text-6xl text-white">🐱</span>
                         </div>
                     {% endif %}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-lavender/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div class="p-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Litter {{ cat.litter_code }}</h3>
-                    <p class="text-amber-600 font-semibold mb-1">{{ cat.gender }}</p>
-                    <p class="text-gray-600 mb-2">Born: {{ cat.date_of_birth_formatted }}</p>
+                    <h3 class="text-2xl font-display font-bold text-lavender-dark mb-2">Litter {{ cat.litter_code }}</h3>
+                    <p class="text-lavender font-semibold text-lg mb-1">{{ cat.gender }}</p>
+                    <p class="text-gray-600 text-base mb-3">Born: {{ cat.date_of_birth_formatted }}</p>
 
                     <!-- Status badges -->
                     <div class="flex gap-2 mb-4">
                         {% if cat.is_available %}
-                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">✓ Available</span>
+                        <span class="bg-green-100 text-green-800 text-sm px-3 py-1.5 rounded-full font-semibold">✓ Available</span>
                         {% else %}
-                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">❌ Adopted</span>
+                        <span class="bg-red-100 text-red-800 text-sm px-3 py-1.5 rounded-full font-semibold">❌ Adopted</span>
                         {% endif %}
                     </div>
 
-                    <button class="w-full bg-amber-500 text-white py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors font-semibold">
+                    <button class="w-full bg-lavender text-white py-3 px-4 rounded-xl hover:bg-lavender-dark transition-all font-semibold text-base shadow-md hover:shadow-lg">
                         Learn More
                     </button>
                 </div>
@@ -83,62 +83,62 @@
 
         <!-- No cats message -->
         {% if not cats %}
-        <div class="text-center py-12 bg-white rounded-xl shadow-lg mx-auto max-w-2xl">
-            <div class="p-8">
-                <div class="text-6xl mb-4">😿</div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">No Kittens Available Right Now</h2>
-                <p class="text-gray-600 mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
-                <p class="text-gray-700 mb-6 font-medium">Want to be first in line when new kittens arrive?</p>
-                <a href="/adoption-form" class="inline-block bg-amber-500 text-white py-3 px-8 rounded-lg hover:bg-amber-600 transition-colors font-semibold text-lg">
+        <div class="text-center py-12 bg-gradient-to-br from-lavender-lighter to-white rounded-2xl shadow-2xl mx-auto max-w-2xl border-2 border-lavender">
+            <div class="p-10">
+                <div class="text-7xl mb-6">😿</div>
+                <h2 class="text-3xl font-display font-bold text-lavender-dark mb-4">No Kittens Available Right Now</h2>
+                <p class="text-gray-700 text-lg mb-6">All our adorable Siberian kittens have found their forever homes! But don't worry - new litters are on the way.</p>
+                <p class="text-lavender-dark text-lg mb-6 font-semibold">Want to be first in line when new kittens arrive?</p>
+                <a href="/adoption-form" class="inline-block bg-accent-gold hover:bg-lavender text-lavender-darker hover:text-white py-4 px-10 rounded-xl shadow-lg hover:shadow-xl transition-all font-bold text-lg transform hover:scale-105">
                     📝 Submit a Spontaneous Request
                 </a>
-                <p class="text-sm text-gray-500 mt-4">We'll contact you as soon as new kittens are available!</p>
+                <p class="text-base text-gray-600 mt-6">We'll contact you as soon as new kittens are available!</p>
             </div>
         </div>
         {% endif %}
     </div>
 
     <!-- Modal -->
-    <div id="catModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 id="modalTitle" class="text-3xl font-bold text-gray-800"></h2>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <div id="catModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-lavender">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="modalTitle" class="text-4xl font-display font-bold text-lavender"></h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-lavender text-3xl transition-colors">&times;</button>
                 </div>
 
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                    <img id="modalImage" src="" alt="" class="w-full h-96 object-contain rounded-lg mx-auto shadow-sm">
+                <div class="bg-lavender-lighter/20 rounded-2xl p-4 mb-6 border-2 border-lavender-lighter">
+                    <img id="modalImage" src="" alt="" class="w-full h-96 object-contain rounded-xl mx-auto">
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-5 text-lg">
                     <div>
-                        <strong>Litter Code:</strong> <span id="modalLitterCode"></span>
+                        <strong class="text-lavender-dark font-semibold">Litter Code:</strong> <span id="modalLitterCode" class="text-gray-700"></span>
                     </div>
                     <div>
-                        <strong>Gender:</strong> <span id="modalGender"></span>
+                        <strong class="text-lavender-dark font-semibold">Gender:</strong> <span id="modalGender" class="text-gray-700"></span>
                     </div>
                     <div>
-                        <strong>Date of Birth:</strong> <span id="modalDateOfBirth"></span>
+                        <strong class="text-lavender-dark font-semibold">Date of Birth:</strong> <span id="modalDateOfBirth" class="text-gray-700"></span>
                     </div>
                     <div>
-                        <strong>Description:</strong> <p id="modalDescription" class="mt-2 text-gray-700"></p>
+                        <strong class="text-lavender-dark font-semibold">Description:</strong> <p id="modalDescription" class="mt-2 text-gray-700 leading-relaxed"></p>
                     </div>
                     <div>
-                        <strong>Availability:</strong>
+                        <strong class="text-lavender-dark font-semibold">Availability:</strong>
                         <div class="mt-2">
-                            <span id="availabilityBadge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
+                            <span id="availabilityBadge" class="inline-flex items-center px-4 py-2 rounded-full text-base font-semibold">
                                 <span id="availabilityText"></span>
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-6 flex gap-4">
-                    <button onclick="openAdoption()" class="bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-semibold">
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    <button onclick="openAdoption()" class="bg-accent-gold hover:bg-lavender text-lavender-darker hover:text-white py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all font-bold text-lg transform hover:scale-105">
                         🏡 Request Adoption
                     </button>
-                    <button onclick="closeModal()" class="bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors">
+                    <button onclick="closeModal()" class="bg-gray-500 text-white py-4 px-8 rounded-xl hover:bg-gray-600 transition-all font-semibold text-lg shadow-md">
                         Close
                     </button>
                 </div>
