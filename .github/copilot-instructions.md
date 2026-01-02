@@ -1,7 +1,7 @@
-# CatFarm FastAPI Project - AI Coding Guidelines
+# LavanderCats Cattery - AI Coding Guidelines
 
 ## Architecture Overview
-This is a FastAPI-based cat breeding farm website with SQLAlchemy ORM, Jinja2 templating, and custom admin interface. The app serves both API endpoints and HTML pages.
+This is a FastAPI-based cattery website with SQLAlchemy ORM, Jinja2 templating, and custom admin interface. The app serves both API endpoints and HTML pages.
 
 **Key Components:**
 - `app/main.py`: FastAPI app setup, routes, middleware, and template rendering

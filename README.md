@@ -1,6 +1,6 @@
-# CatFarm Site - FastAPI Application
+# LavanderCats Cattery - FastAPI Application
 
-A simple cat farm website built with FastAPI. This guide will help you run it on your computer.
+A professional cattery website built with FastAPI. This guide will help you run it on your computer.
 
 ## What You Need First
 
@@ -64,7 +64,7 @@ uvicorn app.main:app --reload
 
 Open your web browser and go to: `http://localhost:8000`
 
-You should see the cat farm website!
+You should see the cattery website!
 
 ## Admin Panel
 
@@ -87,7 +87,7 @@ If you get errors:
 ## Features
 
 - View cats and their photos
-- Read articles about the farm
+- Read articles about the cattery
 - Admin panel to add/edit content
 - Responsive design (works on phone/tablet)
 
@@ -101,4 +101,4 @@ If you want to put this online, you can use:
 
 For Render, just connect your GitHub repo and it will auto-deploy.
 
-Enjoy your cat farm website! 🐾
+Enjoy your cattery website! 🐾

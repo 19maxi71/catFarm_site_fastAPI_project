@@ -15,10 +15,10 @@ try:
     # Sample articles
     sample_articles = [
         {
-            "title": "Welcome to LavanderCats Cat Farm!",
-            "content": """Welcome to LavanderCats Cat Farm, your premier destination for beautiful Siberian cats!
+            "title": "Welcome to LavanderCats Cattery!",
+            "content": """Welcome to LavanderCats Cattery, your premier destination for beautiful Siberian cats!
 
-Our farm is dedicated to breeding healthy, happy, and well-socialized Siberian cats. We believe in ethical breeding practices and prioritize the health and well-being of our cats above all else.
+Our cattery is dedicated to breeding healthy, happy, and well-socialized Siberian cats. We believe in ethical breeding practices and prioritize the health and well-being of our cats above all else.
 
 Our Siberian cats are known for their stunning blue eyes, luxurious triple coat, and affectionate personalities. Whether you're looking for a new family member or a show-quality cat, we have something special for everyone.
 

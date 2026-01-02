@@ -19,8 +19,8 @@ from .upload_api import router as upload_router
 from .auth import authenticate_user
 
 
-app = FastAPI(title="LavanderCats Cat Farm",
-              description="Siberian Cat Breeding Farm")
+app = FastAPI(title="LavanderCats Cattery",
+              description="Siberian Cat Breeding Cattery")
 
 # Add CORS middleware
 app.add_middleware(

@@ -888,7 +888,7 @@
     </div>
     <footer class="bg-warm-beige border-t border-soft-gray py-8 mt-12">
         <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-black">&copy; 2024 LavanderCats Cat Farm. All rights reserved.</p>
+            <p class="text-black">&copy; 2024 LavanderCats Cattery. All rights reserved.</p>
             <p class="mt-2 text-gray-700">Contact: info@lavandercats.com | Phone: 267-538-8590</p>
         </div>
     </footer>
