@@ -25,8 +25,9 @@ TEMP_DIR.mkdir(parents=True, exist_ok=True)
 # Image settings
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
-THUMBNAIL_SIZE = (300, 300)
-FULL_SIZE = (1200, 1200)
+THUMBNAIL_SIZE = (400, 400)  # Larger thumbnails for better quality
+FULL_SIZE = (1920, 1920)  # Full HD width for modern displays
+WEBP_QUALITY = 85  # WebP quality (smaller file size than JPEG at same quality)
 
 
 async def save_uploaded_photo(file: UploadFile, cat_name: str = None, article_image: bool = False) -> Tuple[str, str]:
@@ -99,15 +100,15 @@ async def process_image(temp_path: Path, base_name: str, file_ext: str, target_d
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
 
-            # Create full-size optimized image
-            full_path = target_dir / f"{base_name}_full.jpg"
+            # Create full-size optimized image in WebP format (better compression)
+            full_path = target_dir / f"{base_name}_full.webp"
             img_resized = resize_image(img, FULL_SIZE)
-            img_resized.save(full_path, 'JPEG', quality=85, optimize=True)
+            img_resized.save(full_path, 'WEBP', quality=WEBP_QUALITY, method=6)
 
-            # Create thumbnail
-            thumb_path = THUMBNAILS_DIR / f"{base_name}_thumb.jpg"
+            # Create thumbnail in WebP format
+            thumb_path = THUMBNAILS_DIR / f"{base_name}_thumb.webp"
             img.thumbnail(THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
-            img.save(thumb_path, 'JPEG', quality=80, optimize=True)
+            img.save(thumb_path, 'WEBP', quality=80, method=6)
 
             return full_path, thumb_path
 
