@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title }} - LavanderCats Cat Farm{% endblock %}
+{% block title %}{{ article.title }} - LavanderCats Cattery{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
@@ -213,7 +213,7 @@ function shareArticle() {
     if (navigator.share) {
         navigator.share({
             title: '{{ article.title }}',
-            text: 'Check out this article from LavanderCats Cat Farm',
+            text: 'Check out this article from LavanderCats Cattery',
             url: window.location.href
         });
     } else {
