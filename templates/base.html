@@ -57,6 +57,11 @@
             virtualIndex: 0,
             isTransitioning: false,
             extendedImages: [],
+            carouselRef: null,
+
+            setCarouselRef(ref) {
+                this.carouselRef = ref;
+            },
 
             init() {
                 this.checkScreenSize();
@@ -138,7 +143,7 @@
             },
 
             updateCarousel(animate = true) {
-                const carousel = this.$refs.carousel;
+                const carousel = this.carouselRef;
                 if (!carousel) return;
 
                 carousel.style.transition = animate ? 'transform 0.5s ease-out' : 'none';

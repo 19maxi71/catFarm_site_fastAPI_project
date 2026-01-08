@@ -14,7 +14,7 @@
 <div class="relative w-full mx-auto mb-8 overflow-hidden"
      :class="{ 'h-64': isMobile, 'h-[400px]': !isMobile }"
      x-data="$store.carousel"
-     x-init="init()"
+     x-init="setCarouselRef($refs.carousel); init()"
      @mouseenter="stopAutoPlay()"
      @mouseleave="startAutoPlay()">
 
