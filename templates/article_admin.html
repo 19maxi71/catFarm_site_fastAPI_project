@@ -760,6 +760,29 @@
             clearGallery();
         }
 
+        async function deleteArticle(articleId, articleTitle) {
+            if (!confirm(`Are you sure you want to delete the article "${articleTitle}"?\n\nThis action cannot be undone!`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/articles/${articleId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Article deleted successfully!', 'success');
+                    loadStats();
+                    loadAllArticles();
+                } else {
+                    const error = await response.json();
+                    showAlert('Error deleting article: ' + (error.detail || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        }
+
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
