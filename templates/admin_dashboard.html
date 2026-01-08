@@ -301,7 +301,7 @@
             try {
                 const [catsResponse, requestsResponse, articlesResponse] = await Promise.all([
                     fetch('/api/cats/'),
-                    fetch('/api/adoption/requests/'),
+                    fetch('/api/adoption/requests'),
                     fetch('/api/articles/')
                 ]);
 
