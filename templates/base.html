@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LavanderCats Cattery</title>
+    <!-- Favicon - using SVG for modern browsers, with fallback -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
     <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/images/logo.svg">
 
     <!-- Tailwind CSS from CDN -->
+    <!-- Note: For production, consider installing Tailwind CSS via npm and building with PostCSS -->
+    <!-- This CDN version is convenient for development but shows a console warning -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Custom CSS for fallback images -->
@@ -61,16 +66,27 @@
 
             setCarouselRef(ref) {
                 this.carouselRef = ref;
+                // Update carousel position once ref is available
+                if (ref) {
+                    this.updateCarousel();
+                }
             },
 
             init() {
                 this.checkScreenSize();
                 this.createExtendedImages();
                 this.virtualIndex = this.images.length * 50; // Start in the middle for bidirectional infinite scroll
-                this.updateCarousel();
+
+                // Wait for next tick to ensure carousel ref is set
+                if (this.carouselRef) {
+                    this.updateCarousel();
+                }
+
                 window.addEventListener('resize', () => {
                     this.checkScreenSize();
-                    this.updateCarousel();
+                    if (this.carouselRef) {
+                        this.updateCarousel();
+                    }
                 });
                 this.startAutoPlay();
             },
@@ -300,6 +316,8 @@
                         </p>
                     </div>
                     <!-- Map -->
+                    <!-- Note: Google Maps may be blocked by ad blockers or privacy extensions (ERR_BLOCKED_BY_CLIENT) -->
+                    <!-- This is expected behavior and only affects users with these extensions enabled -->
                     <div class="mt-4 rounded-xl overflow-hidden border-2 border-lavender-lighter shadow-lg">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3040.6547891789895!2d-75.34621492346736!3d40.37719487144313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c42b7f8e8e8e8f%3A0x1234567890abcdef!2s2240%20Brick%20Tavern%20Rd%2C%20Quakertown%2C%20PA%2018951!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
