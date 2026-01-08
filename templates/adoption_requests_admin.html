@@ -193,6 +193,9 @@
                                 </div>
                             </div>
                             <div class="col-md-6 text-end">
+                                <button id="bulkDeleteBtn" class="btn btn-danger btn-action me-2" style="display: none;" onclick="confirmBulkDelete()">
+                                    <i class="fas fa-trash me-1"></i>Delete Selected (<span id="selectedCount">0</span>)
+                                </button>
                                 <a href="/api/adoption/requests/export" class="btn btn-success btn-action">
                                     <i class="fas fa-download me-1"></i>Export to CSV
                                 </a>
@@ -238,6 +241,9 @@
                     <button type="button" class="btn btn-warning btn-action" id="undoRejectBtn" style="display: none;">
                         <i class="fas fa-undo me-1"></i>Undo Rejection
                     </button>
+                    <button type="button" class="btn btn-warning btn-action" id="unapproveBtn" style="display: none;">
+                        <i class="fas fa-undo me-1"></i>Unapprove
+                    </button>
                     <button type="button" class="btn btn-danger btn-action" id="rejectBtn">
                         <i class="fas fa-times me-1"></i>Reject
                     </button>
@@ -279,10 +285,41 @@
         </div>
     </div>
 
+    <!-- Bulk Delete Confirmation Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Bulk Delete
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone!
+                    </div>
+                    <p>Are you sure you want to permanently delete <strong><span id="bulkDeleteCount">0</span></strong> adoption request(s)?</p>
+                    <p class="text-muted mb-0">All selected requests will be removed from the database.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
+                        <i class="fas fa-trash me-1"></i>Delete Requests
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let allRequests = [];
         let currentRequestId = null;
+        let selectedRequests = new Set();
 
         // Load requests on page load
         document.addEventListener('DOMContentLoaded', loadRequests);
@@ -348,6 +385,12 @@
                 <div class="card request-card mb-3">
                     <div class="card-body">
                         <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input request-checkbox" type="checkbox"
+                                           value="${request.id}" onchange="updateBulkDelete()">
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <h6 class="mb-1 fw-bold">${request.customer_name}</h6>
                                 <p class="mb-1 text-muted small">
@@ -548,32 +591,38 @@
             const approveBtn = document.getElementById('approveBtn');
             const rejectBtn = document.getElementById('rejectBtn');
             const undoRejectBtn = document.getElementById('undoRejectBtn');
+            const unapproveBtn = document.getElementById('unapproveBtn');
 
             if (request.status === 'approved') {
                 approveBtn.disabled = true;
                 approveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Already Approved';
-                rejectBtn.disabled = true;
-                rejectBtn.innerHTML = '<i class="fas fa-ban me-1"></i>Cannot Reject';
+                rejectBtn.disabled = false;
+                rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i>Reject';
                 undoRejectBtn.style.display = 'none';
+                unapproveBtn.style.display = 'inline-block';
+                unapproveBtn.disabled = false;
             } else if (request.status === 'rejected') {
-                approveBtn.disabled = true;
-                approveBtn.innerHTML = '<i class="fas fa-ban me-1"></i>Cannot Approve';
+                approveBtn.disabled = false;
+                approveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Approve';
                 rejectBtn.disabled = true;
                 rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i>Already Rejected';
                 undoRejectBtn.style.display = 'inline-block';
                 undoRejectBtn.disabled = false;
+                unapproveBtn.style.display = 'none';
             } else {
                 approveBtn.disabled = false;
                 approveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Approve';
                 rejectBtn.disabled = false;
                 rejectBtn.innerHTML = '<i class="fas fa-times me-1"></i>Reject';
                 undoRejectBtn.style.display = 'none';
+                unapproveBtn.style.display = 'none';
             }
 
             // Add event listeners
             approveBtn.onclick = () => updateRequestStatus(request.id, 'approved');
             rejectBtn.onclick = () => showRejectConfirmation(request.id);
             undoRejectBtn.onclick = () => updateRequestStatus(request.id, 'pending');
+            unapproveBtn.onclick = () => updateRequestStatus(request.id, 'pending');
         }
 
         async function updateRequestStatus(requestId, status, rejectionReason = null) {
@@ -635,6 +684,86 @@
                     alertDiv.remove();
                 }
             }, 5000);
+        }
+
+        function updateBulkDelete() {
+            // Update selected requests set
+            selectedRequests.clear();
+            document.querySelectorAll('.request-checkbox:checked').forEach(checkbox => {
+                selectedRequests.add(parseInt(checkbox.value));
+            });
+
+            // Update UI
+            const count = selectedRequests.size;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('bulkDeleteBtn').style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        function confirmBulkDelete() {
+            const count = selectedRequests.size;
+            if (count === 0) return;
+
+            document.getElementById('bulkDeleteCount').textContent = count;
+            const modal = new bootstrap.Modal(document.getElementById('bulkDeleteModal'));
+            modal.show();
+
+            // Set up confirm button
+            const confirmBtn = document.getElementById('confirmBulkDeleteBtn');
+            confirmBtn.onclick = async () => {
+                await performBulkDelete();
+                bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal')).hide();
+            };
+        }
+
+        async function performBulkDelete() {
+            const idsToDelete = Array.from(selectedRequests);
+            let successCount = 0;
+            let errorCount = 0;
+
+            // Show progress
+            const progressAlert = document.createElement('div');
+            progressAlert.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            progressAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            progressAlert.innerHTML = `
+                <i class="fas fa-spinner fa-spin me-2"></i>Deleting ${idsToDelete.length} request(s)...
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(progressAlert);
+
+            // Delete each request
+            for (const requestId of idsToDelete) {
+                try {
+                    const response = await fetch(`/api/adoption/requests/${requestId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                } catch (error) {
+                    console.error(`Error deleting request ${requestId}:`, error);
+                    errorCount++;
+                }
+            }
+
+            // Remove progress alert
+            progressAlert.remove();
+
+            // Clear selection
+            selectedRequests.clear();
+            updateBulkDelete();
+
+            // Reload requests
+            await loadRequests();
+
+            // Show result
+            if (errorCount === 0) {
+                showAlert(`Successfully deleted ${successCount} request(s)!`, 'success');
+            } else {
+                showAlert(`Deleted ${successCount} request(s), but ${errorCount} failed.`, 'warning');
+            }
         }
     </script>
 </body>

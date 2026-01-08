@@ -265,16 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if litter is passed in URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const litterCode = urlParams.get('litter');
-    if (litterCode) {
-        // Wait a bit for litters to load, then select the one from URL
-        setTimeout(() => {
-            const litterSelect = document.getElementById('litter_code');
-            const option = Array.from(litterSelect.options).find(opt => opt.value === litterCode);
-            if (option) {
-                litterSelect.value = litterCode;
-            }
-        }, 500);
-    }
+    window.preselectedLitter = litterCode; // Store for use after litters load
 });
 
 async function loadLitters() {
@@ -299,6 +290,14 @@ async function loadLitters() {
             option.textContent = `Litter ${litter}`;
             litterSelect.appendChild(option);
         });
+
+        // Pre-select litter if passed in URL
+        if (window.preselectedLitter) {
+            const option = Array.from(litterSelect.options).find(opt => opt.value === window.preselectedLitter);
+            if (option) {
+                litterSelect.value = window.preselectedLitter;
+            }
+        }
     } catch (error) {
         console.error('Error loading litters:', error);
     }
@@ -467,15 +466,21 @@ document.getElementById('adoptionForm').addEventListener('submit', async functio
 
         if (response.ok) {
             messageDiv.className = 'alert alert-success';
-            messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Thank you! Your adoption request has been submitted successfully. We will review it and contact you soon.';
+            messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i><strong>Thank you for your request!</strong><br>We have received your adoption application and will carefully review it. Our team will get back to you shortly via email. We appreciate your interest in welcoming one of our Siberian kittens into your home!<br><br>Redirecting to home page...';
             e.target.reset();
+            messageDiv.style.display = 'block';
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+
+            // Redirect to home page after 5 seconds
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 5000);
         } else {
             messageDiv.className = 'alert alert-danger';
             messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i>${result.detail || 'An error occurred. Please try again.'}`;
+            messageDiv.style.display = 'block';
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
         }
-
-        messageDiv.style.display = 'block';
-        messageDiv.scrollIntoView({ behavior: 'smooth' });
 
     } catch (error) {
         console.error('Error submitting form:', error);

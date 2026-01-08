@@ -171,6 +171,23 @@ async def update_adoption_request(request_id: int, request_data: dict, db: Sessi
     db.commit()
     db.refresh(db_request)
     return {"message": f"Request status updated to {status}"}
+
+
+@router.delete("/requests/{request_id}")
+async def delete_adoption_request(request_id: int, db: Session = Depends(get_db)):
+    db_request = db.query(AdoptionRequest).filter(
+        AdoptionRequest.id == request_id).first()
+    if not db_request:
+        raise HTTPException(
+            status_code=404, detail="Adoption request not found")
+
+    db.delete(db_request)
+    db.commit()
+    return {"message": "Adoption request deleted successfully"}
+
+
+@router.get("/requests/export")
+async def export_adoption_requests(db: Session = Depends(get_db)):
     output = io.StringIO()
     writer = csv.writer(output)
 
