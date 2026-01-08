@@ -211,19 +211,19 @@
                 <!-- Logo and title -->
                 <a href="/" class="flex items-center space-x-3 sm:space-x-4 lg:space-x-5 group">
                     <div class="relative flex-shrink-0">
-                        <!-- White background circle with shadow -->
-                        <div class="absolute inset-0 bg-white rounded-full shadow-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
+                        <!-- White background circle with shadow - enlarged by 4px on each side -->
+                        <div class="absolute -inset-1 bg-white rounded-full shadow-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
                         <!-- Logo with smoother responsive sizing -->
                         <img src="/static/images/logo.svg" alt="LavanderCats Logo" class="relative h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 object-contain p-2">
                     </div>
                     <div class="min-w-0">
-                        <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-white tracking-wide drop-shadow-md group-hover:text-accent-gold transition-colors whitespace-nowrap">LavanderCats</h1>
-                        <p class="text-xs sm:text-sm md:text-base lg:text-lg text-lavender-lighter font-medium tracking-wide">Siberian Cattery</p>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-display font-bold text-white tracking-wide drop-shadow-md group-hover:text-accent-gold transition-colors whitespace-nowrap">LavanderCats</h1>
+                        <p class="text-xs sm:text-sm lg:text-base xl:text-lg text-lavender-lighter font-medium tracking-wide">Siberian Cattery</p>
                     </div>
                 </a>
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-1">
+                <!-- Desktop Navigation - shows at lg (1024px) instead of md (768px) -->
+                <div class="hidden lg:flex items-center space-x-1">
                     <a href="/" class="px-4 lg:px-5 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Home</a>
                     <span class="text-white/40 text-xl">•</span>
                     <a href="/our-cats" class="px-4 lg:px-5 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Our Cats</a>
@@ -237,8 +237,8 @@
                     <a href="/privacy-policy" class="px-4 lg:px-5 py-2.5 text-base lg:text-lg font-semibold text-white hover:text-lavender hover:bg-white rounded-lg transition-all duration-300 hover:shadow-md">Privacy</a>
                 </div>
 
-                <!-- Simple mobile menu (dropdown style) -->
-                <div class="md:hidden relative">
+                <!-- Simple mobile menu (dropdown style) - shows below lg (1024px) -->
+                <div class="lg:hidden relative">
                     <input type="checkbox" id="mobile-menu-toggle" class="hidden">
                     <label for="mobile-menu-toggle" class="cursor-pointer bg-white hover:bg-lavender-lighter text-lavender p-3 rounded-lg transition-all shadow-md flex items-center justify-center">
                         <div class="w-6 h-6 flex flex-col justify-center items-center">
