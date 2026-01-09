@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Important pages for indexing
+Allow: /rockaran
+Allow: /cats
+Allow: /our-cats
+Allow: /news
+
+# Don't index admin pages
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://lavandercats.com/sitemap.xml

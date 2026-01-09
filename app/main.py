@@ -320,6 +320,12 @@ async def privacy_policy(request: Request):
     return templates.TemplateResponse("privacy_policy.html", {"request": request})
 
 
+@app.get("/rockaran")
+async def rockaran(request: Request):
+    """Serve Rockaran legacy/transition page for SEO."""
+    return templates.TemplateResponse("rockaran.html", {"request": request})
+
+
 @app.get("/admin/adoption-requests")
 async def adoption_requests_admin(request: Request):
     """Serve custom admin interface for adoption requests management."""
